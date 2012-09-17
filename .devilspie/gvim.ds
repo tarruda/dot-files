@@ -1,0 +1,10 @@
+; generated_rule gvim
+( if 
+( begin 
+( contains ( application_name ) "Vim" )
+) 
+( begin 
+( maximize )
+( println "match" )
+)
+)

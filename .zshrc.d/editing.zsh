@@ -1,0 +1,2 @@
+# emacs keybinding
+bindkey -e

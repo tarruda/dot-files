@@ -1,0 +1,14 @@
+/*
+!/README
+!/.devilspie
+!/.gitignore
+!/.profile
+!/.zshrc
+!/.zshrc.d/
+!/.pythonrc
+!/.profile.d/
+!/.ssh/config
+/.profile.d/local.sh
+/.zshrc.d/local.zsh
+*.pyc
+.VimballRecord
