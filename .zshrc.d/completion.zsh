@@ -26,3 +26,5 @@ zstyle ':completion:*' verbose true
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 zstyle ':completion:*:functions' ignored-patterns '_*'
+
+zstyle ':completion:*:*:vi:*:*files' ignored-patterns '*.o,*~,*.swp'
