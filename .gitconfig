@@ -1,0 +1,27 @@
+[user]
+        name = Thiago de Arruda
+        email = tpadilha84@gmail.com
+[core]
+        excludesfile = /home/tap/.global.gitignore
+
+[url "http://github.com/"]
+        insteadOf = "gh:"
+
+[url "git@github.com:"]
+        pushInsteadOf = "gh:"
+        pushInsteadOf = "https://github.com/"
+        pushInsteadOf = "http://github.com/"
+
+[url "http://github.com/tarruda/"]
+        insteadOf = "ta:"
+
+[url "git@github.com:tarruda/"]
+        pushInsteadOf = "ta:"
+
+[url "https://gist.github.com/"]
+        insteadOf = "gist:"
+
+[url "git@gist.github.com:"]
+        pushInsteadOf = "https://gist.github.com/"
+        pushInsteadOf = "http://gist.github.com/"
+        pushInsteadOf = "gist:"

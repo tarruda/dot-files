@@ -1,0 +1,14 @@
+*~
+*.swp
+*.swo
+*.exe
+*.so
+*.o
+*.dll
+*.jar
+*.tgz
+*.tar.gz
+*.pyc
+*.pyd
+*.pyo
+.netrwhist
