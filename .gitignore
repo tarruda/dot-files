@@ -12,3 +12,5 @@
 /.zshrc.d/local.zsh
 *.pyc
 .VimballRecord
+*.swp
+*~

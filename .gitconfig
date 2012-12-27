@@ -2,7 +2,7 @@
         name = Thiago de Arruda
         email = tpadilha84@gmail.com
 [core]
-        excludesfile = /home/tap/.global.gitignore
+        excludesfile = ~/.global.gitignore
 
 [url "http://github.com/"]
         insteadOf = "gh:"
