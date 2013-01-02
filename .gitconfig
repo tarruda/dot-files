@@ -11,6 +11,7 @@
         pushInsteadOf = "gh:"
         pushInsteadOf = "https://github.com/"
         pushInsteadOf = "http://github.com/"
+        pushInsteadOf = "git://github.com/"
 
 [url "http://github.com/tarruda/"]
         insteadOf = "ta:"
@@ -24,4 +25,5 @@
 [url "git@gist.github.com:"]
         pushInsteadOf = "https://gist.github.com/"
         pushInsteadOf = "http://gist.github.com/"
+        pushInsteadOf = "git://gist.github.com/"
         pushInsteadOf = "gist:"
