@@ -58,6 +58,9 @@ nvm_display_help() {
 	  nvm                            Select a node.js version
 	  nvm latest                     Install or activate the latest node release
 	  nvm stable                     Install or activate the latest stable node release
+		nvm login										   Export the currently active version to the
+																	 '.login' file. This can be used by '.profile'
+																	 to set the PATH system-wide on login.
 	  nvm install <version>          Installs node <version>
 	  nvm activate <version>         Activates node <version>
 	  nvm deactivate <version>       Activates node <version>
@@ -213,9 +216,15 @@ nvm_activate() {
 	nvm_deactivate > /dev/null
 	local version=$1
 	local dir="$NVM_DIR/versions/$version"
+	local p="$NVM_DIR/versions/$version/bin"
+	local mp="$NVM_DIR/versions/$version/share/man"
 	if [ -d "$dir" ]; then
-		export PATH="$NVM_DIR/versions/$version/bin:$PATH"
-		export MANPATH="$NVM_DIR/versions/$version/share/man:$MANPATH"
+		if ! echo "$PATH" | grep -qF "$p:"; then
+			export PATH="$p:$PATH"
+		fi
+		if ! echo "$MANPATH" | grep -qF "$mp:"; then
+			export MANPATH="$p:$MANPATH"
+		fi
 		echo $version > "$NVM_DIR/.active"
 		nvm_log activated `node --version`
 		echo
@@ -250,6 +259,18 @@ nvm_activate_previous() {
 	local prev=`cat "$NVM_DIR/.prev"`
 	nvm_activate $prev
 	echo
+}
+
+#
+# Copies the currently active version to '.login'. This is useful if you need
+# to set the $PATH on login instead of just when a interactive shell is opened.
+# (eg setting environment for GUI apps)
+#
+
+nvm_login() {
+	if [ -r "$NVM_DIR/.active" ]; then
+		cp "$NVM_DIR/"{.active,.login}
+	fi
 }
 
 #
@@ -417,6 +438,7 @@ nvm() {
 			--latest) nvm_display_latest_version $2 ;;
 			--stable) nvm_display_latest_stable_version $2 ;;
 			bin|which) nvm_display_bin_path_for_version $2 ;;
+			login) shift; nvm_login $@ ;;
 			install) shift; nvm_install $@ ;;
 			activate) shift; nvm_activate $@ ;;
 			deactivate) nvm_deactivate ;;
