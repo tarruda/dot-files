@@ -1,12 +1,13 @@
-if [ -z "$NVM_DIR" ]; then
-	NVM_DIR="$HOME/.nvm"
+if [ -z "$EM_DIR" ]; then
+	EM_DIR="$HOME/.env-manager"
 fi
 
-if [ -r "$NVM_DIR/.login" ]; then
-	# Set the PATH for the exported node.js environment
-	environment=`cat "$NVM_DIR/.login"`
-	d="$NVM_DIR/environments/$environment/bin"
-	if [ -d "$d" ]; then
-		export PATH="$d:$PATH"
+for prog in node; do
+	if [ -r "$EM_DIR/$prog/.login" ]; then
+		environment=`cat "$EM_DIR/$prog/.login"`
+		d="$EM_DIR/$prog/environments/$environment/bin"
+		if [ -d "$d" ]; then
+			export PATH="$d:$PATH"
+		fi
 	fi
-fi
+done
