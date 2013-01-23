@@ -37,6 +37,9 @@ em_display_help() {
 
 	Commands:
 
+	  compile <version> [alias] [config]   Compiles and installs [PROGRAM]
+	 	                                     <version> as <alias> with aditional
+																				 configuration [config]
 	  install <version> [alias]            Installs [PROGRAM] <version> as
 	 	                                     <alias>
 	  uninstall <version>                  Uninstall [PROGRAM] <version>
@@ -88,6 +91,14 @@ em_info_log() {
 	printf "  \033[36m%15s\033[0m : \033[90m%s\033[0m\n" $1 $2
 }
 
+
+#
+# em_warn_log <type> <msg>
+#
+
+em_warn_log() {
+	printf "  \033[33m%15s\033[0m : \033[90m%s\033[0m\n" $1 $2
+}
 
 #
 # em_error_log <msg ...>
@@ -201,49 +212,6 @@ em_display_environments() {
 }
 
 
-#
-# Determine archive filename for <version>.
-#
-
-em_archive_name() {
-	local prog=$1
-	local version=$2
-	case $prog in
-	 	node)
-			local uname="`uname -a`"
-			local arch=x86
-			local os=
-
-			# from nave(1)
-			case "$uname" in
-				Linux*) os=linux ;;
-				Darwin*) os=darwin ;;
-				SunOS*) os=sunos ;;
-			esac
-
-			case "$uname" in
-				*x86_64*) arch=x64 ;;
-			esac
-			echo "node-v${version}-${os}-${arch}.tar.gz" && return
-	esac
-}
-
-
-#
-# Determine archive url for <version>.
-#
-
-em_archive_url() {
-	local prog=$1
-	local version=$2
-	local rv=""
-	case $prog in
-		node)
-			rv="http://nodejs.org/dist/v${version}/`em_archive_name $prog $version`"
-			;;
-	esac
-	echo "$rv"
-}
 
 #
 # Activate <environment>
@@ -319,9 +287,11 @@ em_login() {
 	fi
 }
 
+
 #
 # Resolve version name
 #
+
 em_normalize_version() {
 	local prog=$1
 	local version=$2
@@ -337,6 +307,134 @@ em_normalize_version() {
 
 
 #
+# Determine source archive url for <version>.
+#
+
+em_src_archive_url() {
+	local prog=$1
+	local version=$2
+	local rv=""
+	case $prog in
+	 	node)
+			rv="http://nodejs.org/dist/v${version}/node-v${version}.tar.gz"
+	esac
+	echo "$rv"
+}
+
+
+#
+# Determine binary archive url for <version>.
+#
+
+em_bin_archive_url() {
+	local prog=$1
+	local version=$2
+	local rv=""
+	case $prog in
+	 	node)
+			local uname="`uname -a`"
+			local arch=x86
+			local os=
+
+			# from nave(1)
+			case "$uname" in
+				Linux*) os=linux ;;
+				Darwin*) os=darwin ;;
+				SunOS*) os=sunos ;;
+			esac
+
+			case "$uname" in
+				*x86_64*) arch=x64 ;;
+			esac
+			rv="http://nodejs.org/dist/v${version}/node-v${version}-${os}-${arch}.tar.gz"
+	esac
+	echo "$rv"
+}
+
+
+#
+# Compile and install <version> with with optional alias and compilation config
+#
+
+em_compile() {
+	local prog=$1
+	local version="`em_normalize_version $prog $2`"
+	local alias=$3
+	if [ -z $alias ]; then
+		alias=$version
+	fi
+	local config=$4
+
+	local dir="$EM_DIR/$prog/versions/$alias"
+	if [ -d "$dir" ]; then
+		em_error_log "$alias already exists!" && return
+	fi
+
+	local url="`em_src_archive_url $prog $version`"
+	if [ -z $url ]; then
+		em_error_log "no src archive for $prog $version" && return
+	fi
+
+	if ! em_url_ok $url; then
+		em_error_log "cannot get" "$url" && return
+	fi
+	local archive="`basename $url`"
+	local downloads="$EM_DIR/downloads"
+	local sources="$EM_DIR/$prog/sources"
+	local logfile="$sources/${archive%.tar.gz}.log"
+	echo
+
+	em_info_log compiling "$prog $version"
+
+	em_info_log "create dir" "$dir"
+	# mkdir -p "$dir"
+	mkdir -p "$sources"
+
+	(
+	mkdir -p "$downloads";
+	cd "$downloads";
+	if [ ! -r "$archive" ]; then
+		em_info_log fetch $url
+		eval "$EM_GET $url" > "$archive"
+		em_erase_line
+	fi
+	case $prog in
+		node)	
+			tar x -C "$sources" -f "$downloads/$archive" 
+			cd "$sources/${archive%.tar.gz}"
+			em_info_log "compile start" "use tail -f \"$logfile\" for feedback "
+			if ! ./configure $config --prefix="$dir" > "$logfile" 2>&1; then
+				em_error_log "Error on configuration. See $logfile for details"
+				return 1
+			fi
+			if ! make > "$logfile" 2>&1; then
+				em_error_log "Error on compilation. See $logfile for	details"
+				return 1
+			fi
+		  if ! make install > "$logfile" 2>&1; then
+			 	em_error_log "Error on instalation. See $logfile for details"
+				return 1
+			fi
+			;;
+	esac
+	)
+	if [ $? -ne 0 ]; then
+		return
+	fi
+
+	em_info_log installed "$prog $version as '$alias'"
+	echo -n "Would you like to create a default environment for '$alias'?(y/N) "
+	local c=""
+	read c
+	em_erase_line
+	case $c in 
+		y|Y) em_add $prog $alias $alias ;;
+ 	esac
+	echo
+}
+
+
+#
 # Install version with an optional alias
 #
 
@@ -347,21 +445,31 @@ em_install() {
 	if [ -z $alias ]; then
 		alias=$version
 	fi
+
 	local dir="$EM_DIR/$prog/versions/$alias"
 	if [ -d "$dir" ]; then
 		em_error_log "$alias already exists!" && return
 	fi
-	local url="`em_archive_url $prog $version`"
-	local archive="`em_archive_name $prog $version`"
+
+	local url="`em_bin_archive_url $prog $version`"
+	if [ -z $url ]; then
+		em_warn_log "no binary dist" "$prog $version"
+		em_compile $prog $version $alias
+		return
+	fi
+
+	if ! em_url_ok $url; then
+		em_warn_log "no binary dist" "$prog $version"
+		em_compile $prog $version $alias
+		return
+	fi
+		
+	local archive="`basename $url`"
 	local downloads="$EM_DIR/downloads"
 
 	echo
 
 	em_info_log installing "$prog $version"
-
-	if ! em_url_ok $url; then
- 		em_error_log "invalid version $version of $prog" && return
-	fi
 
 	em_info_log "create dir" "$dir"
 	mkdir -p "$dir"
@@ -392,8 +500,9 @@ em_install() {
 	echo
 }
 
+
 #
-# TODO Uninstall <version ...>
+# Uninstall <version ...>
 #
 em_uninstall() {
 	local prog=$1
@@ -420,6 +529,7 @@ em_uninstall() {
 	done
 	echo
 }
+
 
 #
 # Adds <environment> based on <version> 
@@ -459,6 +569,7 @@ em_add() {
  	esac
 }
 
+
 #
 # Remove <environment ...>
 #
@@ -488,6 +599,7 @@ em_remove() {
 	done
 	echo
 }
+
 
 #
 # Output path for <environment>
@@ -522,6 +634,7 @@ em_display_latest_version() {
 	esac
 }
 
+
 #
 # Display the latest stable version of [PROGRAM] available.
 #
@@ -537,6 +650,7 @@ em_display_latest_stable_version() {
 			;;
 	esac
 }
+
 
 #
 # Display the versions of [PROGRAM] available.
@@ -596,6 +710,7 @@ em() {
 	local cmd=$1
 	shift
 	case $cmd in
+		compile) em_compile $prog $@ ;;
 		install) em_install $prog $@ ;;
 		uninstall) em_uninstall $prog $@ ;;
 		add|+) echo && em_add $prog $@ && echo ;;
