@@ -37,13 +37,15 @@ em_display_help() {
 
 	Commands:
 
-	  install <version>                    Installs [PROGRAM] <version>
-	  create <version> <environment>       Creates <environment> for [PROGRAM]
-	                                       based on <version>
+	  install <version> [alias]            Installs [PROGRAM] <version> as
+	 	                                     <alias>
+	  uninstall <version>                  Uninstall [PROGRAM] <version>
+	  add <version> <environment>          Adds a new <environment> for
+	                                       [PROGRAM] based on <version>
+	  rm <environment ...>                 Remove the given [PROGRAM] environment(s)
 	  activate <environment>               Activates [PROGRAM] <environment>
 	  deactivate <environment>             Activates [PROGRAM] <environment>
 	  bin <environment>                    Output bin path for <environment>
-	  rm <environment ...>                 Remove the given [PROGRAM] environment(s)
 	  ls                                   Output the versions of [PROGRAM] available
 	  prev                                 Revert to the previously activated
 	                                       environment
@@ -63,15 +65,20 @@ em_display_help() {
 	  list          ls
 	  -             rm
 
-	Observations:
-
-	  Whenever a version number is expected you can use 'latest' or 'stable'
-	  as aliases for the latest and latest stable version respectively. (A
-	  internet connection is required to resolve these aliases)
+	Tips:
+	
+	  - You can use the aliases 'lastest' or 'stable' when installing a version
 
 	EOF
 }
 
+
+#
+# Escapes a string for use as a sed search pattern
+#
+em_escape_for_sed() {
+	echo "$1" | sed -e 's/[]\/()$*.^|[]/\\&/g'
+}
 
 #
 # em_info_log <type> <msg>
@@ -330,24 +337,25 @@ em_normalize_version() {
 
 
 #
-# Install <version>
-# TODO decouple versions from environments
+# Install version with an optional alias
 #
 
 em_install() {
 	local prog=$1
 	local version="`em_normalize_version $prog $2`"
-	local dir="$EM_DIR/$prog/environments/$version"
+	local alias=$3
+	if [ -z $alias ]; then
+		alias=$version
+	fi
+	local dir="$EM_DIR/$prog/versions/$alias"
+	if [ -d "$dir" ]; then
+		em_error_log "$alias already exists!" && return
+	fi
 	local url="`em_archive_url $prog $version`"
 	local archive="`em_archive_name $prog $version`"
 	local downloads="$EM_DIR/downloads"
 
 	echo
-
-	if [ -d "$dir" ]; then
-		em_activate $prog $version
-		echo && return
-	fi
 
 	em_info_log installing "$prog $version"
 
@@ -373,8 +381,14 @@ em_install() {
 	)
 	em_erase_line
 
-	em_info_log installed "$prog $version"
-	em_activate $prog $version
+	em_info_log installed "$prog $version as '$alias'"
+	echo -n "Would you like to create a default environment for '$alias'?(y/N)"
+	local c=""
+	read c
+	em_erase_line
+	case $c in 
+		y|Y) em_add $prog $alias $alias ;;
+ 	esac
 	echo
 }
 
@@ -382,16 +396,67 @@ em_install() {
 # TODO Uninstall <version ...>
 #
 em_uninstall() {
-	em_error_log "not implemented" && return
 	local prog=$1
 	shift
 	[ -z "$1" ] && em_error_log "version(s) required" && return
-	local version=`em_normalize_version $1`
+	local version=$1
+	echo
 	while test $# -ne 0; do
-		rm -rf "$EM_DIR/$prog/versions/$version"
+		local dir="$EM_DIR/$prog/versions/$version"
+		local environments="`cat \"$dir/._environments\"`"
+		if [ ! -z $environments ]; then
+			echo "Some environments depend on '$version':"
+			echo
+			echo "$environments"
+			echo
+			echo "Remove those before uninstalling the version"
+			echo
+			return
+		fi
+		rm -rf "$dir"
+		em_info_log uninstalled "$version"
 		shift
-		version=`em_normalize_version $1`
+		version=$1
 	done
+	echo
+}
+
+#
+# Adds <environment> based on <version> 
+#
+
+em_add() {
+	local prog=$1
+	shift
+	[ -z $1 ] && em_error_log "version required" && return
+	[ -z $2 ] && em_error_log "environment needs a name" && return
+	local version=$1
+	local version_dir="$EM_DIR/$prog/versions/$version"
+	if [ ! -d "$version_dir" ]; then
+		em_error_log "version $version doesn't exist" && return
+	fi
+	local environment=$2
+	local dir="$EM_DIR/$prog/environments/$environment"
+	if [ -e "$dir" ]; then
+		em_info_log activated "$prog $environment"
+		echo && return
+	fi
+	mkdir -p "$dir"
+	em_info_log "create dir" "$dir"
+	(
+	cd "$dir"
+	cp -as "$version_dir/"* .
+	)
+	echo "$environment" >> "$version_dir/._environments"
+	echo "$version" > "$dir/._version"
+	em_info_log symlink "$version -> $environment"
+	echo -n "Would you like to activate '$alias'?(y/N)"
+	local c=""
+	read c
+	em_erase_line
+	case $c in 
+		y|Y) em_activate $prog $environment ;;
+ 	esac
 }
 
 #
@@ -405,11 +470,18 @@ em_remove() {
 	echo
 	local environment=$1
 	while test $# -ne 0; do
+		local dir="$EM_DIR/$prog/environments/$environment"
+		if [ ! -d "$dir" ]; then
+			em_error_log "environment $environment not found" && return
+		fi
+		local version=`cat "$dir/._version"`
 		local active=`em_get_current_environment $prog`
 		if [ "$environment" = "$active" ]; then
 			em_deactivate $prog
 		fi
-		rm -rf "$EM_DIR/$prog/environments/$environment"
+		rm -rf "$dir"
+		local escaped=`em_escape_for_sed $environment`
+		sed -i "/^$escaped\$/d" "$EM_DIR/$prog/versions/$version/._environments"
 		em_info_log removed "$prog $environment"
 		shift
 		environment=$1
@@ -524,13 +596,14 @@ em() {
 	local cmd=$1
 	shift
 	case $cmd in
-		bin|which) em_display_path_for_environment $prog ;;
-		login) em_login $prog ;;
 		install) em_install $prog $@ ;;
 		uninstall) em_uninstall $prog $@ ;;
+		add|+) echo && em_add $prog $@ && echo ;;
+		rm|-) em_remove $prog $@ ;;
 		activate) echo && em_activate $prog $@ && echo ;;
 		deactivate) echo && em_deactivate $prog && echo ;;
-		rm|-) em_remove $prog $@ ;;
+		bin|which) em_display_path_for_environment $prog ;;
+		login) em_login $prog ;;
 		ls|list) em_display_remote_versions $prog ;;
 		prev) em_activate_previous $prog ;;
 		*) echo "Invalid command, enter 'em help' for usage info" ;;
