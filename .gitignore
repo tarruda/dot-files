@@ -1,5 +1,6 @@
 /*
 !/README
+!/bin
 !/.devilspie
 !/.gitignore
 !/.profile
@@ -10,7 +11,4 @@
 !/.ssh/config
 /.profile.d/local.sh
 /.zshrc.d/local.zsh
-*.pyc
 .VimballRecord
-*.swp
-*~

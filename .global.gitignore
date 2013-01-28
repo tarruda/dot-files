@@ -6,9 +6,15 @@
 *.o
 *.dll
 *.jar
+*.log
+*.zip
 *.tgz
 *.tar.gz
+*.tbz
+*.tar.bz2
 *.pyc
 *.pyd
 *.pyo
 .netrwhist
+cscope.out
+tags

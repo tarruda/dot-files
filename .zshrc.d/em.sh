@@ -231,6 +231,9 @@ em_activate() {
 		if ! echo "$MANPATH" | grep -qF "$mp:"; then
 			export MANPATH="$p:$MANPATH"
 		fi
+		case $prog in
+			node) export NODE_PATH="$dir/lib/node_modules" ;;
+		esac
 		echo $environment > "$EM_DIR/$prog/.active"
 		em_info_log activated "$prog $environment"
 	fi
@@ -254,6 +257,9 @@ em_deactivate() {
 		if echo "$MANPATH" | grep -qF "$mp:"; then
 			export MANPATH="${MANPATH#$mp:}"
 		fi
+		case $prog in
+			node) unset NODE_PATH ;;
+		esac
 		rm -f "$EM_DIR/$prog/.active"
 		hash -r
 		em_info_log deactivated "$prog $active"
