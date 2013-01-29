@@ -1,24 +1,35 @@
+# trampoline to talk to a parent shell
+jumper() {
+  if [ -r "$HOME/.jumper" ]; then
+    local cmd="`cat \"$HOME/.jumper\"`"
+    rm "$HOME/.jumper"
+    exec zsh -c "$cmd; jumper"
+  else
+    exit
+  fi
+}
+
 mkdtmp() {
-	local name="/tmp/`cat /dev/urandom | tr -cd a-zA-Z0-9 | fold -w10 | head -n1`"
-	while [ -d "$name" ]; do
-		name="/tmp/`cat /dev/urandom | tr -cd a-zA-Z0-9 | fold -w10 | head -n1`"
-	done
-	mkdir "$name"
-	echo "$name"
+  local name="/tmp/`cat /dev/urandom | tr -cd a-zA-Z0-9 | fold -w10 | head -n1`"
+  while [ -d "$name" ]; do
+    name="/tmp/`cat /dev/urandom | tr -cd a-zA-Z0-9 | fold -w10 | head -n1`"
+  done
+  mkdir "$name"
+  echo "$name"
 }
 
 # Command-not-found(ubuntu/debian)
 if [ -x "/usr/lib/command-not-found" ]; then
-	cnf_preexec() {
-		typeset -g cnf_command="${1%% *}"
-	}
+  cnf_preexec() {
+    typeset -g cnf_command="${1%% *}"
+  }
 
-	cnf_precmd() {
-		(($? == 127)) && [ -n "$cnf_command" ] && [ -x /usr/lib/command-not-found ] && {
-		whence -- "$cnf_command" >& /dev/null ||
-			/usr/bin/python /usr/lib/command-not-found -- "$cnf_command"
-		unset cnf_command
-	}
+  cnf_precmd() {
+    (($? == 127)) && [ -n "$cnf_command" ] && [ -x /usr/lib/command-not-found ] && {
+    whence -- "$cnf_command" >& /dev/null ||
+      /usr/bin/python /usr/lib/command-not-found -- "$cnf_command"
+    unset cnf_command
+  }
 }
 typeset -ga preexec_functions
 typeset -ga precmd_functions
