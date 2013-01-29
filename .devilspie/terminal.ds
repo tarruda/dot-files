@@ -1,0 +1,10 @@
+; generated_rule terminal
+( if 
+( begin 
+( is ( application_name ) "Terminal" )
+) 
+( begin 
+( fullscreen )
+( println "match" )
+)
+)

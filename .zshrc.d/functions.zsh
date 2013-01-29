@@ -1,16 +1,3 @@
-autoload -U regexp-replace
-
-l() {
-	command ls --color=auto $@
-}
-
-alias ls=l
-alias p='ps -e'
-
-la() {
-	l -lah $@
-}
-
 mkdtmp() {
 	local name="/tmp/`cat /dev/urandom | tr -cd a-zA-Z0-9 | fold -w10 | head -n1`"
 	while [ -d "$name" ]; do
@@ -38,15 +25,3 @@ typeset -ga precmd_functions
 preexec_functions+=cnf_preexec
 precmd_functions+=cnf_precmd
 fi
-
-normalize_path() {
-	local p=$1
-	# Remove all /./ sequences.
-	regexp-replace p '/\./' '/'
-	regexp-replace p '/[^/]+/\.\./' '/'
-	# Remove dir/.. sequences.
-	# while [[ "$p" =~ [^/][^/]*/\.\./ ]]; do
-	# 	p=${p/${MATCH}/}
-	# done
-	echo $p
-}
