@@ -104,7 +104,6 @@ else
 
   vi() {
     local sid=`tmux display-message -p '#S'`
-    local wid=`tmux display-message -p '#I'`
     # Get session/window ids
     # Lets see if we are in a project
     local dir=`pwd`
@@ -162,7 +161,10 @@ else
       shift
     done
     # extract the unique pane id from vim_id and navigate to it
-    tmux select-pane -t "%${vim_id#\:$dir_id\:}"
+		local pane_uid="%${vim_id#\:$dir_id\:}"
+		local window_id="`tmux display -pt $pane_uid '#I'`"
+    tmux select-window -t "$window_id"
+    tmux select-pane -t "$pane_uid"
   }
 
 	_shm_register
