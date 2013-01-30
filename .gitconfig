@@ -1,29 +1,33 @@
 [user]
-        name = Thiago de Arruda
-        email = tpadilha84@gmail.com
+  name = Thiago de Arruda
+  email = tpadilha84@gmail.com
+
+[github]
+  user = tarruda
+
 [core]
-        excludesfile = ~/.global.gitignore
+  excludesfile = ~/.global.gitignore
 
 [url "http://github.com/"]
-        insteadOf = "gh:"
+  insteadOf = "gh:"
 
 [url "git@github.com:"]
-        pushInsteadOf = "gh:"
-        pushInsteadOf = "https://github.com/"
-        pushInsteadOf = "http://github.com/"
-        pushInsteadOf = "git://github.com/"
+  pushInsteadOf = "gh:"
+  pushInsteadOf = "https://github.com/"
+  pushInsteadOf = "http://github.com/"
+  pushInsteadOf = "git://github.com/"
 
 [url "http://github.com/tarruda/"]
-        insteadOf = "ta:"
+  insteadOf = "ta:"
 
 [url "git@github.com:tarruda/"]
-        pushInsteadOf = "ta:"
+  pushInsteadOf = "ta:"
 
 [url "https://gist.github.com/"]
-        insteadOf = "gist:"
+  insteadOf = "gist:"
 
 [url "git@gist.github.com:"]
-        pushInsteadOf = "https://gist.github.com/"
-        pushInsteadOf = "http://gist.github.com/"
-        pushInsteadOf = "git://gist.github.com/"
-        pushInsteadOf = "gist:"
+  pushInsteadOf = "https://gist.github.com/"
+  pushInsteadOf = "http://gist.github.com/"
+  pushInsteadOf = "git://gist.github.com/"
+  pushInsteadOf = "gist:"
