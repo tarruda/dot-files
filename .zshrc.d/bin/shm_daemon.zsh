@@ -57,9 +57,9 @@ socket_dir=$1
 [[ -t 1 ]] && exec >&-
 [[ -t 2 ]] && exec 2>&-
 (
-# logfile=/tmp/tmux-zsh-vim-shm.log
-# exec &> $logfile
-exec &> /dev/null
+logfile=/tmp/tmux-zsh-vim-shm.log
+exec > /dev/null
+exec 2>> $logfile
 # actual data being managed
 typeset -A data
 data=()

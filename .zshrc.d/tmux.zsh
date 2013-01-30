@@ -169,4 +169,10 @@ else
 
 	_shm_register
 	trap _shm_unregister HUP INT TERM EXIT PIPE
+
+	# hide_terminal_top_shell() {
+	# 	local window_id="`tmux display -pt $TMUX_PANE '#I'`"
+	# 	tmux
+	
+	# }
 fi
