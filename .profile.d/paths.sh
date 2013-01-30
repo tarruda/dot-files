@@ -4,8 +4,8 @@ if [ -d "$HOME/.git-extras/bin" ] ; then
 fi
 
 # Include custom commands
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
+if [ -d "$HOME/.bin" ] ; then
+    PATH="$HOME/.bin:$PATH"
 fi
 
 export PATH
