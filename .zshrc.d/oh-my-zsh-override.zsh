@@ -1,5 +1,5 @@
 unsetopt correct_all
-
+unsetopt share_history
 unalias gl
 unalias gup
 unalias gcp

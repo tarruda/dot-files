@@ -1,55 +1,75 @@
 # This implements a simple daemon that listens on a unix socket
 # (thanks to zsh awesomeness) whose purpose is to store key-value
-# pairs specific to the tmux session. Only one instance should be running for
-# each tmux session, and it should also exit when the last window exits
-# 
-# So far, the only reason to implement this is because vim servername is
-# case-insensitive, so we cant have a 1-1 mapping between servers and
-# directories. This daemon will store a table for mapping directory->uuid that
-# will be used as servernames
-# - close stdio fds
-# - fork again and make the child start working
+# pairs globally. Only one instance of this should be running.
+# each client process should register itself before making the
+# first request and unregister on exit. When all clients are 
+# unregistered, the daemon shouldo exit.
+
+serve_request() {
+  zsocket -a $1
+  local conn=$REPLY
+  local req=
+  read req <&$conn
+	local parsed_req=
+	parsed_req=(${(s:|||:)req})
+	case $parsed_req[1] in
+		ENTER)
+			# the client is registering itself
+			clients[$parsed_req[2]]=1
+			echo "Client $parsed_req[2] registered"
+			;;
+		EXIT)
+			# the client is unregistering itself
+			unset "clients[$parsed_req[2]]"
+			echo "Client $parsed_req[2] unregistered"
+			if [ ${#clients} -eq 0 ]; then
+				echo "No more clients are remaining, exiting daemon"
+				exec {conn}>&-
+				rm -rf "$socket_dir"
+				exit
+			fi
+			;;
+		GET)
+			echo -n "GET $parsed_req[2];"
+			# get a value
+			if [ ! -z $data[$parsed_req[2]] ]; then
+				echo "found: $data[$parsed_req[2]]"
+				echo $data[$parsed_req[2]] >&$conn
+			elif [ ! -z $parsed_req[3] ]; then
+				echo "not found, but setting it to: $parsed_req[3]"
+				# a default value was provided, set and return it
+				data[$parsed_req[2]]=$parsed_req[3]
+				echo $parsed_req[3] >&$conn
+			else
+				echo "not found"
+			fi
+			;;
+	esac
+	# force connection close
+  exec {conn}>&-
+}
+
+# to finish the daemonization process, we ensure stdio fds are closed
+# (they should already by closed by setsid) and perform a second fork
 zmodload zsh/net/socket
 socket_dir=$1
-sid=$2
-[[ -t 0 ]] && exec </dev/null
-[[ -t 1 ]] && exec >/dev/null
-[[ -t 2 ]] && exec 2>/dev/null
+[[ -t 0 ]] && exec <&-
+[[ -t 1 ]] && exec >&-
+[[ -t 2 ]] && exec 2>&-
 (
-exec > /tmp/tmux-zsh-vim-shm-${sid}.log
-exec 2> /tmp/tmux-zsh-vim-shm-${sid}.log
+logfile=/tmp/tmux-zsh-vim-shm.log
+exec &> $logfile
+# actual data being managed
 typeset -A data
 data=()
-zsocket -l "$socket_dir/listen" || exit 1
+# registered client processes. used mainly to know when the daemon should exit
+typeset -A clients
+clients=()
+zsocket -l "$socket_dir/socket" || exit 1
+echo $$ > "$socket_dir/pid"
 sock_fd=$REPLY
+echo "Shared memory daemon listening on '$socket_dir/socket'"
 while true; do
-  zsocket -a $sock_fd
-  # We will be passed a directory name as key, and if it does not currently
-  # have a corresponding value we create and store it. 
-  # Finally we return the unique value which represents the directory
-  local conn=$REPLY
-  dir=""
-  read dir <&$conn
-  # close input fd
-  # exec $REPLY<&-
-  # close output fd
-  # exec $REPLY>&-
-  if [ "$dir" = "EXIT" ]; then
-    # A shell is exiting, wait a little bit and check if the session
-    # still exists
-    sleep 0.5
-    if ! tmux has-session -t $sid > /dev/null 2>&1; then
-      break
-    fi
-  fi
-  if [ -z $data[$dir] ]; then
-    data[$dir]=`uuidgen -t`
-    # to normalize with vim server naming, convert the uuid to uppercase
-    data[$dir]=${data[$dir]:u}
-  fi
-  # send uuid
-  echo $data[$dir] >&$conn
-  echo "`ls /proc/self/fd`"
-  exec {conn}>&-
+	serve_request $sock_fd
 done
 ) &!

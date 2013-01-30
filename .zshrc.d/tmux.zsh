@@ -12,12 +12,99 @@ else
     tmux detach
   }
 
-  # Sweet vim/tmux integration
-  # Inspired by https://gist.github.com/2792055
-  # TODO: Implement a fuzzy finder completion for zsh in the spirit of CtrlP vim plugin,
-  #       then integrate with the function below
+	# register to the shm server
+	_shm_register() {
+		local REPLY=
+		local tmux_vim_socket_dir="/tmp/tmux-zsh-vim-shm"
+    local socket_path="$tmux_vim_socket_dir/socket"
+		# ensure the shared memory daemon is running:
+		# - start a subshell
+		# - set umask to 0 (by default anyone can read/write daemon-created files)
+		# - try to acquire the daemon lock, if succeeds:
+		#   - change dir to root
+		#   - replace the subshell with a new, disowned shell,
+		#     with sid set (ensures no controlling terminal)
+		#   - the new shell invokes start_shared_memory to finish
+		#     the daemonization process and do the rest of the job
+		(
+		umask 0
+		if mkdir "$tmux_vim_socket_dir" > /dev/null 2>&1; then
+			cd /
+			exec setsid zsh "$HOME/.zshrc.d/bin/shm_daemon.zsh" $tmux_vim_socket_dir &!
+		fi
+		)
+		# now try to connect with the daemon, up to 5 times, increasing the poll
+		# interval with each iteration
+		local interval=
+		for i in 1 2 3 4 5; do
+			if zsocket $socket_path > /dev/null 2>&1; then
+				break
+			fi
+			interval=$((i * 0.5))
+			sleep $interval
+		done
+		if [ -z $REPLY ]; then
+			echo "Error registering with the shared memory daemon" >&2
+			local daemon_pid=
+			if [ -r "$tmux_vim_socket_dir/pid" ]; then
+				daemon_pid=`cat "$tmux_vim_socket_dir/pid"`
+			fi
+			if [ -z $daemon_pid ] || !ps -p $daemon_pid; then
+				local msg=
+				msg=(
+				"The process pointed by the daemon pid was"
+				"not running, will delete the directory"
+				"'$tmux_vim_socket_dir'"
+				)
+				echo "$msg" >&2
+				rm -rf "$tmux_vim_socket_dir"
+			fi
+			return 1
+		fi
+		_shm_client_id=`uuidgen -t`
+		echo "ENTER|||$_shm_client_id" >&$REPLY
+		exec {REPLY}>&-
+	}
+
+	_shm_unregister() {
+    local socket_path="/tmp/tmux-zsh-vim-shm/socket"
+		if zsocket $socket_path > /dev/null 2>&1; then
+      echo "EXIT|||$_shm_client_id" >&$REPLY
+			exec {REPLY}>&-
+		fi
+	}
+
+	# gets value mapped to the key from the shared memory daemon. optionally, it
+	# can receive a third argument which is a value to be set(atomically) for
+	# the key, in case it is not yet present in the dictionary.
+	_shm_get() {
+    local socket_path="/tmp/tmux-zsh-vim-shm/socket"
+		local key=$1
+		local default=$2
+		# message to be sent to the daemon
+		local req=""
+		if [ -z $default ]; then
+			req="GET|||${key}"
+		else
+			req="GET|||${key}|||${default}"
+		fi
+		# variable used by zsh that will point to the connection fd
+		local REPLY=""
+		# connect to the daemon
+    zsocket $socket_path
+		# send the message
+		echo "$req" >&$REPLY
+    # read response
+    local res=""
+    read res <&$REPLY
+    # close the connection
+    exec {REPLY}>&-
+		echo "$res"
+	}
 
   vi() {
+    local sid=`tmux display-message -p '#S'`
+    local wid=`tmux display-message -p '#I'`
     # Get session/window ids
     # Lets see if we are in a project
     local dir=`pwd`
@@ -30,19 +117,20 @@ else
       # go up one level
       dir=${dir%/*}
     done
-    # since vim servername is case-insensitive, we need to get a tmux
-    # session-specific surrogate uuid to use instead
-    local sid=`tmux display-message -p '#S'`
-    local socket_path="/tmp/tmux-zsh-vim-shm-$sid/listen"
-    # connect to shared_memory
-    zsocket $socket_path
-    # ask for uuid for the directory
-    echo "$dir" >&$REPLY
-    # wait for response
-    local dir_id=""
-    read dir_id <&$REPLY
-    # close the connection
-    exec {REPLY}>&-
+    # vim servernames are case-insensitive, so we cant use directory
+		# names as parts of the servername(it would generate ambiguities
+		# with names which differ only in case), so each directory/sid 
+		# pair is mapped to a unique id, which will be used as servername
+		#
+		# since the directory->uuid mapping is global(not specific to a
+		# zsh instance) the data will be stored in the shared memory
+		# daemon, which will also synchronize access to the data.
+		local default=`uuidgen -t`
+		# convert to uppercase since thats how vim display the servers
+		default=${default:u}
+		# append the session id to the key, because vim instances are
+		# session-specific
+		local dir_id=`_shm_get "$dir:$sid" $default`
     vim_id_pattern=":${dir_id}:"
     local vim_id=`vim --serverlist | grep -F "$vim_id_pattern"`
     if [ -z $vim_id ]; then
@@ -77,31 +165,6 @@ else
     tmux select-pane -t "%${vim_id#\:$dir_id\:}"
   }
 
-  # start the shared memory daemon:
-  # - start a subshell
-  # - set umask to 0 (by default anyone can read/write daemon-created files)
-  # - try to acquire the daemon role atomically. If succeeds:
-  #   - change dir to root
-  #   - replace the subshell with a new, disowned shell,
-  #     with sid set (ensures no controlling terminal)
-  #   - the new shell invokes start_shared_memory to finish
-  #     the daemonization process and do the rest of the job
-  (
-  umask 0
-  tmux_sid=`tmux display-message -p '#S'`
-  tmux_vim_socket_dir="/tmp/tmux-zsh-vim-shm-$tmux_sid"
-  if mkdir "$tmux_vim_socket_dir" > /dev/null 2>&1; then
-    cd /
-    exec setsid zsh "$HOME/.zshrc.d/bin/shm_daemon.zsh" $tmux_vim_socket_dir $tmux_sid &!
-  fi
-  )
-  # Start the daemon if it is not already started
-  # TRAPEXIT() {
-  #   local sid=`tmux display-message -p '#S'`
-  #   local socket_path="/tmp/tmux-zsh-vim-shm-$sid/listen"
-  #   if [ -S $socket_path ]; then
-  #     zsocket $socket_path
-  #     echo "EXIT" >&$REPLY
-  #   fi
-  # }
+	_shm_register
+	trap _shm_unregister HUP INT TERM EXIT PIPE
 fi
