@@ -1,6 +1,5 @@
 if [ $TERM != "screen-256color" ] && [  $TERM != "screen" ]; then
-  # Start tmux and call the trampoline on exit
-  TERM=xterm-256color tmux new; jumper
+	TERM=xterm-256color exec zsh -c 'tmux attach || tmux new'
 else
   # tmux is running, define tmux-specific utilities
   tmw() {
@@ -18,21 +17,16 @@ else
 		local tmux_vim_socket_dir="/tmp/tmux-zsh-vim-shm"
     local socket_path="$tmux_vim_socket_dir/socket"
 		# ensure the shared memory daemon is running:
-		# - start a subshell
-		# - set umask to 0 (by default anyone can read/write daemon-created files)
 		# - try to acquire the daemon lock, if succeeds:
-		#   - change dir to root
-		#   - replace the subshell with a new, disowned shell,
-		#     with sid set (ensures no controlling terminal)
+		#	  - start a subshell
+		#   - replace the subshell with a new, disowned shell
 		#   - the new shell invokes start_shared_memory to finish
 		#     the daemonization process and do the rest of the job
-		(
-		umask 0
 		if mkdir "$tmux_vim_socket_dir" > /dev/null 2>&1; then
-			cd /
-			exec setsid zsh "$HOME/.zshrc.d/tmux.d/shm_daemon.zsh" $tmux_vim_socket_dir &!
+			(
+			exec zsh "$HOME/.zshrc.d/tmux.d/shm_daemon.zsh" $tmux_vim_socket_dir &!
+			)
 		fi
-		)
 		# now try to connect with the daemon, up to 5 times, increasing the poll
 		# interval with each iteration
 		local interval=
@@ -85,7 +79,7 @@ else
     while [ -n "$dir" ] ; do
       [[ -d "$dir/.git" ||\
         -d "$dir/.svn" ||\
-        -d "$dir/.hg" ] ||\
+        -d "$dir/.hg"  ||\
         -d "$dir/.bzr" ]] && break
       # go up one level
       dir=${dir%/*}

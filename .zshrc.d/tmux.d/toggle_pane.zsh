@@ -20,9 +20,13 @@ fi
 hidden=`_shm_get "${toggle}-hidden"`
 if [ ! -z $hidden ]; then
 	# join and swap
-	tmux join-pane -d -p $percentage -s "%$toggle" -t "%$tgt"
+	tmux join-pane -p $percentage -s "%$toggle" -t "%$tgt"
 	_shm_pop "${toggle}-hidden" > /dev/null
 	tmux swap-pane -s "%$toggle" -t "%$tgt"
+	if [ -z $2 ]; then
+		# focus the joined pane
+		tmux select-pane -t "%$toggle"
+	fi
 else
 	tmux break-pane -d -t "%$toggle"
 	_shm_set "${toggle}-hidden" 1

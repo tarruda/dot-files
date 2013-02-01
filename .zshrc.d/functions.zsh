@@ -1,14 +1,3 @@
-# trampoline to talk to a parent shell
-jumper() {
-  if [ -r "$HOME/.jumper" ]; then
-    local cmd="`cat \"$HOME/.jumper\"`"
-    rm "$HOME/.jumper"
-    exec zsh -c "$cmd; jumper"
-  else
-    exit
-  fi
-}
-
 mkdtmp() {
   local name="/tmp/`cat /dev/urandom | tr -cd a-zA-Z0-9 | fold -w10 | head -n1`"
   while [ -d "$name" ]; do
