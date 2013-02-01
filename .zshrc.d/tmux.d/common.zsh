@@ -16,7 +16,10 @@ _shm_get() {
 	# variable used by zsh that will point to the connection fd
 	local REPLY=""
 	# connect to the daemon
-	zsocket $socket_path
+	if ! zsocket $socket_path; then
+		echo "Failed connecting to $socket_path"
+		return 1
+	fi
 	# send the message
 	echo "$req" >&$REPLY
 	# read response
@@ -35,7 +38,10 @@ _shm_set() {
 	local req=""
 	req="SET|||${key}|||${value}"
 	local REPLY=""
-	zsocket $socket_path
+	if ! zsocket $socket_path; then
+		echo "Failed connecting to $socket_path"
+		return 1
+	fi
 	echo "$req" >&$REPLY
 	# no need for response
 	exec {REPLY}>&-
@@ -49,7 +55,10 @@ _shm_pop() {
 	local req=""
 	req="POP|||${key}"
 	local REPLY=""
-	zsocket $socket_path
+	if ! zsocket $socket_path; then
+		echo "Failed connecting to $socket_path"
+		return 1
+	fi
 	echo "$req" >&$REPLY
 	local res=""
 	read res <&$REPLY
