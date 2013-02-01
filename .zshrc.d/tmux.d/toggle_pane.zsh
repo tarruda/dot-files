@@ -11,11 +11,11 @@ percentage=
 if [ "$parsed[2]" = "bottom" ]; then
 	toggle="$parsed[1]"
 	tgt=$tmux_pane
-	percentage=80
+	percentage=70
 else
 	toggle="$tmux_pane"
 	tgt="$parsed[1]"
-	percentage=20
+	percentage=30
 fi
 hidden=`_shm_get "${toggle}-hidden"`
 if [ ! -z $hidden ]; then

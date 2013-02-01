@@ -7,8 +7,12 @@ else
   }
 
   ssh() {
-    echo "ssh $*;TERM=xterm-256color tmux a" > "$HOME/.jumper"
-    tmux detach
+		# TODO match the host against a list of hosts known to be running tmux
+		tmux set status off
+		tmux set prefix ^P
+		command ssh "$@"
+		tmux set -u prefix
+		tmux set -u status
   }
 
 	# register to the shm server
@@ -74,9 +78,10 @@ else
     local sid=`tmux display-message -p '#S'`
     # Get session/window ids
     # Lets see if we are in a project
-    local dir=`pwd`
+    local dir="`pwd`"
     local vim_id_pattern=""
     while [ -n "$dir" ] ; do
+			# Only work with svn 1.7 +
       [[ -d "$dir/.git" ||\
         -d "$dir/.svn" ||\
         -d "$dir/.hg"  ||\
@@ -112,10 +117,11 @@ else
       done
       # g:project_dir can be used by vim scripts that need to know the project
       # root directory
-      tmux split-window -d -p 80 "vim \
+      tmux split-window -d -p 70 "vim \
+				-c \"cd $dir\" \
         -c \"let g:project_dir='$dir'\" \
         -c vim -c ':silent !echo \$TMUX_PANE >> $fifo'\
-        --servername \":$dir_id:\${TMUX_PANE#*\%}\""
+				--servername \":$dir_id:\${TMUX_PANE#*\%}\""
       local pane_id=`cat $fifo`
       # will only get here after vim has started
       pane_id=${pane_id#*\%}
@@ -129,7 +135,7 @@ else
     # open all files
     vim --servername "$vim_id" --remote-send "<ESC>"
     while [ $# -ne 0 ]; do
-      vim --servername "$vim_id" --remote-send ":e $1<CR>"
+			vim --servername "$vim_id" --remote-send ":e ${(q)1:a}<CR>"
       shift
     done
     # extract the unique pane id from vim_id and navigate to it
@@ -138,7 +144,7 @@ else
     tmux select-window -t "$window_id"
     tmux select-pane -t "$pane_uid"
   }
-
+	alias e=vi
 	_shm_register
 	trap _shm_unregister HUP INT TERM EXIT
 fi
