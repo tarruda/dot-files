@@ -125,8 +125,8 @@ else
       local pane_id=`cat $fifo`
       # will only get here after vim has started
       pane_id=${pane_id#*\%}
+			rm $fifo
       vim_id=":$dir_id:$pane_id"
-      rm $fifo
 			# now we associate the two panes in shared memory, so we can more easily
 			# break/join them toguether
 			_shm_set "$pane_id" "${TMUX_PANE#*\%}:bottom"
@@ -140,8 +140,8 @@ else
     done
     # extract the unique pane id from vim_id and navigate to it
 		local pane_uid="%${vim_id#\:$dir_id\:}"
-		local window_id="`tmux display -pt $pane_uid '#I'`"
-    tmux select-window -t "$window_id"
+		local window_uid="`tmux display-message -pt \"$pane_uid\" '#{window_id}'`"
+    tmux select-window -t "$window_uid"
     tmux select-pane -t "$pane_uid"
   }
 	alias e=vi
