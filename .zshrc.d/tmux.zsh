@@ -30,7 +30,7 @@ else
 		umask 0
 		if mkdir "$tmux_vim_socket_dir" > /dev/null 2>&1; then
 			cd /
-			exec setsid zsh "$HOME/.zshrc.d/bin/shm_daemon.zsh" $tmux_vim_socket_dir &!
+			exec setsid zsh "$HOME/.zshrc.d/tmux.d/shm_daemon.zsh" $tmux_vim_socket_dir &!
 		fi
 		)
 		# now try to connect with the daemon, up to 5 times, increasing the poll
@@ -49,7 +49,7 @@ else
 			if [ -r "$tmux_vim_socket_dir/pid" ]; then
 				daemon_pid=`cat "$tmux_vim_socket_dir/pid"`
 			fi
-			if [ -z $daemon_pid ] || !ps -p $daemon_pid; then
+			if [ -z $daemon_pid ] || ! ps -p $daemon_pid; then
 				local msg=
 				msg=(
 				"The process pointed by the daemon pid was"
@@ -74,33 +74,7 @@ else
 		fi
 	}
 
-	# gets value mapped to the key from the shared memory daemon. optionally, it
-	# can receive a third argument which is a value to be set(atomically) for
-	# the key, in case it is not yet present in the dictionary.
-	_shm_get() {
-    local socket_path="/tmp/tmux-zsh-vim-shm/socket"
-		local key=$1
-		local default=$2
-		# message to be sent to the daemon
-		local req=""
-		if [ -z $default ]; then
-			req="GET|||${key}"
-		else
-			req="GET|||${key}|||${default}"
-		fi
-		# variable used by zsh that will point to the connection fd
-		local REPLY=""
-		# connect to the daemon
-    zsocket $socket_path
-		# send the message
-		echo "$req" >&$REPLY
-    # read response
-    local res=""
-    read res <&$REPLY
-    # close the connection
-    exec {REPLY}>&-
-		echo "$res"
-	}
+	source "$HOME/.zshrc.d/tmux.d/common.zsh"
 
   vi() {
     local sid=`tmux display-message -p '#S'`
@@ -153,6 +127,10 @@ else
       pane_id=${pane_id#*\%}
       vim_id=":$dir_id:$pane_id"
       rm $fifo
+			# now we associate the two panes in shared memory, so we can more easily
+			# break/join them toguether
+			_shm_set "$pane_id" "${TMUX_PANE#*\%}:bottom"
+			_shm_set "${TMUX_PANE#*\%}" "${pane_id}:top"
     fi
     # open all files
     vim --servername "$vim_id" --remote-send "<ESC>"
@@ -168,11 +146,5 @@ else
   }
 
 	_shm_register
-	trap _shm_unregister HUP INT TERM EXIT PIPE
-
-	# hide_terminal_top_shell() {
-	# 	local window_id="`tmux display -pt $TMUX_PANE '#I'`"
-	# 	tmux
-	
-	# }
+	trap _shm_unregister HUP INT TERM EXIT
 fi

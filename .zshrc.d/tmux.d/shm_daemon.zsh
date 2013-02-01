@@ -31,7 +31,6 @@ serve_request() {
 			;;
 		GET)
 			echo -n "GET $parsed_req[2];"
-			# get a value
 			if [ ! -z $data[$parsed_req[2]] ]; then
 				echo "found: $data[$parsed_req[2]]"
 				echo $data[$parsed_req[2]] >&$conn
@@ -42,6 +41,18 @@ serve_request() {
 				echo $parsed_req[3] >&$conn
 			else
 				echo "not found"
+			fi
+			;;
+		SET)
+			echo -n "SET $parsed_req[2] to $parsed_req[3];"
+			data[$parsed_req[2]]=$parsed_req[3]
+			;;
+		POP)
+			echo -n "POP $parsed_req[2];"
+			if [ ! -z $data[$parsed_req[2]] ]; then
+				echo "found: $data[$parsed_req[2]]"
+				echo $data[$parsed_req[2]] >&$conn
+				unset "data[$parsed_req[2]]"
 			fi
 			;;
 	esac
