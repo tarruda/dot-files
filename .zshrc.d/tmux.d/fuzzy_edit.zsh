@@ -1,10 +1,13 @@
 #!/usr/bin/env zsh
 # Simple fuzzy file opener
 
+ib_pos=(0 0)
+
 cleanup() {
 	zcurses end
 	_shm_pop "$wid:fuzzy-open" > /dev/null
 	_shm_pop "$wid:fuzzy-running" > /dev/null
+	exit
 }
 
 split() {
@@ -17,30 +20,71 @@ setup_screen() {
 	zcurses init
 	zcurses addwin header 1 $COLUMNS 0 0
 	zcurses addwin results 8 $COLUMNS 1 0
-	zcurses addwin input_box 1 $COLUMNS 10 0
+	zcurses addwin input_box 1 $COLUMNS 9 0
 	zcurses string header "Fuzzy file search"
 	zcurses refresh header results input_box
 }
 
 getchar() {
 	zcurses input input_box char
-	if [ -n $char ]; then
-		zcurses char header $char
-		zcurses move results 0 0
-	fi
 	keycode=`printf "%d" "'$char'"`
 }
 
 fuzzy_find() {
-	find . -type f
-	
+	find . -type f | grep -F "$1" | head -n 8
+}
+
+get_current_text() {
+	local rv=""
+	local reply=
+	local curs=$ib_pos[2]
+	for (( i = 0; i <= $curs; i++ )); do
+		zcurses move input_box 0 $i
+		zcurses querychar input_box
+		rv="${rv}${reply[1]}"
+	done
+	echo -n "$rv"
+}
+
+update_results() {
+	local i=0
+	local max=8
+	zcurses move results 0 0
+	local res_line=0
+	local line=
+	while read line; do
+		zcurses string results "$line"
+		res_line=$(($res_line + 1))
+		zcurses move results $res_line 0
+		zcurses refresh results input_box
+		i=$(($i + 1))
+		[[ $i -eq 8 ]] && break
+	done
 }
 
 process_char() {
-	zcurses string results "Pressed $char"
-	zcurses refresh results input_box
-	# coproc fuzzy_find
-	# local f_pid=$!
+	if [[ -n "$f_pid" && -n "`jobs`" ]]; then
+		# kill currently running find
+		kill $f_pid
+	fi
+	zcurses position input_box ib_pos
+	zcurses move results 0 0
+	if [ $keycode = 127 ]; then
+		# backspace
+		zcurses move input_box 0 $(($ib_pos[2] - 1))
+		zcurses char input_box " "
+		zcurses move input_box 0 $(($ib_pos[2] - 1))
+	else
+		zcurses char input_box $char
+	fi
+	zcurses refresh input_box
+	local txt="`get_current_text`"
+	if [ -n "$txt" ]; then
+		wait
+		# zcurses clear results
+		find . -type f -path "*$txt*" | update_results &
+		f_pid=$!
+	fi
 }
  
 run() {
