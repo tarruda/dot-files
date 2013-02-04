@@ -30,15 +30,11 @@ getchar() {
 	keycode=`printf "%d" "'$char'"`
 }
 
-fuzzy_find() {
-	find . -type f | grep -F "$1" | head -n 8
-}
-
 get_current_text() {
 	local rv=""
 	local reply=
 	local curs=$ib_pos[2]
-	for (( i = 0; i <= $curs; i++ )); do
+	for (( i = 0; i < $curs; i++ )); do
 		zcurses move input_box 0 $i
 		zcurses querychar input_box
 		rv="${rv}${reply[1]}"
@@ -46,7 +42,8 @@ get_current_text() {
 	echo -n "$rv"
 }
 
-update_results() {
+process_results() {
+	local ib_pos=
 	local i=0
 	local max=8
 	zcurses move results 0 0
@@ -62,11 +59,9 @@ update_results() {
 	done
 }
 
+f_pid=
 process_char() {
-	if [[ -n "$f_pid" && -n "`jobs`" ]]; then
-		# kill currently running find
-		kill $f_pid
-	fi
+	kill $f_pid &> /dev/null
 	zcurses position input_box ib_pos
 	zcurses move results 0 0
 	if [ $keycode = 127 ]; then
@@ -77,12 +72,11 @@ process_char() {
 	else
 		zcurses char input_box $char
 	fi
-	zcurses refresh input_box
-	local txt="`get_current_text`"
-	if [ -n "$txt" ]; then
-		wait
-		# zcurses clear results
-		find . -type f -path "*$txt*" | update_results &
+	zcurses clear results
+	zcurses refresh results input_box
+	zcurses position input_box ib_pos
+	if [ $ib_pos[2] -gt 0 ]; then
+		find . -type f -path "*`get_current_text`*" | process_results &
 		f_pid=$!
 	fi
 }
