@@ -11,6 +11,7 @@ renderer() {
 	zcurses move input_box 0 0
 	zcurses refresh header results input_box
 	exec 4>"$ipc_pipe"
+	local cwd=`pwd`
 	local cmd=
 	local ib_pos=0
 	local res_line=0
@@ -36,7 +37,7 @@ renderer() {
 			RESULT*)
 				if [ $res_line -lt 8 ]; then
 					# adds line to result window
-					local line=${cmd#RESULT}
+					local line=${${cmd#RESULT}#$cwd/}
 					zcurses string results "$line"
 					zcurses move results $((++res_line)) 0
 				fi
@@ -51,9 +52,7 @@ renderer() {
 				continue
 				;;
 		esac
-		zcurses clear header
-		zcurses string header "Fuzzy search: $buffer"
-		zcurses refresh header results input_box
+		zcurses refresh results input_box
 	done
 	exec 4>&-
 }
@@ -62,6 +61,7 @@ cleanup() {
 	zcurses end
 	_shm_pop "$wid:fuzzy-open" > /dev/null
 	_shm_pop "$wid:fuzzy-running" > /dev/null
+	exec 4<&-
 	rm -f "$ipc_pipe"
 	exit
 }
@@ -96,16 +96,44 @@ process_results() {
 	done
 }
 
-f_pid=
+walk() {
+	local cwd=$1
+	local pattern=$2
+	local matches=$3
+	local base_dir=$4
+	local rel_dir=
+	for file in "$cwd/"(#a2)"$pattern"(.N); do
+		echo "RESULT$file"
+		matches=$(($matches + 1))
+		[ $((++matches)) -ge 8 ] && exit
+	done
+	for dir in "$cwd/"*(/N); do
+		rel_dir="${dir#$base_dir/}"
+		if [ -z $prune_dirs[$rel_dir] ]; then
+			walk "$dir" "$pattern" "$matches" "$base_dir"
+		fi
+	done
+}
+
+do_find() {
+	typeset -A prune_dirs
+	echo "$PRUNE_DIRS" > /tmp/ss
+	eval "prune_dirs=($PRUNE_DIRS)"
+	setopt extendedglob
+	echo "CLEAR"
+	walk "$1" "$2" 0 "$1"
+}
+
+f_pid=""
 process_char() {
-	if [ $keycode = 127 ]; then
-		# backspace
-		echo "BACK" >&p
-	else
-		echo "ECHO$char" >&p
-	fi
+	case $keycode in
+		127) echo "BACK" >&p ;;
+		*) echo "ECHO$char" >&p ;;
+	esac
+	# if already running, kill the current finder before restarting
 	kill $f_pid &> /dev/null
-	find . -type f -path "*`get_current_text`*" | process_results >&p &
+	ps -p $f_pid &> /dev/null && wait $f_pid &> /dev/null
+	do_find "`pwd`" "`get_current_text`" >&p &
 	f_pid=$!
 }
  
@@ -119,6 +147,17 @@ get_current_text() {
 run() {
 	zmodload zsh/curses
 	trap cleanup INT HUP TERM EXIT
+	# load ignored directories
+	PRUNE_DIRS=""
+	if [ -r "$HOME/.fuzzy_ignore" ]; then
+		exec 3<"$HOME/.fuzzy_ignore"
+		while read -u 3 pat; do
+			PRUNE_DIRS="$fuzzy_prune_dirs '$pat' 1 "
+		done
+		exec 3>&-
+	fi
+	export PRUNE_DIRS
+	#
 	setup_screen
 	export ipc_pipe=`mktemp -u`
 	while ! mkfifo -m 600 "$ipc_pipe" &>/dev/null; do
