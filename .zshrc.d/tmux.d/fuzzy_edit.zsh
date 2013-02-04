@@ -17,7 +17,7 @@ renderer() {
 	local res_line=0
 	local buffer=""
 	while read cmd; do
-		case $cmd in
+		case "$cmd" in
 			ECHO*)
 				# echo character in the input window
 				local char=${cmd#ECHO}
@@ -100,28 +100,22 @@ walk() {
 	local cwd=$1
 	local pattern=$2
 	local matches=$3
-	local base_dir=$4
-	local rel_dir=
-	for file in "$cwd/"(#a2)"$pattern"(.N); do
+	local fpattern="$cwd/(#ia2)*${pattern}*${PRUNE_FILES}(.N)"
+	local dpattern="$cwd/*${PRUNE_DIRS}(/N)"
+	for file in ${~fpattern}; do
 		echo "RESULT$file"
 		matches=$(($matches + 1))
 		[ $((++matches)) -ge 8 ] && exit
 	done
-	for dir in "$cwd/"*(/N); do
-		rel_dir="${dir#$base_dir/}"
-		if [ -z $prune_dirs[$rel_dir] ]; then
-			walk "$dir" "$pattern" "$matches" "$base_dir"
-		fi
+	for dir in ${~dpattern}; do
+	  walk "$dir" "$pattern" "$matches"
 	done
 }
 
 do_find() {
-	typeset -A prune_dirs
-	echo "$PRUNE_DIRS" > /tmp/ss
-	eval "prune_dirs=($PRUNE_DIRS)"
 	setopt extendedglob
 	echo "CLEAR"
-	walk "$1" "$2" 0 "$1"
+	walk "$1" "$2" 0
 }
 
 f_pid=""
@@ -146,17 +140,28 @@ get_current_text() {
 
 run() {
 	zmodload zsh/curses
+	zmodload zsh/pcre
+	setopt rematchpcre
 	trap cleanup INT HUP TERM EXIT
 	# load ignored directories
 	PRUNE_DIRS=""
-	if [ -r "$HOME/.fuzzy_ignore" ]; then
-		exec 3<"$HOME/.fuzzy_ignore"
+	PRUNE_FILES=""
+	local dir="$HOME"
+	if [ -r "$dir/.fuzzy_ignore" ]; then
+		exec 3<"$dir/.fuzzy_ignore"
 		while read -u 3 pat; do
-			PRUNE_DIRS="$fuzzy_prune_dirs '$pat' 1 "
+			if [ "$pat" -pcre-match /$ ]; then
+				PRUNE_DIRS="$PRUNE_DIRS~$dir/${pat%/}"
+			else
+				PRUNE_FILES="$PRUNE_FILES~$dir/$pat"
+			fi
 		done
 		exec 3>&-
 	fi
 	export PRUNE_DIRS
+	export PRUNE_FILES
+	echo "$PRUNE_DIRS" > /tmp/dd
+	echo "$PRUNE_FILES" > /tmp/ff
 	#
 	setup_screen
 	export ipc_pipe=`mktemp -u`
