@@ -3,10 +3,66 @@
 
 ib_pos=(0 0)
 
+# simple api for synchronizing render actions in the curses window
+renderer() {
+	zcurses string header "Fuzzy search"
+	# reset positions
+	zcurses move results 0 0
+	zcurses move input_box 0 0
+	zcurses refresh header results input_box
+	exec 4>"$ipc_pipe"
+	local cmd=
+	local ib_pos=0
+	local res_line=0
+	local buffer=""
+	while read cmd; do
+		case $cmd in
+			ECHO*)
+				# echo character in the input window
+				local char=${cmd#ECHO}
+				zcurses char input_box $char
+				ib_pos=$(($ib_pos + 1))
+				buffer="$buffer$char"
+				;;
+			BACK)
+				if [ $ib_pos -gt 0 ]; then
+					# erase character in the input window
+					zcurses move input_box 0 $(($ib_pos - 1))
+					zcurses char input_box " "
+					zcurses move input_box 0 $((--ib_pos))
+					buffer=${buffer[1,-2]}
+				fi
+				;;
+			RESULT*)
+				if [ $res_line -lt 8 ]; then
+					# adds line to result window
+					local line=${cmd#RESULT}
+					zcurses string results "$line"
+					zcurses move results $((++res_line)) 0
+				fi
+				;;
+			CLEAR)
+				zcurses clear results
+				zcurses move results 0 0
+				res_line=0
+				;;
+			TXT)
+				print -u 4 "$buffer"
+				continue
+				;;
+		esac
+		zcurses clear header
+		zcurses string header "Fuzzy search: $buffer"
+		zcurses refresh header results input_box
+	done
+	exec 4>&-
+}
+
 cleanup() {
 	zcurses end
 	_shm_pop "$wid:fuzzy-open" > /dev/null
 	_shm_pop "$wid:fuzzy-running" > /dev/null
+	rm -f "$ipc_pipe"
 	exit
 }
 
@@ -21,8 +77,6 @@ setup_screen() {
 	zcurses addwin header 1 $COLUMNS 0 0
 	zcurses addwin results 8 $COLUMNS 1 0
 	zcurses addwin input_box 1 $COLUMNS 9 0
-	zcurses string header "Fuzzy file search"
-	zcurses refresh header results input_box
 }
 
 getchar() {
@@ -30,30 +84,13 @@ getchar() {
 	keycode=`printf "%d" "'$char'"`
 }
 
-get_current_text() {
-	local rv=""
-	local reply=
-	local curs=$ib_pos[2]
-	for (( i = 0; i < $curs; i++ )); do
-		zcurses move input_box 0 $i
-		zcurses querychar input_box
-		rv="${rv}${reply[1]}"
-	done
-	echo -n "$rv"
-}
-
 process_results() {
-	local ib_pos=
 	local i=0
 	local max=8
-	zcurses move results 0 0
-	local res_line=0
 	local line=
+	echo "CLEAR"
 	while read line; do
-		zcurses string results "$line"
-		res_line=$(($res_line + 1))
-		zcurses move results $res_line 0
-		zcurses refresh results input_box
+		echo "RESULT$line"
 		i=$(($i + 1))
 		[[ $i -eq 8 ]] && break
 	done
@@ -61,31 +98,35 @@ process_results() {
 
 f_pid=
 process_char() {
-	kill $f_pid &> /dev/null
-	zcurses position input_box ib_pos
-	zcurses move results 0 0
 	if [ $keycode = 127 ]; then
 		# backspace
-		zcurses move input_box 0 $(($ib_pos[2] - 1))
-		zcurses char input_box " "
-		zcurses move input_box 0 $(($ib_pos[2] - 1))
+		echo "BACK" >&p
 	else
-		zcurses char input_box $char
+		echo "ECHO$char" >&p
 	fi
-	zcurses clear results
-	zcurses refresh results input_box
-	zcurses position input_box ib_pos
-	if [ $ib_pos[2] -gt 0 ]; then
-		find . -type f -path "*`get_current_text`*" | process_results &
-		f_pid=$!
-	fi
+	kill $f_pid &> /dev/null
+	find . -type f -path "*`get_current_text`*" | process_results >&p &
+	f_pid=$!
 }
  
+get_current_text() {
+	local txt=
+	echo "TXT" >&p
+	read -u 4 txt
+	echo -n "$txt"
+}
+
 run() {
 	zmodload zsh/curses
 	trap cleanup INT HUP TERM EXIT
 	setup_screen
+	export ipc_pipe=`mktemp -u`
+	while ! mkfifo -m 600 "$ipc_pipe" &>/dev/null; do
+		export ipc_pipe=`mktemp -u`
+	done
 	_shm_set "$wid:fuzzy-running" "${TMUX_PANE#*\%}"
+	{ coproc renderer >&3 } 3>&1
+	exec 4<"$ipc_pipe"
 	getchar
 	while true; do
 		if [ $keycode != 27 ]; then
