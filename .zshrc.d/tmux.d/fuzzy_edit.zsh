@@ -160,8 +160,6 @@ run() {
 	fi
 	export PRUNE_DIRS
 	export PRUNE_FILES
-	echo "$PRUNE_DIRS" > /tmp/dd
-	echo "$PRUNE_FILES" > /tmp/ff
 	#
 	setup_screen
 	export ipc_pipe=`mktemp -u`

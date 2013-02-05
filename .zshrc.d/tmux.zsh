@@ -1,5 +1,7 @@
 if [ $TERM != "screen-256color" ] && [  $TERM != "screen" ]; then
-	TERM=xterm-256color exec zsh -c 'tmux attach || tmux new'
+	if which tmux &>/dev/null; then
+		TERM=xterm-256color exec zsh -c 'tmux attach || tmux new'
+	fi
 else
   # tmux is running, define tmux-specific utilities
   tmw() {
@@ -59,7 +61,7 @@ else
 			fi
 			return 1
 		fi
-		_shm_client_id=`uuidgen -t`
+		_shm_client_id=`uuidgen`
 		echo "ENTER|||$_shm_client_id" >&$REPLY
 		exec {REPLY}>&-
 	}
@@ -97,7 +99,7 @@ else
 		# since the directory->uuid mapping is global(not specific to a
 		# zsh instance) the data will be stored in the shared memory
 		# daemon, which will also synchronize access to the data.
-		local default=`uuidgen -t`
+		local default=`uuidgen`
 		# convert to uppercase since thats how vim display the servers
 		default=${default:u}
 		# append the session id to the key, because vim instances are
