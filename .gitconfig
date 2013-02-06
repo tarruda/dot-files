@@ -31,3 +31,6 @@
   pushInsteadOf = "http://gist.github.com/"
   pushInsteadOf = "git://gist.github.com/"
   pushInsteadOf = "gist:"
+
+[push]
+	default = simple
