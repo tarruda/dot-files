@@ -8,3 +8,10 @@ if [ ! -e "$HOME/.ssh/config" ]; then
 	ServerAliveCountMax 2
 	EOF
 fi
+
+# Ensure ssh agent is running
+SSHPID=`ps axi | grep -c "[s]sh-agent"`
+if [ $SSHPID -eq 0 ]; then
+	ssh-agent > "$HOME/.ssh-env"
+fi
+. "$HOME/.ssh-env"
