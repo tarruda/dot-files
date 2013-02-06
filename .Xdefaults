@@ -1,0 +1,32 @@
+URxvt.perl-lib: /home/tarruda/.config/urxvt
+URxvt.perl-ext-common: fullscreen
+URxvt*keysym.F11: perl:fullscreen:switch
+URxvt.background: #1C1C1C
+URxvt.foreground: #FFFFFF
+URxvt.font: xft:Ubuntu Mono:size=15
+URxvt.scrollBar: false
+! gnome-terminal Tango theme
+! black
+URxvt.color0 : #2E2E34343636
+URxvt.color8 : #555557575353
+! red
+URxvt.color1 : #CCCC00000000
+URxvt.color9 : #EFEF29292929
+! green
+URxvt.color2 : #4E4E9A9A0606
+URxvt.color10 : #8A8AE2E23434
+! yellow
+URxvt.color3 : #C4C4A0A00000
+URxvt.color11 : #FCFCE9E94F4F
+! blue
+URxvt.color4 : #34346565A4A4
+URxvt.color12 : #72729F9FCFCF
+! magenta
+URxvt.color5 : #757550507B7B
+URxvt.color13 : #ADAD7F7FA8A8
+! cyan
+URxvt.color6 : #060698209A9A
+URxvt.color14 : #3434E2E2E2E2
+! white
+URxvt.color7 : #D3D3D7D7CFCF
+URxvt.color15 : #EEEEEEEEECEC
