@@ -1,0 +1,32 @@
+<separator label="Session" />
+<item label="Reload Openbox Configuration">
+  <action name="Reconfigure"></action>
+</item>
+
+<menu label="Exit" id="exit-menu">
+  <item label="Logout">
+    <action name="Exit"/>
+  </item>
+
+  <item label="Reboot">
+    <action name="Execute">
+      <prompt>
+        Reboot?
+      </prompt>
+      <execute>
+        shutdown -r now
+      </execute>
+    </action>
+  </item>
+
+  <item label="Shutdown">
+    <action name="Execute">
+      <prompt>
+        Shut down?
+      </prompt>
+      <execute>
+        shutdown -p now
+      </execute>
+    </action>
+  </item>
+</menu>
