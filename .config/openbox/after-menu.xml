@@ -11,7 +11,7 @@
   <item label="Reboot">
     <action name="Execute">
       <prompt>
-        Reboot?
+        Reboot the computer?
       </prompt>
       <execute>
         shutdown -r now
@@ -22,7 +22,7 @@
   <item label="Shutdown">
     <action name="Execute">
       <prompt>
-        Shut down?
+        Turn off the computer?
       </prompt>
       <execute>
         shutdown -p now
