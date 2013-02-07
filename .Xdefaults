@@ -1,4 +1,4 @@
-URxvt.perl-lib: $HOME/.config/urxvt
+URxvt.perl-lib: .config/urxvt
 URxvt.perl-ext-common: fullscreen
 URxvt.keysym.F11: perl:fullscreen:switch
 URxvt.background: #1C1C1C
