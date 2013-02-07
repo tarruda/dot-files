@@ -31,7 +31,7 @@ function create_pyenv {
 		echo "Remove the directory '$envdir' first"
 		return 1
 	fi
-	virtualenv --no-site-packages "$envdir"
+	virtualenv2 --no-site-packages "$envdir"
 }
 
 # Prints python installed packages in a format

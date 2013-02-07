@@ -1,0 +1,3 @@
+--pager=LESS=FSRX less -r
+--type-set
+ coffee=.coffee

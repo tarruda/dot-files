@@ -1,3 +1,4 @@
+# Mount many encfs volumes using a single key
 decrypt() {
 	local p="$HOME/.encfs/mounts.txt"
 	if [ -r "$p" ]; then
@@ -21,7 +22,12 @@ decrypt() {
 				echo "invalid target '$tgt'"
 				return 1
 			fi
-			echo "$key" | encfs -S "$src" "$tgt" && echo "mounted $src on $tgt"
+			echo "$key" | encfs -S "$src" "$tgt"
+			if [ $? -eq 0 ]; then
+				echo "mounted $src on $tgt"
+			else
+				return 1
+			fi
 		done
 		exec 3>&-
 		echo "done"

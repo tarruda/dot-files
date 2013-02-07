@@ -7,24 +7,24 @@
 rounded = 7
 border_width = 2
 background_color = #000000 60
-border_color = #FFFFFF 16
+border_color = #FFFFFF 13
 
 # ID 2
 rounded = 5
 border_width = 0
 background_color = #FFFFFF 40
-border_color = #FFFFFF 48
+border_color = #FFFFFF 45
 
 # ID 3
 rounded = 5
 border_width = 0
-background_color = #FFFFFF 16
-border_color = #FFFFFF 68
+background_color = #FFFFFF 13
+border_color = #FFFFFF 65
 
 # Panel
 panel_monitor = all
 panel_position = bottom right horizontal
-panel_size = 98% 25
+panel_size = 98% 30
 panel_margin = 0 0
 panel_padding = 7 0 7
 panel_dock = 0
@@ -64,11 +64,11 @@ task_urgent_icon_asb = 100 0 0
 task_iconified_icon_asb = 70 0 0
 
 # Fonts
-task_font = sans 7
-task_font_color = #FFFFFF 68
-task_active_font_color = #FFFFFF 83
-task_urgent_font_color = #FFFFFF 83
-task_iconified_font_color = #FFFFFF 68
+task_font = Ubuntu Light 12
+task_font_color = #FFFFFF 65
+task_active_font_color = #FFFFFF 80
+task_urgent_font_color = #FFFFFF 80
+task_iconified_font_color = #FFFFFF 65
 font_shadow = 0
 
 # System Tray
@@ -81,13 +81,13 @@ systray_icon_asb = 70 0 0
 
 # Clock
 time1_format = %H:%M
-time1_font = sans 8
-time2_format = %A %d %B
-time2_font = sans 6
-clock_font_color = #FFFFFF 74
+time1_font = Ubuntu Light 12
+clock_font_color = #FFFFFF 71
+clock_tooltip = %A %d %B
 clock_padding = 1 0
 clock_background_id = 0
 clock_rclick_command = orage
+clock_tooltip_timezone = 
 
 # Tooltips
 tooltip = 0
@@ -95,7 +95,7 @@ tooltip_padding = 2 2
 tooltip_show_timeout = 0.7
 tooltip_hide_timeout = 0.3
 tooltip_background_id = 1
-tooltip_font = sans 10
+tooltip_font = Ubuntu Light 10
 tooltip_font_color = #000000 80
 
 # Mouse
@@ -111,7 +111,7 @@ battery_low_cmd = notify-send "battery low"
 battery_hide = 98
 bat1_font = sans 8
 bat2_font = sans 6
-battery_font_color = #FFFFFF 74
+battery_font_color = #FFFFFF 71
 battery_padding = 1 0
 battery_background_id = 0
 
