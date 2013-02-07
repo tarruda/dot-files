@@ -1,10 +1,14 @@
-URxvt.perl-lib: /home/tarruda/.config/urxvt
+URxvt.perl-lib: $HOME/.config/urxvt
 URxvt.perl-ext-common: fullscreen
-URxvt*keysym.F11: perl:fullscreen:switch
+URxvt.keysym.F11: perl:fullscreen:switch
 URxvt.background: #1C1C1C
 URxvt.foreground: #FFFFFF
-URxvt.font: xft:Ubuntu Mono:size=14:antialias=true:hinting=true
-URxvt.boldFont: xft:Ubuntu Mono:bold:size=14:antialias=true:hinting=true
+URxvt.font: xft:Ubuntu Mono:style=regular:pixelsize=20
+Xft.dpi:        96
+Xft.antialias:  true
+Xft.rgba:       rgb
+Xft.hinting:    true
+Xft.hintstyle:  hintslight
 URxvt.scrollBar: false
 ! gnome-terminal Tango theme
 ! black
