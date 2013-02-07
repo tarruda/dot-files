@@ -11,8 +11,8 @@ else
   ssh() {
 		# TODO match the host against a list of hosts known to be running tmux
 		tmux set status off
-		tmux set prefix ^P
-		command ssh "$@"
+		tmux set prefix ^o
+		ssh-add -l || ssh-add && { command ssh "$@" }
 		tmux set -u prefix
 		tmux set -u status
   }

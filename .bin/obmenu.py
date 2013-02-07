@@ -30,6 +30,8 @@ icon_dirs = [os.path.join(HOME, '.obmenu-override/pixmaps'),
              ]
 # Try scalable first, then grow in size starting from 16
 for size in 'scalable', 16, 22, 24, 32, 36, 48, 64, 72, 96, 128, 192, 256:
+    if isinstance(size, int):
+        size = str(size) + 'x' + str(size)
     icon_dirs.append('/usr/local/share/icons/hicolor/%s/apps' % size)
     icon_dirs.append('/usr/share/icons/hicolor/%s/apps' % size)
 
