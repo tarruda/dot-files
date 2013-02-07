@@ -11,3 +11,4 @@ if which VBoxClient-all > /dev/null 2>&1; then
 fi
 
 tint2 &
+urxvt &

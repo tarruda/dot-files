@@ -761,5 +761,13 @@
 
   # end of the example
 -->
+ <application name="urxvt">
+   <decor>yes</decor>
+   <shade>no</shade>
+   <skip_pager>yes</skip_pager>
+   <skip_taskbar>no</skip_taskbar>
+   <fullscreen>yes</fullscreen>
+   <maximized>true</maximized>
+ </application>
   </applications>
 </openbox_config>
