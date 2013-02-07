@@ -5,11 +5,9 @@
 exec > /dev/null
 exec 2>&1
 
-if which VBoxClient > /dev/null 2>&1; then
+if which VBoxClient-all > /dev/null 2>&1; then
 	# If running as virtualbox guest, initialize guest additions features
-	VBoxClient --clipboard
-	VBoxClient --display
-	VBoxClient --seamless
+	VBoxClient-all
 fi
 
 tint2 &

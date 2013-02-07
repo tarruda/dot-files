@@ -3,6 +3,6 @@
 <openbox_menu xmlns="http://openbox.org/3.4/menu">
 
 <!-- Add static stuff to {before,after}-menu.xml -->
-<menu id="root-menu" label="Openbox dynamic menu" execute="obmenu.py"/>
+<menu id="root-menu" label="Openbox dynamic menu" execute="python2 ~/.bin/obmenu.py"/>
 
 </openbox_menu>

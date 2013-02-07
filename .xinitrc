@@ -3,7 +3,7 @@
 setxkbmap us_intl
 
 if [ -z $PROFILE_LOADED ]; then
-	. "$HOME/.profile"
+	source "$HOME/.profile"
 fi
 unset PROFILE_LOADED
 

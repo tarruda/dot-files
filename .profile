@@ -14,7 +14,7 @@ export PATH
 # Run scripts in profile directory
 if [ -d "$HOME/.profile.d" ]; then
 	for profile in $HOME/.profile.d/*.sh; do
-		test -r "$profile" && . "$profile"
+		test -r "$profile" && source "$profile"
 	done
 	unset profile
 fi

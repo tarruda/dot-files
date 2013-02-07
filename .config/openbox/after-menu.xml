@@ -14,7 +14,7 @@
         Reboot the computer?
       </prompt>
       <execute>
-        shutdown -r now
+        sudo shutdown -r now
       </execute>
     </action>
   </item>
@@ -25,7 +25,7 @@
         Turn off the computer?
       </prompt>
       <execute>
-        shutdown -p now
+        sudo shutdown -h now
       </execute>
     </action>
   </item>
