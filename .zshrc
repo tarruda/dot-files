@@ -1,3 +1,41 @@
+
+function git() {
+	# Invoke ssh-add on demand
+	case $1 in
+		pull|push|fetch)
+			local remote=$2
+			if [ -z $remote ]; then
+				# remote wasn't specified so we have to find it by looking at
+				# which remote branch the current branch is tracking
+				local current_branch="`command git branch | grep '^*'`"
+				current_branch=${current_branch#\*\ }
+				local line=
+				command git for-each-ref \
+					--format='%(refname:short)<-%(upstream:short)' refs/heads | \
+			 	while read line; do
+					if [ "${line%%\<\-*}" = "$current_branch" ]; then
+						remote="${line#*<-}"
+						remote="${remote%%/*}"
+						break
+					fi
+				done
+			fi
+			# now find out the url
+			local grepLine='Fetch'
+			[ "$1" = "push" ] && grepLine='Push'
+			local url="`git remote show "$remote" -n | grep "$grepLine"`"
+			url="${url#*$grepLine*\:\ }"
+			case $url in
+				*@*|ssh://*)
+					# needs SSH key, so invoke ssh-add if needed
+					ssh-add -l &> /dev/null || ssh-add
+			esac
+		;;
+	esac
+
+	command git $@
+}
+
 # load oh-my-zsh
 ZSH=$HOME/.oh-my-zsh
 ZSH_THEME="evan" # afowler, alanpeabody, cypher
