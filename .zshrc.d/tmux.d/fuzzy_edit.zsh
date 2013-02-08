@@ -5,7 +5,7 @@ ib_pos=(0 0)
 
 # simple api for synchronizing render actions in the curses window
 renderer() {
-	zcurses string header "Fuzzy search"
+	zcurses string header "Fuzzy search: $1" 
 	# reset positions
 	zcurses move results 0 0
 	zcurses move input_box 0 0
@@ -100,8 +100,10 @@ walk() {
 	local cwd=$1
 	local pattern=$2
 	local matches=$3
-	local fpattern="$cwd/(#ia2)*${pattern}*${PRUNE_FILES}(.N)"
-	local dpattern="$cwd/*${PRUNE_DIRS}(/N)"
+	# explicitly associate the (#ia1) flag so it wont apply to
+	# the negated patterns
+	local fpattern="$cwd/(((#ia1)*${pattern}*)${PRUNE_REL_FILES})${PRUNE_FILES}(.N)"
+	local dpattern="$cwd/(*${PRUNE_REL_DIRS})${PRUNE_DIRS}(/N)"
 	for file in ${~fpattern}; do
 		echo "RESULT$file"
 		matches=$(($matches + 1))
@@ -120,15 +122,36 @@ do_find() {
 
 f_pid=""
 process_char() {
+	local dir="$1"
 	case $keycode in
 		127) echo "BACK" >&p ;;
 		*) echo "ECHO$char" >&p ;;
 	esac
 	# if already running, kill the current finder before restarting
-	kill $f_pid &> /dev/null
-	ps -p $f_pid &> /dev/null && wait $f_pid &> /dev/null
-	do_find "`pwd`" "`get_current_text`" >&p &
-	f_pid=$!
+	# kill $f_pid &> /dev/null
+	if ps -p $f_pid &> /dev/null; then
+		# finder still running
+		if [ -z $waiting ]; then
+			# signal that we are already waiting for a finder to exit
+			waiting=1
+			# only run one finder process at a time, and use another shell
+			# to wait and start the finder again asynchronously
+			(
+			# since the finder is not a child of this shell, poll until it exits
+			while ps -p $f_pid &>/dev/null; do 
+				if ps -p $f_pid | grep -q 'defunct'; then
+					break
+				fi
+				sleep 0.5
+			done
+			echo "`get_current_text`">/tmp/finder; do_find "$dir" "`get_current_text`" >&p
+			) &
+		fi
+	else
+		unset waiting
+		do_find "$dir" "`get_current_text`" >&p &
+		f_pid=$!
+	fi
 }
  
 get_current_text() {
@@ -144,22 +167,36 @@ run() {
 	setopt rematchpcre
 	trap cleanup INT HUP TERM EXIT
 	# load ignored directories
+	PRUNE_REL_DIRS=""
+	PRUNE_REL_FILES=""
 	PRUNE_DIRS=""
 	PRUNE_FILES=""
-	local dir="$HOME"
+	local dir="$PWD"
 	if [ -r "$dir/.fuzzy_ignore" ]; then
 		exec 3<"$dir/.fuzzy_ignore"
 		while read -u 3 pat; do
-			if [ "$pat" -pcre-match /$ ]; then
-				PRUNE_DIRS="$PRUNE_DIRS~$dir/${pat%/}"
+			# strip line comments in the ignore file
+			pat="${pat%%\#*}"
+			[ -z $pat ] && echo "abc" > /tmp/finder && continue
+			if [ "$pat" -pcre-match ^/ ]; then
+				# relative to the base directory
+				if [ "$pat" -pcre-match /$ ]; then
+					PRUNE_DIRS="$PRUNE_DIRS~$dir${pat%/}"
+				else
+					PRUNE_FILES="$PRUNE_FILES~$dir$pat"
+				fi
 			else
-				PRUNE_FILES="$PRUNE_FILES~$dir/$pat"
+				# relative to the current directory being scanned
+				if [ "$pat" -pcre-match /$ ]; then
+					PRUNE_REL_DIRS="$PRUNE_REL_DIRS~${pat%/}"
+				else
+					PRUNE_REL_FILES="$PRUNE_REL_FILES~$pat"
+				fi
 			fi
 		done
 		exec 3>&-
 	fi
-	export PRUNE_DIRS
-	export PRUNE_FILES
+	export PRUNE_DIRS PRUNE_FILES PRUNE_REL_DIRS PRUNE_REL_FILES
 	#
 	setup_screen
 	export ipc_pipe=`mktemp -u`
@@ -167,12 +204,12 @@ run() {
 		export ipc_pipe=`mktemp -u`
 	done
 	_shm_set "$wid:fuzzy-running" "${TMUX_PANE#*\%}"
-	{ coproc renderer >&3 } 3>&1
+	{ coproc renderer "$dir" >&3 } 3>&1
 	exec 4<"$ipc_pipe"
 	getchar
 	while true; do
 		if [ $keycode != 27 ]; then
-			process_char
+			process_char "$dir"
 		else
 			break
 		fi
