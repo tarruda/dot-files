@@ -1,6 +1,8 @@
 if [ $TERM != "screen-256color" ] && [  $TERM != "screen" ]; then
 	if which tmux &>/dev/null; then
 		TERM=xterm-256color exec zsh -c 'tmux attach || tmux new'
+	else
+		alias vi='vim'
 	fi
 else
   # tmux is running, define tmux-specific utilities

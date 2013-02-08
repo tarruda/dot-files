@@ -330,6 +330,9 @@
         <command>urxvt</command>
       </action>
     </keybind>
+    <keybind key="A-F11">
+      <action name="ToggleFullScreen" />
+    </keybind>
   </keyboard>
   <mouse>
     <dragThreshold>1</dragThreshold>
@@ -767,7 +770,7 @@
    <skip_pager>yes</skip_pager>
    <skip_taskbar>no</skip_taskbar>
    <fullscreen>yes</fullscreen>
-   <maximized>true</maximized>
+   <maximized>false</maximized>
  </application>
   </applications>
 </openbox_config>
