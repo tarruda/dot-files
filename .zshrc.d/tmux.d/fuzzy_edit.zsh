@@ -106,7 +106,6 @@ walk() {
 	local dpattern="$cwd/(*${PRUNE_REL_DIRS})${PRUNE_DIRS}(/N)"
 	for file in ${~fpattern}; do
 		echo "RESULT$file"
-		matches=$(($matches + 1))
 		[ $((++matches)) -ge 8 ] && exit
 	done
 	for dir in ${~dpattern}; do
@@ -115,6 +114,7 @@ walk() {
 }
 
 do_find() {
+	rm -f /tmp/finder
 	setopt extendedglob
 	echo "CLEAR"
 	walk "$1" "$2" 0
@@ -128,7 +128,7 @@ process_char() {
 		*) echo "ECHO$char" >&p ;;
 	esac
 	# if already running, kill the current finder before restarting
-	# kill $f_pid &> /dev/null
+	kill $f_pid &> /dev/null
 	if ps -p $f_pid &> /dev/null; then
 		# finder still running
 		if [ -z $waiting ]; then
@@ -144,7 +144,7 @@ process_char() {
 				fi
 				sleep 0.5
 			done
-			echo "`get_current_text`">/tmp/finder; do_find "$dir" "`get_current_text`" >&p
+			do_find "$dir" "`get_current_text`" >&p
 			) &
 		fi
 	else
