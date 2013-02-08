@@ -17,6 +17,15 @@ else
 		tmux set -u status
   }
 
+	# unregister from the shm server
+	_shm_unregister() {
+    local socket_path="/tmp/tmux-zsh-vim-shm/socket"
+		if zsocket $socket_path > /dev/null 2>&1; then
+      echo "EXIT|||$_shm_client_id" >&$REPLY
+			exec {REPLY}>&-
+		fi
+	}
+
 	# register to the shm server
 	_shm_register() {
 		local REPLY=
@@ -64,14 +73,6 @@ else
 		_shm_client_id=`uuidgen`
 		echo "ENTER|||$_shm_client_id" >&$REPLY
 		exec {REPLY}>&-
-	}
-
-	_shm_unregister() {
-    local socket_path="/tmp/tmux-zsh-vim-shm/socket"
-		if zsocket $socket_path > /dev/null 2>&1; then
-      echo "EXIT|||$_shm_client_id" >&$REPLY
-			exec {REPLY}>&-
-		fi
 	}
 
 	source "$HOME/.zshrc.d/tmux.d/common.zsh"
@@ -147,6 +148,7 @@ else
     tmux select-pane -t "$pane_uid"
   }
 	alias e=vi
+
+	trap _shm_unregister EXIT
 	_shm_register
-	trap _shm_unregister HUP INT TERM EXIT
 fi
