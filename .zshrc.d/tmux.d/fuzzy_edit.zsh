@@ -59,17 +59,9 @@ renderer() {
 
 cleanup() {
 	zcurses end
-	_shm_pop "$wid:fuzzy-open" > /dev/null
-	_shm_pop "$wid:fuzzy-running" > /dev/null
 	exec 4<&-
 	rm -f "$ipc_pipe"
 	exit
-}
-
-split() {
-	_shm_set "$wid:fuzzy-open" 1
-	tmux split-window -t $wid -l 10\
-		"zsh \"$HOME/.zshrc.d/tmux.d/fuzzy_edit.zsh\" $pid"
 }
 
 setup_screen() {
@@ -114,7 +106,6 @@ walk() {
 }
 
 do_find() {
-	rm -f /tmp/finder
 	setopt extendedglob
 	echo "CLEAR"
 	walk "$1" "$2" 0
@@ -161,76 +152,55 @@ get_current_text() {
 	echo -n "$txt"
 }
 
-run() {
-	zmodload zsh/curses
-	zmodload zsh/pcre
-	setopt rematchpcre
-	trap cleanup INT HUP TERM EXIT
-	# load ignored directories
-	PRUNE_REL_DIRS=""
-	PRUNE_REL_FILES=""
-	PRUNE_DIRS=""
-	PRUNE_FILES=""
-	local dir="$PWD"
-	if [ -r "$dir/.fuzzy_ignore" ]; then
-		exec 3<"$dir/.fuzzy_ignore"
-		while read -u 3 pat; do
-			# strip line comments in the ignore file
-			pat="${pat%%\#*}"
-			[ -z $pat ] && echo "abc" > /tmp/finder && continue
-			if [ "$pat" -pcre-match ^/ ]; then
-				# relative to the base directory
-				if [ "$pat" -pcre-match /$ ]; then
-					PRUNE_DIRS="$PRUNE_DIRS~$dir${pat%/}"
-				else
-					PRUNE_FILES="$PRUNE_FILES~$dir$pat"
-				fi
+zmodload zsh/curses
+zmodload zsh/pcre
+setopt rematchpcre
+trap cleanup INT TERM EXIT
+# load ignored directories
+PRUNE_REL_DIRS=""
+PRUNE_REL_FILES=""
+PRUNE_DIRS=""
+PRUNE_FILES=""
+local dir="$PWD"
+if [ -r "$dir/.fuzzy_ignore" ]; then
+	exec 3<"$dir/.fuzzy_ignore"
+	while read -u 3 pat; do
+		# strip line comments in the ignore file
+		pat="${pat%%\#*}"
+		[ -z $pat ] && continue
+		if [ "$pat" -pcre-match ^/ ]; then
+			# relative to the base directory
+			if [ "$pat" -pcre-match /$ ]; then
+				PRUNE_DIRS="$PRUNE_DIRS~$dir${pat%/}"
 			else
-				# relative to the current directory being scanned
-				if [ "$pat" -pcre-match /$ ]; then
-					PRUNE_REL_DIRS="$PRUNE_REL_DIRS~${pat%/}"
-				else
-					PRUNE_REL_FILES="$PRUNE_REL_FILES~$pat"
-				fi
+				PRUNE_FILES="$PRUNE_FILES~$dir$pat"
 			fi
-		done
-		exec 3>&-
-	fi
-	export PRUNE_DIRS PRUNE_FILES PRUNE_REL_DIRS PRUNE_REL_FILES
-	#
-	setup_screen
-	export ipc_pipe=`mktemp -u`
-	while ! mkfifo -m 600 "$ipc_pipe" &>/dev/null; do
-		export ipc_pipe=`mktemp -u`
-	done
-	_shm_set "$wid:fuzzy-running" "${TMUX_PANE#*\%}"
-	{ coproc renderer "$dir" >&3 } 3>&1
-	exec 4<"$ipc_pipe"
-	getchar
-	while true; do
-		if [ $keycode != 27 ]; then
-			process_char "$dir"
 		else
-			break
+			# relative to the current directory being scanned
+			if [ "$pat" -pcre-match /$ ]; then
+				PRUNE_REL_DIRS="$PRUNE_REL_DIRS~${pat%/}"
+			else
+				PRUNE_REL_FILES="$PRUNE_REL_FILES~$pat"
+			fi
 		fi
-		getchar
 	done
-}
-
-source "$HOME/.zshrc.d/tmux.d/common.zsh"
-
-pid=$1
-wid="`tmux display-message -pt \"$pid\" '#{window_id}'`" 2>/dev/null
-if [ -z $wid ]; then
-	echo "Cannot find window"
-	exit
+	exec 3>&-
 fi
-is_open="`_shm_get $wid:fuzzy-open`"
-if [ -z $is_open ]; then
-	split
-else
-	pane_id="`_shm_get $wid:fuzzy-running`"
-	if [ "%$pane_id" != "$TMUX_PANE" ]; then
-		run
+export PRUNE_DIRS PRUNE_FILES PRUNE_REL_DIRS PRUNE_REL_FILES
+#
+setup_screen
+export ipc_pipe=`mktemp -u`
+while ! mkfifo -m 600 "$ipc_pipe" &>/dev/null; do
+	export ipc_pipe=`mktemp -u`
+done
+{ coproc renderer "$dir" >&3 } 3>&1
+exec 4<"$ipc_pipe"
+getchar
+while true; do
+	if [ $keycode != 27 ]; then
+		process_char "$dir"
+	else
+		break
 	fi
-fi
+	getchar
+done

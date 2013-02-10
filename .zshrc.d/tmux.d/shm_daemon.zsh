@@ -70,6 +70,7 @@ socket_dir=$1
 (
 logfile=/tmp/tmux-zsh-vim-shm.log
 exec > /dev/null
+# exec >> $logfile
 exec 2>> $logfile
 # actual data being managed
 typeset -A data
