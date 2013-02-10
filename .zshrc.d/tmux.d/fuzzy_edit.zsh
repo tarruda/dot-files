@@ -1,17 +1,93 @@
 #!/usr/bin/env zsh
-# Simple fuzzy file opener
 
-ib_pos=(0 0)
+# Simple fuzzy file finder, useful for quickly opening files by typing only
+# parts of the name
 
-# simple api for synchronizing render actions in the curses window
+run() {
+	setup
+	trap cleanup INT TERM EXIT
+	getchar
+	while true; do
+		if [ $KEYCODE != 27 ]; then
+			process_char
+		else
+			break
+		fi
+		getchar
+	done
+}
+
+setup() {
+	zmodload zsh/curses
+	zmodload zsh/pcre
+	setopt rematchpcre
+	export CWD="`pwd`"
+	setup_ipc
+	setup_ignore_patterns
+	setup_screen
+	# initialize renderer process
+	{ coproc renderer >&3 } 3>&1
+	# Open INPUT_IPC for reading the currently typed text
+	exec 4<"$INPUT_IPC"
+}
+
+setup_ipc() {
+	# This pipe is used for reading the currently typed text
+	export INPUT_IPC=`mktemp -u`
+	while ! mkfifo -m 600 "$INPUT_IPC" &>/dev/null; do
+		export INPUT_IPC=`mktemp -u`
+	done
+}
+
+setup_ignore_patterns() {
+	PRUNE_REL_DIRS=""
+	PRUNE_REL_FILES=""
+	PRUNE_DIRS=""
+	PRUNE_FILES=""
+	if [ -r "$CWD/.fuzzy_ignore" ]; then
+		exec 3<"$CWD/.fuzzy_ignore"
+		while read -u 3 pat; do
+			# strip line comments in the ignore file
+			pat="${pat%%\#*}"
+			[ -z $pat ] && continue
+			if [ "$pat" -pcre-match ^/ ]; then
+				# relative to the base directory
+				if [ "$pat" -pcre-match /$ ]; then
+					PRUNE_DIRS="$PRUNE_DIRS~$CWD${pat%/}"
+				else
+					PRUNE_FILES="$PRUNE_FILES~$CWD$pat"
+				fi
+			else
+				# relative to the current directory being scanned
+				if [ "$pat" -pcre-match /$ ]; then
+					PRUNE_REL_DIRS="$PRUNE_REL_DIRS~${pat%/}"
+				else
+					PRUNE_REL_FILES="$PRUNE_REL_FILES~$pat"
+				fi
+			fi
+		done
+		exec 3>&-
+	fi
+	export PRUNE_DIRS PRUNE_FILES PRUNE_REL_DIRS PRUNE_REL_FILES
+}
+
+setup_screen() {
+	zcurses init
+	zcurses addwin header 1 $COLUMNS 0 0
+	zcurses addwin results 8 $COLUMNS 1 0
+	zcurses addwin input_box 1 $COLUMNS 9 0
+}
+
+# Runs in a coproc shell and provides a simple protocol for executing
+# and serializing render actions to the terminal. It is also used to
+# read the currently typed text
 renderer() {
-	zcurses string header "Fuzzy search: $1" 
+	zcurses string header "Fuzzy search: $CWD" 
 	# reset positions
 	zcurses move results 0 0
 	zcurses move input_box 0 0
 	zcurses refresh header results input_box
-	exec 4>"$ipc_pipe"
-	local cwd=`pwd`
+	exec 4>"$INPUT_IPC"
 	local cmd=
 	local ib_pos=0
 	local res_line=0
@@ -37,12 +113,13 @@ renderer() {
 			RESULT*)
 				if [ $res_line -lt 8 ]; then
 					# adds line to result window
-					local line=${${cmd#RESULT}#$cwd/}
+					local line=${${cmd#RESULT}#$CWD/}
 					zcurses string results "$line"
 					zcurses move results $((++res_line)) 0
 				fi
 				;;
 			CLEAR)
+				# clear the results
 				zcurses clear results
 				zcurses move results 0 0
 				res_line=0
@@ -60,39 +137,69 @@ renderer() {
 cleanup() {
 	zcurses end
 	exec 4<&-
-	rm -f "$ipc_pipe"
+	rm -f "$INPUT_IPC"
 	exit
 }
 
-setup_screen() {
-	zcurses init
-	zcurses addwin header 1 $COLUMNS 0 0
-	zcurses addwin results 8 $COLUMNS 1 0
-	zcurses addwin input_box 1 $COLUMNS 9 0
-}
-
+# Reads a single char and sets the char keycode
 getchar() {
-	zcurses input input_box char
-	keycode=`printf "%d" "'$char'"`
+	zcurses input input_box CHAR
+	KEYCODE=`printf "%d" "'$CHAR'"`
 }
 
-process_results() {
-	local i=0
-	local max=8
-	local line=
+process_char() {
+	case $KEYCODE in
+		127) echo "BACK" >&p ;;
+		*) echo "ECHO$CHAR" >&p ;;
+	esac
+	# if already running, kill the current finder before restarting
+	kill $FIND_PID &> /dev/null
+	if ps -p $FIND_PID &> /dev/null; then
+		# finder still running
+		if [ -z $waiting ]; then
+			# signal that we are already waiting for a finder to exit
+			waiting=1
+			# only run one finder process at a time, and use another shell
+			# to wait and start the finder again asynchronously
+			(
+			# since the finder is not a child of this shell, poll until it exits
+			while ps -p $FIND_PID &>/dev/null; do 
+				if ps -p $FIND_PID | grep -q 'defunct'; then
+					break
+				fi
+				sleep 0.5
+			done
+			find "`get_current_text`" >&p
+			) &
+		fi
+	else
+		unset waiting
+		find "`get_current_text`" >&p &
+		FIND_PID=$!
+	fi
+}
+
+# queries the 
+get_current_text() {
+	local txt=
+	echo "TXT" >&p
+	read -u 4 txt
+	echo -n "$txt"
+}
+
+# Delegates the actual finding to the 'walk' function. This runs aynchronously
+# in a background process
+find() {
+	setopt extendedglob
 	echo "CLEAR"
-	while read line; do
-		echo "RESULT$line"
-		i=$(($i + 1))
-		[[ $i -eq 8 ]] && break
-	done
+	walk "$CWD" "$1" 0
 }
 
 walk() {
 	local cwd=$1
 	local pattern=$2
 	local matches=$3
-	# explicitly associate the (#ia1) flag so it wont apply to
+	# explicitly set the scope of the '#ia1' flag so it wont apply to
 	# the negated patterns
 	local fpattern="$cwd/(((#ia1)*${pattern}*)${PRUNE_REL_FILES})${PRUNE_FILES}(.N)"
 	local dpattern="$cwd/(*${PRUNE_REL_DIRS})${PRUNE_DIRS}(/N)"
@@ -105,102 +212,4 @@ walk() {
 	done
 }
 
-do_find() {
-	setopt extendedglob
-	echo "CLEAR"
-	walk "$1" "$2" 0
-}
-
-f_pid=""
-process_char() {
-	local dir="$1"
-	case $keycode in
-		127) echo "BACK" >&p ;;
-		*) echo "ECHO$char" >&p ;;
-	esac
-	# if already running, kill the current finder before restarting
-	kill $f_pid &> /dev/null
-	if ps -p $f_pid &> /dev/null; then
-		# finder still running
-		if [ -z $waiting ]; then
-			# signal that we are already waiting for a finder to exit
-			waiting=1
-			# only run one finder process at a time, and use another shell
-			# to wait and start the finder again asynchronously
-			(
-			# since the finder is not a child of this shell, poll until it exits
-			while ps -p $f_pid &>/dev/null; do 
-				if ps -p $f_pid | grep -q 'defunct'; then
-					break
-				fi
-				sleep 0.5
-			done
-			do_find "$dir" "`get_current_text`" >&p
-			) &
-		fi
-	else
-		unset waiting
-		do_find "$dir" "`get_current_text`" >&p &
-		f_pid=$!
-	fi
-}
- 
-get_current_text() {
-	local txt=
-	echo "TXT" >&p
-	read -u 4 txt
-	echo -n "$txt"
-}
-
-zmodload zsh/curses
-zmodload zsh/pcre
-setopt rematchpcre
-trap cleanup INT TERM EXIT
-# load ignored directories
-PRUNE_REL_DIRS=""
-PRUNE_REL_FILES=""
-PRUNE_DIRS=""
-PRUNE_FILES=""
-local dir="$PWD"
-if [ -r "$dir/.fuzzy_ignore" ]; then
-	exec 3<"$dir/.fuzzy_ignore"
-	while read -u 3 pat; do
-		# strip line comments in the ignore file
-		pat="${pat%%\#*}"
-		[ -z $pat ] && continue
-		if [ "$pat" -pcre-match ^/ ]; then
-			# relative to the base directory
-			if [ "$pat" -pcre-match /$ ]; then
-				PRUNE_DIRS="$PRUNE_DIRS~$dir${pat%/}"
-			else
-				PRUNE_FILES="$PRUNE_FILES~$dir$pat"
-			fi
-		else
-			# relative to the current directory being scanned
-			if [ "$pat" -pcre-match /$ ]; then
-				PRUNE_REL_DIRS="$PRUNE_REL_DIRS~${pat%/}"
-			else
-				PRUNE_REL_FILES="$PRUNE_REL_FILES~$pat"
-			fi
-		fi
-	done
-	exec 3>&-
-fi
-export PRUNE_DIRS PRUNE_FILES PRUNE_REL_DIRS PRUNE_REL_FILES
-#
-setup_screen
-export ipc_pipe=`mktemp -u`
-while ! mkfifo -m 600 "$ipc_pipe" &>/dev/null; do
-	export ipc_pipe=`mktemp -u`
-done
-{ coproc renderer "$dir" >&3 } 3>&1
-exec 4<"$ipc_pipe"
-getchar
-while true; do
-	if [ $keycode != 27 ]; then
-		process_char "$dir"
-	else
-		break
-	fi
-	getchar
-done
+run
