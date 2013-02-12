@@ -1,5 +1,6 @@
 #!/usr/bin/env zsh
 
+RESULTS_HEIGHT=$(($LINES - 2))
 # Simple fuzzy file finder, useful for quickly opening files by typing only
 # parts of the name
 
@@ -74,8 +75,8 @@ setup_ignore_patterns() {
 setup_screen() {
 	zcurses init
 	zcurses addwin header 1 $COLUMNS 0 0
-	zcurses addwin results 8 $COLUMNS 1 0
-	zcurses addwin input_box 1 $COLUMNS 9 0
+	zcurses addwin results $RESULTS_HEIGHT $COLUMNS 1 0
+	zcurses addwin input_box 1 $COLUMNS $(($RESULTS_HEIGHT + 1)) 0
 }
 
 # Runs in a coproc shell and provides a simple protocol for executing
@@ -96,10 +97,12 @@ renderer() {
 		case "$cmd" in
 			ECHO*)
 				# echo character in the input window
-				local char=${cmd#ECHO}
-				zcurses char input_box $char
+				local char="${cmd#ECHO}"
+				zcurses char input_box "$char"
 				ib_pos=$(($ib_pos + 1))
 				buffer="$buffer$char"
+				zcurses clear header
+				zcurses string header "Fuzzy search: $buffer" 
 				;;
 			BACK)
 				if [ $ib_pos -gt 0 ]; then
@@ -108,10 +111,12 @@ renderer() {
 					zcurses char input_box " "
 					zcurses move input_box 0 $((--ib_pos))
 					buffer=${buffer[1,-2]}
+					zcurses clear header
+					zcurses string header "Fuzzy search: $buffer" 
 				fi
 				;;
 			RESULT*)
-				if [ $res_line -lt 8 ]; then
+				if [ $res_line -lt $RESULTS_HEIGHT ]; then
 					# adds line to result window
 					local line=${${cmd#RESULT}#$CWD/}
 					zcurses string results "$line"
@@ -124,12 +129,12 @@ renderer() {
 				zcurses move results 0 0
 				res_line=0
 				;;
-			TXT)
+			GET)
 				print -u 4 "$buffer"
 				continue
 				;;
 		esac
-		zcurses refresh results input_box
+		zcurses refresh header results input_box
 	done
 	exec 4>&-
 }
@@ -156,14 +161,15 @@ process_char() {
 	kill $FIND_PID &> /dev/null
 	if ps -p $FIND_PID &> /dev/null; then
 		# finder still running
-		if [ -z $waiting ]; then
+		if [ -z $WAITING ]; then
 			# signal that we are already waiting for a finder to exit
-			waiting=1
+			WAITING=1
 			# only run one finder process at a time, and use another shell
 			# to wait and start the finder again asynchronously
 			(
+			echo "WAITING" > /tmp/finder
 			# since the finder is not a child of this shell, poll until it exits
-			while ps -p $FIND_PID &>/dev/null; do 
+			while kill -0 $FIND_PID &>/dev/null; do 
 				if ps -p $FIND_PID | grep -q 'defunct'; then
 					break
 				fi
@@ -173,7 +179,7 @@ process_char() {
 			) &
 		fi
 	else
-		unset waiting
+		# unset WAITING
 		find "`get_current_text`" >&p &
 		FIND_PID=$!
 	fi
@@ -181,10 +187,10 @@ process_char() {
 
 # queries the 
 get_current_text() {
-	local txt=
-	echo "TXT" >&p
-	read -u 4 txt
-	echo -n "$txt"
+	local text=
+	echo "GET" >&p
+	read -u 4 text
+	echo -n "$text"
 }
 
 # Delegates the actual finding to the 'walk' function. This runs aynchronously
@@ -193,6 +199,7 @@ find() {
 	setopt extendedglob
 	echo "CLEAR"
 	walk "$CWD" "$1" 0
+	sleep 5
 }
 
 walk() {
@@ -205,7 +212,7 @@ walk() {
 	local dpattern="$cwd/(*${PRUNE_REL_DIRS})${PRUNE_DIRS}(/N)"
 	for file in ${~fpattern}; do
 		echo "RESULT$file"
-		[ $((++matches)) -ge 8 ] && exit
+		[ $((++matches)) -ge $RESULTS_HEIGHT ] && sleep 5 && exit
 	done
 	for dir in ${~dpattern}; do
 	  walk "$dir" "$pattern" "$matches"
