@@ -16,3 +16,14 @@ case $OSTYPE in
 		alias p='ps -ef'
 		;;
 esac
+
+setopt auto_cd
+setopt auto_pushd
+setopt pushd_ignore_dups
+
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+
+alias d='dirs -v | head -10'
