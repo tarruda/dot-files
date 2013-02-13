@@ -1,0 +1,11 @@
+#
+# Activate previous environment
+#
+
+local prog=$1
+if [ ! -r "$EM_DIR/$prog/.prev" ]; then
+	em_error_log "no previous environment for $prog was activated" && return
+fi
+local prev=`cat "$EM_DIR/$prog/.prev"`
+em_activate $prog $prev
+echo

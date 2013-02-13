@@ -1,0 +1,26 @@
+#
+# Determine binary archive url for <version>.
+#
+
+local prog=$1
+local version=$2
+local rv=""
+case $prog in
+ 	node)
+		local uname="`uname -a`"
+		local arch=x86
+		local os=
+
+		# from nave(1)
+		case "$uname" in
+			Linux*) os=linux ;;
+			Darwin*) os=darwin ;;
+			SunOS*) os=sunos ;;
+		esac
+
+		case "$uname" in
+			*x86_64*) arch=x64 ;;
+		esac
+		rv="http://nodejs.org/dist/v${version}/node-v${version}-${os}-${arch}.tar.gz"
+esac
+echo "$rv"

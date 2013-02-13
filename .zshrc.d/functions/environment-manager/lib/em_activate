@@ -1,0 +1,23 @@
+#
+# Activate <environment>
+#
+
+local $prog=$1
+em_deactivate $prog > /dev/null
+local environment=$2
+local dir="$EM_DIR/$prog/environments/$environment"
+local p="$dir/bin"
+local mp="$dir/share/man"
+if [ -d "$dir" ]; then
+	if ! echo "$PATH" | grep -qF "$p:"; then
+		export PATH="$p:$PATH"
+	fi
+	if ! echo "$MANPATH" | grep -qF "$mp:"; then
+		export MANPATH="$p:$MANPATH"
+	fi
+	case $prog in
+		node) export NODE_PATH="$dir/lib/node_modules" ;;
+	esac
+	echo $environment > "$EM_DIR/$prog/.active"
+	em_info_log activated "$prog $environment"
+fi

@@ -1,0 +1,76 @@
+imports=(
+ 	em_display_help
+	em_escape_for_sed
+	em_info_log
+	em_warn_log
+	em_error_log
+	em_erase_line
+	em_url_ok
+	em_get_current_environment
+	em_get_environment_for_index
+	em_display_environments_with_selected
+	em_display_environments
+	em_activate
+	em_deactivate
+	em_activate_previous
+	em_login
+	em_normalize_version
+	em_src_archive_url
+	em_bin_archive_url
+	em_compile
+	em_install
+	em_uninstall
+	em_add
+	em_remove
+	em_display_path_for_environment
+	em_display_latest_version
+	em_display_latest_stable_version
+	em_display_remote_versions
+	)
+
+
+autoload -Uz ${imports[@]}
+
+if [ -z "$EM_DIR" ]; then
+	EM_DIR="$HOME/.env-manager"
+fi
+
+# wget support (Added --no-check-certificate for Github downloads)
+which wget > /dev/null && EM_GET="wget --no-check-certificate -q -O-"
+
+# curl support
+which curl > /dev/null && EM_GET="curl -# -L"
+
+# Ensure we have curl or wget
+test -z "$EM_GET" && em_error_log "curl or wget required" && return
+
+# Handle arguments
+if test $# -eq 0; then
+	em_display_help && return
+fi
+local prog=$1
+shift
+case $prog in
+	node) ;;
+	-h|--help|help) em_display_help && return;;
+	*) echo "Invalid program/option, enter 'em help' for usage info" && return ;;
+esac
+if test $# -eq 0; then
+	em_display_environments $prog && return
+fi
+local cmd=$1
+shift
+case $cmd in
+	compile) em_compile $prog $@ ;;
+	install) em_install $prog $@ ;;
+	uninstall) em_uninstall $prog $@ ;;
+	add|+) echo && em_add $prog $@ && echo ;;
+	rm|-) em_remove $prog $@ ;;
+	activate) echo && em_activate $prog $@ && echo ;;
+	deactivate) echo && em_deactivate $prog && echo ;;
+	bin|which) em_display_path_for_environment $prog ;;
+	login) em_login $prog ;;
+	ls|list) em_display_remote_versions $prog ;;
+	prev) em_activate_previous $prog ;;
+	*) echo "Invalid command, enter 'em help' for usage info" ;;
+esac

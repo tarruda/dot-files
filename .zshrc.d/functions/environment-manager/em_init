@@ -1,0 +1,3 @@
+for prog in node; do
+	[ -r "$EM_DIR/$prog/.active" ] && em_activate $prog `cat "$EM_DIR/$prog/.active"` > /dev/null
+done

@@ -1,0 +1,5 @@
+#
+# em_info_log <type> <msg>
+#
+
+printf "  \033[36m%15s\033[0m : \033[90m%s\033[0m\n" $1 $2

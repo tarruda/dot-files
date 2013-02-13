@@ -1,0 +1,23 @@
+#
+# Display current environment and others installed.
+#
+
+local prog=$1
+local up=$'\033[A'
+local down=$'\033[B'
+local active=`em_get_current_environment $prog`
+local n=""
+local selected=""
+if [ -n "$active" ]; then
+	em_display_environments_with_selected $prog $active
+	echo -n "Enter the environment number to activate it: "
+
+	read n
+	echo
+	selected=`em_get_environment_for_index $prog $n`
+	[ -z $selected ] && em_error_log "Invalid selection" && return
+	em_activate $prog $selected
+	echo
+else
+	echo "No versions are installed yet. Try 'em $prog install stable'."
+fi

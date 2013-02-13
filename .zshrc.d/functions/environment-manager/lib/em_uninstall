@@ -1,0 +1,27 @@
+#
+# Uninstall <version ...>
+#
+
+local prog=$1
+shift
+[ -z "$1" ] && em_error_log "version(s) required" && return
+local version=$1
+echo
+while test $# -ne 0; do
+	local dir="$EM_DIR/$prog/versions/$version"
+	local environments="`cat \"$dir/._environments\"`"
+	if [ ! -z $environments ]; then
+		echo "Some environments depend on '$version':"
+		echo
+		echo "$environments"
+		echo
+		echo "Remove those before uninstalling the version"
+		echo
+		return
+	fi
+	rm -rf "$dir"
+	em_info_log uninstalled "$version"
+	shift
+	version=$1
+done
+echo

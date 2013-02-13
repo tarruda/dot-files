@@ -1,0 +1,24 @@
+#
+# Deactivates the current environment
+#
+
+local prog=$1
+local active=`em_get_current_environment $prog`
+if [ -n "$active" ]; then
+	local dir="$EM_DIR/$prog/environments/$active"
+	local p="$dir/bin"
+	local mp="$dir/share/man"
+	echo $active > "$EM_DIR/$prog/.prev"
+	if echo "$PATH" | grep -qF "$p:"; then
+		export PATH="${PATH#$p:}"
+	fi
+	if echo "$MANPATH" | grep -qF "$mp:"; then
+		export MANPATH="${MANPATH#$mp:}"
+	fi
+	case $prog in
+		node) unset NODE_PATH ;;
+	esac
+	rm -f "$EM_DIR/$prog/.active"
+	hash -r
+	em_info_log deactivated "$prog $active"
+fi

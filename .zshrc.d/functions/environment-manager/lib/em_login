@@ -1,0 +1,10 @@
+#
+# Copies the currently active environment to '.login'. This is useful if you need
+# to set the $PATH on login instead of just when a interactive shell is opened.
+# (eg setting environment for apps not started by command line)
+#
+
+local prog=$1
+if [ -r "$EM_DIR/$prog/.active" ]; then
+	cp "$EM_DIR/$prog/"{.active,.login}
+fi

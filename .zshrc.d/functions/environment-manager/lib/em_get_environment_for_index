@@ -1,0 +1,15 @@
+#
+# Gets the environment that corresponds to the selected index
+#
+
+local prog=$1
+local i=0
+for dir in "$EM_DIR/$prog/environments"/*; do
+	local environment="${dir##*/}"
+	if [ "$i" = "$2" ]; then
+		echo $environment
+		return
+	fi
+	i=$(($i + 1))
+done
+echo ""

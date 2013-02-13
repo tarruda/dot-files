@@ -1,0 +1,4 @@
+#
+# Escapes a string for use as a sed search pattern
+#
+echo "$1" | sed -e 's/[]\/()$*.^|[]/\\&/g'

@@ -1,0 +1,13 @@
+#
+# Echoes the currently active environment if any
+#
+
+local prog=$1
+local active=""
+local envs="`ls \"$EM_DIR/$prog/environments\" 2> /dev/null`"
+if [ -r "$EM_DIR/$prog/.active" ]; then
+	active=`cat "$EM_DIR/$prog/.active"`
+elif [ -n $envs ]; then
+	active="none"
+fi
+echo "$active"

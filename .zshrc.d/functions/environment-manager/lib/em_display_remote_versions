@@ -1,0 +1,29 @@
+#
+# Display the versions of [PROGRAM] available.
+#
+
+local prog=$1
+local active=`em_get_current_environment`
+local versions=""
+case $prog in
+	node)
+		versions=`eval "$EM_GET 2> /dev/null http://nodejs.org/dist/" \
+			| egrep -o '[0-9]+\.[0-9]+\.[0-9]+' \
+			| sort -u -k 1,1n -k 2,2n -k 3,3n -t . \
+			| awk 'BEGIN{print}{ print "  " $1 }'`
+
+		echo
+		for v in $versions; do
+			if [ "$active" = "$v" ]; then
+				printf "  \033[36mο\033[0m $v \033[0m\n"
+			else
+				if [ -d "$EM_DIR/versions/$v" ]; then
+					printf "    $v \033[0m\n"
+				else
+					printf "    \033[90m$v\033[0m\n"
+				fi
+			fi
+		done
+		echo
+		;;
+esac
