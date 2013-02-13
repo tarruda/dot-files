@@ -1,0 +1,5 @@
+local name="/tmp/`cat /dev/urandom | tr -cd a-zA-Z0-9 | fold -w10 | head -n1`"
+while ! mkfifo -m 600 "$name" &> /dev/null; do
+	name="/tmp/`cat /dev/urandom | tr -cd a-zA-Z0-9 | fold -w10 | head -n1`"
+done
+echo "$name"
