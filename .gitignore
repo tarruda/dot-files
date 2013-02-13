@@ -9,6 +9,8 @@
 !/.pythonrc
 !/.profile.d/
 !/.ssh/config
-/.profile.d/local.sh
-/.zshrc.d/local.zsh
+!/.zsh
+/.zsh/profile.d/local.zsh
+/.zsh/rc.d/local.zsh
+.zcompdump
 .VimballRecord

@@ -41,7 +41,7 @@ else
 		#     the daemonization process and do the rest of the job
 		if mkdir "$tmux_vim_socket_dir" > /dev/null 2>&1; then
 			(
-			exec zsh "$HOME/.zshrc.d/tmux.d/shm_daemon.zsh" $tmux_vim_socket_dir &!
+			exec zsh "$ZDOTDIR/tmux.d/shm_daemon.zsh" $tmux_vim_socket_dir &!
 			)
 		fi
 		# now try to connect with the daemon, up to 5 times, increasing the poll
@@ -77,7 +77,7 @@ else
 		exec {REPLY}>&-
 	}
 
-	source "$HOME/.zshrc.d/tmux.d/common.zsh"
+	source "$ZDOTDIR/tmux.d/common.zsh"
 
   vi() {
     local sid=`tmux display-message -p '#S'`

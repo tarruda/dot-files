@@ -1,4 +1,4 @@
-which xmodmap >/dev/null 2>&1 && \
+which xmodmap &> /dev/null && \
 xmodmap - << EOF
 remove Lock = Super_L
 keysym Super_L = F12

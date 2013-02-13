@@ -43,7 +43,10 @@ DISABLE_AUTO_UPDATE="true"
 plugins=(git git-extras)
 source $ZSH/oh-my-zsh.sh
 
-# load personal scripts
-for rc in `ls "$HOME/.zshrc.d/"*.zsh`; do
-	source "$rc"
-done
+if [ -d "$ZDOTDIR/rc.d" ]; then
+	# delegate initialization
+	for startup in "$ZDOTDIR/rc.d/"*.zsh(.N); do
+		source "$startup"
+	done
+	unset startup
+fi

@@ -1,4 +1,4 @@
-source "$HOME/.zshrc.d/tmux.d/common.zsh"
+source "$ZDOTDIR/tmux.d/common.zsh"
 
 parsed=
 tmux_pane=${1#*\%}

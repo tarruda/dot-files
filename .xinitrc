@@ -1,11 +1,12 @@
-#!/bin/sh
+#!/usr/bin/env zsh
 
 setxkbmap us_intl
 
-if [ -z $PROFILE_LOADED ]; then
-	source "$HOME/.profile"
+if [ -z $ZDOTDIR ]; then
+	export ZDOTDIR="$HOME/.zsh"
 fi
-unset PROFILE_LOADED
+
+[ -r "$ZDOTDIR/.zprofile" ] && source "$ZDOTDIR/.zprofile"
 
 DEFAULT_SESSION=openbox-session
 
