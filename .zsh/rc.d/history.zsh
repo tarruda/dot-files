@@ -1,4 +1,3 @@
-unsetopt histignorealldups sharehistory
 setopt histignorealldups
 
 HISTSIZE=1000

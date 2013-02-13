@@ -12,5 +12,6 @@ bindkey -M vicmd '/' history-incremental-search-forward
 bindkey -M vicmd '?' history-incremental-search-backward
 
 # Allows editing the command line with an external editor
+autoload edit-command-line
 zle -N edit-command-line
 bindkey -M vicmd "v" edit-command-line

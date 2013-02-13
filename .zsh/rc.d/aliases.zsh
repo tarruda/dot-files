@@ -1,5 +1,5 @@
 case $OSTYPE in
-	freebsd*)
+	*bsd*)
 		# Make freebsd ls colors look like linux ls
 		# src: http://www.puresimplicity.net/~hemi/freebsd/misc.html
 		export CLICOLOR="YES";
