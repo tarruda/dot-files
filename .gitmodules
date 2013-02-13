@@ -1,6 +1,3 @@
-[submodule ".vim"]
-	path = .vim
-	url = git://github.com/tarruda/vim-files.git
 [submodule ".git-extras"]
 	path = .git-extras
 	url = gh:visionmedia/git-extras

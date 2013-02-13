@@ -1,6 +1,6 @@
 /*
 !/README
-!/.bin
+!/.bin/
 !/.devilspie
 !/.gitignore
 !/.profile
@@ -10,6 +10,8 @@
 !/.profile.d/
 !/.ssh/config
 !/.zsh
+!/.vim/
+/.vim/sessions/
 /.zsh/profile.d/local.zsh
 /.zsh/rc.d/local.zsh
 /.zsh/.zcompdump
