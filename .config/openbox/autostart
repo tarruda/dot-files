@@ -5,6 +5,10 @@
 exec > /dev/null
 exec 2>&1
 
+if [ -f "$HOME/.config/openbox/background.png" ] && which xsetbg > /dev/null 2>&1; then
+	xsetbg "$HOME/.config/openbox/background.png"
+fi
+
 if which VBoxClient-all > /dev/null 2>&1; then
 	# If running as virtualbox guest, initialize guest additions features
 	VBoxClient-all
