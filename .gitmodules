@@ -1,3 +1,6 @@
 [submodule ".git-extras"]
 	path = .git-extras
 	url = gh:visionmedia/git-extras
+[submodule ".vim/bundle/vundle"]
+	path = .vim/bundle/vundle
+	url = gh:gmarik/vundle
