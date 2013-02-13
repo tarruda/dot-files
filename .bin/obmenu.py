@@ -3,6 +3,10 @@ import os, sys
 
 # Check for menu cache
 menu_cache = '/tmp/obmenu-cache.xml'
+if len(sys.argv) == 2 and os.path.isdir(sys.argv[1]):
+    # let the user specify cache location(like /dev/shm)
+    menu_cache = os.path.join(sys.argv[1], 'obmenu-cache.xml')
+
 if os.path.isfile(menu_cache):
     f = open(menu_cache, 'r')
     print f.read()

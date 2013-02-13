@@ -12,5 +12,6 @@
 !/.zsh
 /.zsh/profile.d/local.zsh
 /.zsh/rc.d/local.zsh
-.zcompdump
+/.zsh/.zcompdump
+/.zsh/.zsh_history
 .VimballRecord
