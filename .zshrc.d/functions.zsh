@@ -1,27 +1,9 @@
-mkdtmp() {
-  local name="/tmp/`cat /dev/urandom | tr -cd a-zA-Z0-9 | fold -w10 | head -n1`"
-  while [ -d "$name" ]; do
-    name="/tmp/`cat /dev/urandom | tr -cd a-zA-Z0-9 | fold -w10 | head -n1`"
-  done
-  mkdir "$name"
-  echo "$name"
-}
+fpath=(~/.zshrc.d/functions/*(/N) ~/.zshrc.d/functions/*/lib $fpath)
 
-# Command-not-found(ubuntu/debian)
-if [ -x "/usr/lib/command-not-found" ]; then
-  cnf_preexec() {
-    typeset -g cnf_command="${1%% *}"
-  }
+# autoload all public functions
+for file in ~/.zshrc.d/functions/*/*(.N); do
+	file=${file##*/}
+	autoload -Uz $file
+done
 
-  cnf_precmd() {
-    (($? == 127)) && [ -n "$cnf_command" ] && [ -x /usr/lib/command-not-found ] && {
-    whence -- "$cnf_command" >& /dev/null ||
-      /usr/bin/python /usr/lib/command-not-found -- "$cnf_command"
-    unset cnf_command
-  }
-}
-typeset -ga preexec_functions
-typeset -ga precmd_functions
-preexec_functions+=cnf_preexec
-precmd_functions+=cnf_precmd
-fi
+unset file saved_fpath
