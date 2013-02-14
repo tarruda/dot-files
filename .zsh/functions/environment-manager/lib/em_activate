@@ -2,20 +2,31 @@
 # Activate <environment>
 #
 
-local $prog=$1
+local prog=$1
 em_deactivate $prog > /dev/null
 local environment=$2
+local display=$3
 local dir="$EM_DIR/$prog/environments/$environment"
-local p="$dir/bin"
-local mp="$dir/share/man"
+local p="`em_bin_path_impl \"$dir\"`"
+local mp="`em_man_path_impl \"$dir\"`"
 if [ -d "$dir" ]; then
-	if ! echo "$PATH" | grep -qF "$p:"; then
-		export PATH="$p:$PATH"
+	if [ -z $display ]; then
+		if ! echo "$PATH" | grep -qF "$p:"; then
+			export PATH="$p:$PATH"
+		fi
+		if ! echo "$MANPATH" | grep -qF "$mp:"; then
+			export MANPATH="$p:$MANPATH"
+		fi
+		eval "`em_activate_impl \"$dir\"`"
+		em_info_log activated "$prog $environment"
+		echo "$enviroment" > "$dir/.active"
+	else
+		local impl="`em_activate_impl \"$dir\"`"
+		# echo a environment setup file to be sourced by bourne shells
+		cat <<- EOF
+		export PATH="$p:\$PATH"
+		export MANPATH="$mp:\$MANPATH"
+		$impl
+		EOF
 	fi
-	if ! echo "$MANPATH" | grep -qF "$mp:"; then
-		export MANPATH="$p:$MANPATH"
-	fi
-	em_activate_impl "$dir"
-	echo $environment > "$EM_DIR/$prog/.active"
-	em_info_log activated "$prog $environment"
 fi

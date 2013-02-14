@@ -6,8 +6,8 @@ local prog=$1
 local active=`em_get_current_environment $prog`
 if [ -n "$active" ]; then
 	local dir="$EM_DIR/$prog/environments/$active"
-	local p="$dir/bin"
-	local mp="$dir/share/man"
+	local p="`em_bin_path_impl $dir`"
+	local mp="`em_man_path_impl $dir`"
 	echo $active > "$EM_DIR/$prog/.prev"
 	if echo "$PATH" | grep -qF "$p:"; then
 		export PATH="${PATH#$p:}"

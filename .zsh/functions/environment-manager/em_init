@@ -1,8 +1,0 @@
-# ensure environment manager dir
-if [ -z "$EM_DIR" ]; then
-	EM_DIR="$HOME/.env-manager"
-fi
-
-for prog in "$ZDOTDIR/functions/environment-manager/lib/"*(/N:t); do
-	[ -r "$EM_DIR/$prog/.active" ] && em $prog activate `cat "$EM_DIR/$prog/.active"` > /dev/null
-done

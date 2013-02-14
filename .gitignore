@@ -4,8 +4,9 @@
 !/.vim/
 /.vim/sessions/
 /.vim/bundle/*
-/.zsh/profile.d/local.zsh
-/.zsh/rc.d/local.zsh
+/.zsh/profile-local.d/
+/.zsh/rc-local.d/
 /.zsh/.zcompdump
 /.zsh/.zsh_history
+/.zsh/.zcalc_history
 .VimballRecord
