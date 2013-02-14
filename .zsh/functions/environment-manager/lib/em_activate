@@ -19,10 +19,10 @@ if [ -d "$dir" ]; then
 		fi
 		eval "`em_activate_impl \"$dir\"`"
 		em_info_log activated "$prog $environment"
-		echo "$enviroment" > "$dir/.active"
+		echo "$environment" > "$EM_DIR/$prog/.active"
 	else
 		local impl="`em_activate_impl \"$dir\"`"
-		# echo a environment setup file to be sourced by bourne shells
+		# echo an bourne shells file to be included at startup
 		cat <<- EOF
 		export PATH="$p:\$PATH"
 		export MANPATH="$mp:\$MANPATH"
