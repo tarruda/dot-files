@@ -21,11 +21,6 @@ imports=($libdir/em_*(.N:t) $impldir/em_*(.N:t))
 # load private functions
 autoload -U ${imports[@]}
 
-# ensure working directory
-if [ -z "$EM_DIR" ]; then
-	EM_DIR="$HOME/.env-manager"
-fi
-
 # wget support (Added --no-check-certificate for Github downloads)
 which wget > /dev/null && EM_GET="wget --no-check-certificate -q -O-"
 
