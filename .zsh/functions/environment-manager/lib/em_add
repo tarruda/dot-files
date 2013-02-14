@@ -26,6 +26,7 @@ cp -as "$version_dir/"* .
 echo "$environment" >> "$version_dir/._environments"
 echo "$version" > "$dir/._version"
 em_info_log symlink "$version -> $environment"
+em_add_impl "$dir" # prog specific setup
 echo -n "Would you like to activate '$alias'?(y/N)"
 local c=""
 read c

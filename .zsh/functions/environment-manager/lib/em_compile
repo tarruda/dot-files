@@ -26,13 +26,12 @@ fi
 local archive="`basename $url`"
 local downloads="$EM_DIR/downloads"
 local sources="$EM_DIR/$prog/sources"
-local logfile="$sources/${archive%.tar.gz}.log"
 echo
 
 em_info_log compiling "$prog $version"
 
 em_info_log "create dir" "$dir"
-# mkdir -p "$dir"
+mkdir -p "$dir"
 mkdir -p "$sources"
 
 (
@@ -43,7 +42,7 @@ if [ ! -r "$archive" ]; then
 	eval "$EM_GET $url" > "$archive"
 	em_erase_line
 fi
-em_compile_impl $sources $downloads $archive $config $logfile
+em_compile_impl $sources $downloads $archive $config $dir
 )
 if [ $? -ne 0 ]; then
 	return

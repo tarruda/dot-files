@@ -3,9 +3,9 @@ local downloads=$2
 local archive=$3
 local dir=$4
 local config=$5
-local logfile="$sources/${archive%.tar.gz}.log"
+local logfile="$sources/${archive%.tgz}.log"
 tar x -C "$sources" -f "$downloads/$archive" 
-cd "$sources/${archive%.tar.gz}"
+cd "$sources/${archive%.tgz}"
 em_info_log "compile start" "use tail -f \"$logfile\" for feedback "
 if ! ./configure $config --prefix="$dir" > "$logfile" 2>&1; then
 	em_error_log "Error on configuration. See $logfile for details"
@@ -19,3 +19,18 @@ if ! make install > "$logfile" 2>&1; then
 	em_error_log "Error on instalation. See $logfile for details"
 	return 1
 fi
+
+em_info_log "installing" "pip/distribute"
+cd "$downloads"
+if [ ! -r "distribute_setup.py" ]; then
+	eval "$EM_GET http://python-distribute.org/distribute_setup.py" > distribute_setup.py
+	em_erase_line
+fi
+cat distribute_setup.py | "$dir/bin/python" &> /dev/null
+
+if [ ! -r "get-pip.py" ]; then
+	eval "$EM_GET https://raw.github.com/pypa/pip/master/contrib/get-pip.py" > get-pip.py
+	em_erase_line
+fi
+cat get-pip.py | "$dir/bin/python" &> /dev/null
+cd - &> /dev/null

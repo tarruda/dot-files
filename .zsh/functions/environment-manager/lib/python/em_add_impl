@@ -1,0 +1,4 @@
+# local dir=$1
+# # install distribute/pip inside the environment
+# eval "$EM_GET http://python-distribute.org/distribute_setup.py" | "$dir/bin/python"
+# eval "$EM_GET https://raw.github.com/pypa/pip/master/contrib/get-pip.py" | "$dir/bin/python"

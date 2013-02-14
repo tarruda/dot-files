@@ -1,0 +1,2 @@
+local version=$1
+echo "http://www.python.org/ftp/python/${version}/Python-${version}.tgz"

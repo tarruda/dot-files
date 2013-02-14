@@ -1,0 +1,2 @@
+local dir=$1
+echo "export PYTHONHOME=\"$dir\""

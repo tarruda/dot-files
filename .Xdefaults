@@ -5,6 +5,8 @@ URxvt.background: #1C1C1C
 URxvt.foreground: #FFFFFF
 URxvt.font: xft:Ubuntu Mono:style=regular:pixelsize=18
 URxvt.letterSpace: -1
+URxvt.url-launcher: /usr/bin/firefox
+URxvt.underlineURLs: true
 Xft.dpi:        96
 Xft.antialias:  true
 Xft.rgba:       rgb

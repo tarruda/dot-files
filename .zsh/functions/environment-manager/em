@@ -8,10 +8,12 @@ saved_fpath=($fpath)
 # set the function path to be the lib directory(reduce search time)
 fpath=($libdir $impldir)
 
-TRAPEXIT() {
+TRAPINT TRAPEXIT() {
+	[ -z "$saved_fpath" ] && return
+	trap - SIGINT # remove the sigint handler
 	# restore environment on exit
 	fpath=($saved_fpath)
- 	unfunction ${imports[@]}
+	unfunction ${imports[@]}
 	unset EM_GET saved_fpath imports
 }
 
@@ -40,7 +42,7 @@ if test $# -eq 0; then
 fi
 shift
 case $prog in
-	node) ;;
+	node|python) ;;
 	-h|--help|help) em_display_help && return;;
 	*) echo "Invalid program/option, enter 'em help' for usage info" && return ;;
 esac
