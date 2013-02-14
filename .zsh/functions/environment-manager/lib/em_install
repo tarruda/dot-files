@@ -46,9 +46,7 @@ if [ ! -r "$archive" ]; then
 	eval "$EM_GET $url" > "$archive"
 fi
 cd "$dir";
-case $prog in
-	node)	tar x --strip 1 -C "$dir" -f "$downloads/$archive" ;;
-esac
+em_install_impl $dir "$downloads/$archive"
 )
 em_erase_line
 

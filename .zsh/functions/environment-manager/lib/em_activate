@@ -15,9 +15,7 @@ if [ -d "$dir" ]; then
 	if ! echo "$MANPATH" | grep -qF "$mp:"; then
 		export MANPATH="$p:$MANPATH"
 	fi
-	case $prog in
-		node) export NODE_PATH="$dir/lib/node_modules" ;;
-	esac
+	em_activate_impl "$dir"
 	echo $environment > "$EM_DIR/$prog/.active"
 	em_info_log activated "$prog $environment"
 fi

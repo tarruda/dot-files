@@ -15,9 +15,7 @@ if [ -n "$active" ]; then
 	if echo "$MANPATH" | grep -qF "$mp:"; then
 		export MANPATH="${MANPATH#$mp:}"
 	fi
-	case $prog in
-		node) unset NODE_PATH ;;
-	esac
+	em_deactivate_impl
 	rm -f "$EM_DIR/$prog/.active"
 	hash -r
 	em_info_log deactivated "$prog $active"

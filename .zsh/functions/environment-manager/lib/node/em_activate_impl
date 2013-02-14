@@ -1,0 +1,2 @@
+local dir=$1
+export NODE_PATH="$dir/lib/node_modules"

@@ -1,0 +1,2 @@
+local version=$1
+echo "http://nodejs.org/dist/v${version}/node-v${version}.tar.gz"

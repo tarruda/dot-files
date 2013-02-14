@@ -4,9 +4,5 @@
 
 local prog=$1
 local version=$2
-local rv=""
-case $prog in
-	node)
-		rv="http://nodejs.org/dist/v${version}/node-v${version}.tar.gz"
-esac
+local rv="`em_src_archive_url_impl $version`"
 echo "$rv"

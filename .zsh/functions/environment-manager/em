@@ -1,36 +1,27 @@
-imports=(
- 	em_display_help
-	em_escape_for_sed
-	em_info_log
-	em_warn_log
-	em_error_log
-	em_erase_line
-	em_url_ok
-	em_get_current_environment
-	em_get_environment_for_index
-	em_display_environments_with_selected
-	em_display_environments
-	em_activate
-	em_deactivate
-	em_activate_previous
-	em_login
-	em_normalize_version
-	em_src_archive_url
-	em_bin_archive_url
-	em_compile
-	em_install
-	em_uninstall
-	em_add
-	em_remove
-	em_display_path_for_environment
-	em_display_latest_version
-	em_display_latest_stable_version
-	em_display_remote_versions
-	)
+local prog=$1
+local libdir="$ZDOTDIR/functions/environment-manager/lib"
+local impldir="$libdir/$prog"
 
+# save the current function path
+saved_fpath=($fpath)
 
-autoload -Uz ${imports[@]}
+# set the function path to be the lib directory(reduce search time)
+fpath=($libdir $impldir)
 
+TRAPEXIT() {
+	# restore environment on exit
+	fpath=($saved_fpath)
+ 	unfunction ${imports[@]}
+	unset EM_GET saved_fpath imports
+}
+
+# collect helper function names
+imports=($libdir/em_*(.N:t) $impldir/em_*(.N:t))
+
+# load private functions
+autoload -U ${imports[@]}
+
+# ensure working directory
 if [ -z "$EM_DIR" ]; then
 	EM_DIR="$HOME/.env-manager"
 fi
@@ -48,7 +39,6 @@ test -z "$EM_GET" && em_error_log "curl or wget required" && return
 if test $# -eq 0; then
 	em_display_help && return
 fi
-local prog=$1
 shift
 case $prog in
 	node) ;;

@@ -21,6 +21,6 @@ case $prog in
 		case "$uname" in
 			*x86_64*) arch=x64 ;;
 		esac
-		rv="http://nodejs.org/dist/v${version}/node-v${version}-${os}-${arch}.tar.gz"
+		rv="`em_bin_archive_url_impl $version $os $arch`"
 esac
 echo "$rv"

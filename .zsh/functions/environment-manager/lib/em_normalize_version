@@ -8,7 +8,4 @@ case $version in
 	latest) version=`em_display_latest_version $prog` ;;
 	stable)	version=`em_display_latest_stable_version $prog` ;;
 esac
-case $prog in
-	node) version=${version#v} ;;
-esac
-echo "$version"
+echo "`em_normalize_version_impl $version`"

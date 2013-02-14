@@ -1,0 +1,4 @@
+local version=$1
+local os=$2
+local arch=$3
+echo "http://nodejs.org/dist/v${version}/node-v${version}-${os}-${arch}.tar.gz"

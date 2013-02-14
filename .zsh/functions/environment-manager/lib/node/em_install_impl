@@ -1,0 +1,3 @@
+local dir=$1
+local archive=$2
+tar x --strip 1 -C "$dir" -f "$archive"
