@@ -18,8 +18,8 @@ set showcmd
 set completeopt=menu,menuone,longest
 " Limit popup menu height
 set pumheight=15
-" Shows line numbers
-set number
+" Shows relative line numbers
+set relativenumber
 " Global tab settings
 set expandtab
 set tabstop=2

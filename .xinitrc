@@ -1,7 +1,5 @@
 #!/usr/bin/env zsh
 
-setxkbmap us_intl
-
 if [ -z $ZDOTDIR ]; then
 	export ZDOTDIR="$HOME/.zsh"
 fi
