@@ -159,7 +159,7 @@ process_char() {
 	esac
 	# if already running, kill the current finder before restarting
 	kill $FIND_PID &> /dev/null
-	if ps -p $FIND_PID &> /dev/null; then
+	if kill -0 $FIND_PID &> /dev/null; then
 		# finder still running
 		if [ -z $WAITING ]; then
 			# signal that we are already waiting for a finder to exit
@@ -167,9 +167,8 @@ process_char() {
 			# only run one finder process at a time, and use another shell
 			# to wait and start the finder again asynchronously
 			(
-			echo "WAITING" > /tmp/finder
 			# since the finder is not a child of this shell, poll until it exits
-			while kill -0 $FIND_PID &>/dev/null; do 
+			while kill -0 $FIND_PID &> /dev/null; do 
 				if ps -p $FIND_PID | grep -q 'defunct'; then
 					break
 				fi
