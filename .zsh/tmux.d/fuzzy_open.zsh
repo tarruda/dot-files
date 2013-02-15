@@ -23,7 +23,7 @@ else
 	pane_id="`_shm_get $wid:fuzzy-running`"
 	if [ "%$pane_id" != "$TMUX_PANE" ]; then
 		_shm_set "$wid:fuzzy-running" "${TMUX_PANE#*\%}"
-		zsh "$ZDOTDIR/tmux.d/fuzzy_edit.zsh"
+		zsh "$ZDOTDIR/tmux.d/fuzzy_find.zsh"
 		cleanup
 	fi
 fi

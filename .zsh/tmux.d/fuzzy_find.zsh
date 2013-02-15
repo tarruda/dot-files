@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
-# Simple interactive fuzzy file finder, useful for quickly opening files by
-# typing only parts of the name
+# Simple interactive fuzzy file finder, useful for quickly opening files in
+# a 'project directory' by only typing parts of the name
 
 
 # Action to be executed on the selected filename
@@ -16,20 +16,19 @@ if [ -z $ERRORS_ALLOWED ]; then
 fi
 # Number of result windows
 RESULTS_HEIGHT=$(($LINES - 2))
-export ACTION ERRORS_ALLOWED RESULTS_HEIGHT
+# working dir
+CWD="`pwd`"
+# share this info with background jobs
+export ACTION ERRORS_ALLOWED RESULTS_HEIGHT CWD
 
 run() {
 	setup
-	trap cleanup INT TERM EXIT
+	trap 'cleanup; exit' EXIT INT TERM
 	find "" >&p &
 	FIND_PID=$!
 	getchar
 	while true; do
-		if [ $KEYCODE != 27 ]; then
-			process_char
-		else
-			break
-		fi
+		process_char
 		getchar
 	done
 }
@@ -38,7 +37,6 @@ setup() {
 	zmodload zsh/curses
 	zmodload zsh/pcre
 	setopt rematchpcre
-	export CWD="`pwd`"
 	setup_ipc
 	setup_ignore_patterns
 	setup_screen
@@ -217,10 +215,8 @@ renderer() {
 }
 
 cleanup() {
-	zcurses end
 	rm -f "$INPUT_IPC"
-	exec 4<&- &> /dev/null
-	exit
+	zcurses end
 }
 
 # Reads a single char and sets the char keycode
@@ -235,8 +231,12 @@ process_char() {
 			local file=
 		 	echo "ENTER" >&p
 			read -u 4 file
+			cleanup
 			exec eval "$ACTION \"$file\""
 		 	;;
+		27)
+			exit
+			;;
 		32)
 		 	echo "SPACE" >&p
 			reset_find
@@ -272,7 +272,7 @@ reset_find() {
 				if ps -p $FIND_PID | grep -q 'defunct'; then
 					break
 				fi
-				sleep 0.5
+				sleep 0.1
 			done
 			find "`get_current_text`" >&p
 			) &
