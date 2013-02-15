@@ -1,0 +1,4 @@
+local file=
+for file in "$ZDOTDIR/"(.zshrc|.zprofile|.zshenv) "$ZDOTDIR/"**/*.zsh; do
+	zcompile $file
+done
