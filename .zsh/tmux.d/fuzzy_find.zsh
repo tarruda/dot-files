@@ -295,6 +295,7 @@ get_current_text() {
 # Delegates the actual finding to the 'walk' function. This runs as a background job
 find() {
 	setopt extendedglob
+	setopt globdots
 	echo "CLEAR"
 	if [ -n "$1" ]; then
 		walk "$CWD" "$1" 0
