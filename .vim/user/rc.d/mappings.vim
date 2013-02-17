@@ -1,6 +1,6 @@
 " Leader mappings
 " Type , + space to clear search
-nnoremap <silent> <leader><space> :noh<cr>
+nnoremap <silent> <leader>c :noh<cr>
 " Move between bracket pairs using tab
 " (in normal and visual mode)
 nnoremap <tab> %

@@ -325,6 +325,11 @@
         <command>kfmclient openProfile filemanagement</command>
       </action>
     </keybind>
+    <keybind key="C-A-f">
+      <action name="Execute">
+        <command>firefox</command>
+      </action>
+    </keybind>
     <keybind key="C-A-t">
       <action name="Execute">
         <command>urxvt</command>

@@ -1,0 +1,4 @@
+let mapleader = ","
+" Leader mappings
+" Type , + space to clear search
+nnoremap <silent> <leader>c :noh<cr>
