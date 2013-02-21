@@ -3,7 +3,7 @@ source "$ZDOTDIR/tmux.d/common.zsh"
 parsed=
 tmux_pane=${1#*\%}
 other=`_shm_get $tmux_pane`
-[ -z $other ] && return
+[[ -z $other ]] && return
 parsed=(${(s.:.)other})
 toggle=
 tgt=

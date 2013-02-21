@@ -23,7 +23,7 @@ else
 	pane_id="`_shm_get $wid:fuzzy-running`"
 	if [ "%$pane_id" != "$TMUX_PANE" ]; then
 		_shm_set "$wid:fuzzy-running" "${TMUX_PANE#*\%}"
-		tmux send-keys -t $TMUX_PANE vi '^X' '^T'
+		{ sleep 0.1 && tmux send-keys -t $TMUX_PANE 'C-x' 'C-x' } &
 		zsh
 		# zsh "$ZDOTDIR/tmux.d/fuzzy_find.zsh" "zsh '$ZDOTDIR/tmux.d/vi.zsh'"
 		cleanup
