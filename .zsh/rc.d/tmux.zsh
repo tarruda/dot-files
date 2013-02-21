@@ -1,6 +1,10 @@
-if [ $TERM != "tmux" ] && [ $TERM != "screen-256color" ] && [  $TERM != "screen" ]; then
+if [[ $TERM != "tmux" && $TERM != "screen-256color" && $TERM != "screen" ]]; then
 	if which tmux &>/dev/null; then
-		exec zsh -c 'tmux attach || tmux new'
+		if [[ -z $SHELR ]]; then
+			exec zsh -c 'tmux attach || tmux new'
+		elif [[ $SHELR == '1' ]]; then
+			SHELR='2' shelr record
+		fi
 	else
 		alias vi='vim'
 	fi

@@ -335,6 +335,11 @@
         <command>urxvt</command>
       </action>
     </keybind>
+    <keybind key="C-A-r">
+      <action name="Execute">
+        <command>sh -c 'SHELR=1 exec urxvt -geometry 132x43+0+0'</command>
+      </action>
+    </keybind>
     <keybind key="A-F11">
       <action name="ToggleFullScreen" />
     </keybind>
@@ -774,7 +779,7 @@
    <shade>no</shade>
    <skip_pager>yes</skip_pager>
    <skip_taskbar>no</skip_taskbar>
-   <fullscreen>yes</fullscreen>
+   <fullscreen>no</fullscreen>
    <maximized>false</maximized>
  </application>
   </applications>

@@ -4,3 +4,6 @@
 [submodule ".vim/bundle/vundle"]
 	path = .vim/bundle/vundle
 	url = gh:gmarik/vundle
+[submodule ".zsh/plugins/fuzzy-match"]
+	path = .zsh/plugins/fuzzy-match
+	url = ta:zsh-fuzzy-match

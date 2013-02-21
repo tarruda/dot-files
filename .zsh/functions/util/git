@@ -31,4 +31,4 @@ case $1 in
 	;;
 esac
 
-command git $@
+command git "$@"
