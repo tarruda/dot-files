@@ -34,3 +34,10 @@
 
 [push]
 	default = simple
+
+[imap] 
+  folder = "[Gmail]/Drafts" 
+  host = imaps://imap.gmail.com 
+  user = tpadilha84@gmail.com
+  port = 993 
+  sslverify = true 
