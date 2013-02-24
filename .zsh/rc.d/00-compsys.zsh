@@ -21,6 +21,9 @@ zstyle ':completion:*' original true
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
 zstyle ':completion:*' squeeze-slashes true
 
+# ignore extensions when completing edit commands
+zstyle ":completion:*:*:(vim|vi|e):*:*files" ignored-patterns '(*~|*.(o|swp|swo|tgz|tbz|tar.(gz|bz2|xz)))'
+
 # initialize the completion system
 autoload -Uz compinit
 compinit

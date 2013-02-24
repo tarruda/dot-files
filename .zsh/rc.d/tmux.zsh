@@ -6,7 +6,7 @@ if [[ $TERM != "tmux" && $TERM != "screen-256color" && $TERM != "screen" ]]; the
 			SHELR='2' shelr record
 		fi
 	else
-		alias vi='vim'
+		alias vi=vim
 	fi
 else
   # tmux is running, define tmux-specific utilities
