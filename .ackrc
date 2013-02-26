@@ -1,3 +1,5 @@
 --pager=LESS=FSRX less -r
 --type-set
  coffee=.coffee
+--type-set
+ m4=.m4
