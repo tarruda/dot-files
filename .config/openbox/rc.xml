@@ -337,7 +337,7 @@
     </keybind>
     <keybind key="C-A-r">
       <action name="Execute">
-        <command>sh -c 'SHELR=1 exec urxvt -geometry 132x43+0+0'</command>
+        <command>sh -c 'NOTMUX=1 exec urxvt -geometry 132x43+0+0'</command>
       </action>
     </keybind>
     <keybind key="A-F11">

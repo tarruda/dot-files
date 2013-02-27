@@ -1,1 +1,1 @@
-au  BufNewFile,BufRead .tmux.conf setlocal filetype=tmux
+au  BufNewFile,BufRead .tmux*.conf setlocal filetype=tmux

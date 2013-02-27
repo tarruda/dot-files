@@ -1,28 +1,18 @@
-if [[ $TERM != "tmux" && $TERM != "screen-256color" && $TERM != "screen" ]]; then
+if [[ -z $NOTMUX && -z $TMUX ]]; then
 	if which tmux &>/dev/null; then
-		if [[ -z $SHELR ]]; then
-			exec zsh -c 'tmux attach || tmux new'
-		elif [[ $SHELR == '1' ]]; then
-			SHELR='2' shelr record
-		fi
+		exec zsh -c 'tmux attach || tmux new'
 	else
+		[[ -n $NOTMUX ]] && unset NOTMUX
 		alias vi=vim
+		alias e=vi
 	fi
 else
+
+	if [[ -r "$HOME/.tmux-local.conf" ]]; then
+		tmux source-file "$HOME/.tmux-local.conf"
+	fi
+
   # tmux is running, define tmux-specific utilities
-  tmw() {
-    tmux split-window -dh "$*"
-  }
-
-  ssh() {
-		# TODO match the host against a list of hosts known to be running tmux
-		tmux set -q status off
-		tmux set -q prefix ^o
-		ssh-add -l || ssh-add && { command ssh "$@" }
-		tmux set -uq prefix
-		tmux set -uq status
-  }
-
   vi() {
 		zsh "$ZDOTDIR/tmux.d/vi.zsh" "$@"
   }
