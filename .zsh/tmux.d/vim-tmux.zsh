@@ -4,6 +4,9 @@
 # Open one vim instance per project, if a project file is
 # opened and there is a running vim instance for that project, then open in it
 # alias this script in zsh if running inside tmux
+#
+# requires tmux monitor patch:
+# http://sourceforge.net/mailarchive/forum.php?thread_name=CAAq2XdqyKOMj4%2BVFySA9Qbmi0K4jym%2B0sH-z%2BADJT9ijRKzj2w%40mail.gmail.com&forum_name=tmux-users
 
 while (( $# != 0 )); do
 	file=$1
@@ -17,7 +20,7 @@ while (( $# != 0 )); do
 		# go up one level
 		dir=${dir:h}
 	done
-	tmux monitor -l "@vim-edit:$dir" # prevent race conditions
+	tmux monitor -l "@vim-edit:$dir" # to be safe, synchroninze access to the vim pane
 	vim_pane=`tmux show -v "@vim-edit:$dir" 2> /dev/null`
 	if [[ -z $vim_pane ]] || ! tmux display-message -p -t $vim_pane &> /dev/null; then
 		# vim is not running in any pane, so start a new instance 

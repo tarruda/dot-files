@@ -14,7 +14,7 @@ else
   # tmux is running, define tmux-specific utilities
 
   vi() {
-		zsh "$ZDOTDIR/tmux.d/vi-tmux.zsh" "$@"
+		zsh "$ZDOTDIR/tmux.d/vim-tmux.zsh" "$@"
   }
 fi
 
