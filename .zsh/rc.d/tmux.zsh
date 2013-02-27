@@ -4,7 +4,6 @@ if [[ -z $NOTMUX && -z $TMUX ]]; then
 	else
 		[[ -n $NOTMUX ]] && unset NOTMUX
 		alias vi=vim
-		alias e=vi
 	fi
 else
 
@@ -13,9 +12,10 @@ else
 	fi
 
   # tmux is running, define tmux-specific utilities
-  vi() {
-		zsh "$ZDOTDIR/tmux.d/vi.zsh" "$@"
-  }
 
-	alias e=vi
+  vi() {
+		zsh "$ZDOTDIR/tmux.d/vi-tmux.zsh" "$@"
+  }
 fi
+
+alias e=vi
