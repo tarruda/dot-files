@@ -9,3 +9,4 @@ if which vim &>/dev/null; then
     export EDITOR="$VIM"
 		unset VIM
 fi
+export ACKRC=".ackrc"

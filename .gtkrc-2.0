@@ -3,7 +3,7 @@
 
 gtk-theme-name="Simple-Slate"
 gtk-icon-theme-name="hicolor"
-gtk-font-name="Ubuntu Light 12"
+gtk-font-name="DejaVu Serif Semi-Condensed 12"
 gtk-cursor-theme-size=0
 gtk-toolbar-style=GTK_TOOLBAR_BOTH
 gtk-toolbar-icon-size=GTK_ICON_SIZE_LARGE_TOOLBAR
@@ -13,6 +13,6 @@ gtk-enable-event-sounds=1
 gtk-enable-input-feedback-sounds=1
 gtk-xft-antialias=1
 gtk-xft-hinting=1
-gtk-xft-hintstyle="hintfull"
+gtk-xft-hintstyle="hintslight"
 gtk-xft-rgba="rgb"
 include "/home/tarruda/.gtkrc-2.0.mine"
