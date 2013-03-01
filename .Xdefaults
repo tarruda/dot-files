@@ -3,10 +3,10 @@ URxvt.perl-ext-common: fullscreen
 URxvt.keysym.F11: perl:fullscreen:switch
 URxvt.background: #1C1C1C
 URxvt.foreground: #FFFFFF
-URxvt.font: xft:Ubuntu Mono:pixelsize=18
-URxvt.boldFont: xft:Ubuntu Mono:bold:pixelsize=18
-URxvt.italicFont: xft:Ubuntu Mono:italic:pixelsize=18:autohint=true
-URxvt.boldItalicFont: xft:Ubuntu Mono:bold:italic:pixelsize=18:autohint=true
+URxvt.font: xft:Ubuntu Mono:pixelsize=20
+URxvt.boldFont: xft:Ubuntu Mono:bold:pixelsize=20
+URxvt.italicFont: xft:Ubuntu Mono:italic:pixelsize=20:autohint=true
+URxvt.boldItalicFont: xft:Ubuntu Mono:bold:italic:pixelsize=20:autohint=true
 URxvt.letterSpace: -1
 URxvt.url-launcher: /usr/bin/firefox
 URxvt.underlineURLs: true
