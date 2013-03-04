@@ -1,2 +1,2 @@
-map <F5> :SlimuxREPLSendLine<CR>
-vmap <F5> :SlimuxREPLSendSelection<CR>
+map <F6> :SlimuxREPLSendLine<CR>
+vmap <F6> :SlimuxREPLSendSelection<CR>

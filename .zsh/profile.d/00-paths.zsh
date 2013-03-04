@@ -17,8 +17,11 @@ if [ -d "$HOME/.user-prefixes" ]; then
 		if [ -d "$prefix/bin" ]; then
 			PATH="$prefix/bin:$PATH"
 		fi
+		if [ -d "$prefix/share/man" ]; then
+			MANPATH="$prefix/share/man:$MANPATH"
+		fi
 	done
 	unset prefix
 fi
 
-export PATH
+export PATH MANPATH

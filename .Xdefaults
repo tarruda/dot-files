@@ -16,6 +16,7 @@ Xft.rgba:       rgb
 Xft.hinting:    true
 Xft.hintstyle:  hintslight
 URxvt.scrollBar: false
+URxvt*saveLines: 0
 ! gnome-terminal Tango theme
 ! black
 URxvt.color0 : #2E2E34343636
