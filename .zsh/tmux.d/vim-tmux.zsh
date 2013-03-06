@@ -4,25 +4,22 @@
 # Open one vim instance per project or dir. Additional files of that
 # project/dir are opened in the same instance.
 # Alias this script in zsh if running inside tmux
-#
-# requires tmux monitor patch:
-# http://sourceforge.net/mailarchive/forum.php?thread_name=CAAq2XdqyKOMj4%2BVFySA9Qbmi0K4jym%2B0sH-z%2BADJT9ijRKzj2w%40mail.gmail.com&forum_name=tmux-users
 
 vim_ensure_is_open() {
 	dir=$1
-	tmux monitor -l "vim-edit:$dir" # to be safe, synchroninze access to the vim pane
+	tmux wait -L "vim-edit:$dir" # to be safe, synchroninze access to the vim pane
 	[[ -z $vim_pane ]] && vim_pane=`tmux show -v "@vim-edit:$dir" 2> /dev/null`
 	if [[ -z $vim_pane ]] || ! tmux display-message -pt $vim_pane &> /dev/null; then
 		# vim is not running in any pane, so start a new instance 
-		monitor="`uuidgen`"
+		channel="`uuidgen`"
 		tmux split-window -d -p 70 "vim \
 			-c \"cd $dir\" \
 			-c ':silent !tmux set -q \"@vim-edit:$dir\" \"\$TMUX_PANE\"'\
-			-c ':silent !tmux monitor -s \"$monitor\"'"
-		tmux monitor -w $monitor
+			-c ':silent !tmux wait -S \"$channel\"'"
+		tmux wait $channel
 		vim_pane=`tmux show -v "@vim-edit:$dir" 2> /dev/null`
 	fi
-	tmux monitor -u "vim-edit:$dir"
+	tmux wait -U "vim-edit:$dir"
 }
 
 while (( $# != 0 )); do

@@ -20,6 +20,7 @@ alias gr='git remote'
 compdef _git gr=git-remote
 alias grv='git remote -v'
 compdef _git grv=git-remote
+alias grm='git ls-files --deleted -z | xargs -0 git rm'
 alias grmv='git remote rename'
 compdef _git grmv=git-remote
 alias grrm='git remote remove'
