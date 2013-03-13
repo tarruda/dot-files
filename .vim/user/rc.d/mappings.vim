@@ -17,3 +17,15 @@ vnoremap <C-k> :m '<-2<CR>gv=gv
 inoremap <F1> <ESC>
 nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
+
+if $TERM =~ 'tmux'
+  " fix some mappings
+  nnoremap <Esc>A <up>
+  nnoremap <Esc>B <down>
+  nnoremap <Esc>C <right>
+  nnoremap <Esc>D <left>
+  inoremap <Esc>A <up>
+  inoremap <Esc>B <down>
+  inoremap <Esc>C <right>
+  inoremap <Esc>D <left>
+endif
