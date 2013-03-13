@@ -1,44 +1,68 @@
-URxvt.perl-lib: .config/urxvt
-URxvt.perl-ext-common: fullscreen
-URxvt.keysym.F11: perl:fullscreen:switch
-URxvt.background: #1C1C1C
-URxvt.foreground: #FFFFFF
-URxvt.font: xft:Ubuntu Mono:pixelsize=22
-/* URxvt.boldFont: xft:Ubuntu Mono:bold:pixelsize=22 */
-/* URxvt.italicFont: xft:Ubuntu Mono:italic:pixelsize=22:autohint=true */
-/* URxvt.boldItalicFont: xft:Ubuntu Mono:bold:italic:pixelsize=22:autohint=true */
-URxvt.letterSpace: -1
-URxvt.url-launcher: /usr/bin/firefox
-URxvt.underlineURLs: true
+! urxvt
+urxvt*perl-lib: .config/urxvt
+urxvt*perl-ext-common: fullscreen
+urxvt*keysym.F11: perl:fullscreen:switch
+urxvt*background: #1C1C1C
+urxvt*foreground: #FFFFFF
+urxvt*font: xft:Ubuntu Mono:pixelsize=22
+urxvt*letterSpace: -1
+urxvt*url-launcher: /usr/bin/firefox
+urxvt*underlineURLs: true
+urxvt*scrollBar: false
+urxvt*saveLines: 0
+! tango color scheme (gnome terminal)
+! black
+urxvt*color0 : #2E2E34343636
+urxvt*color8 : #555557575353
+! red
+urxvt*color1 : #CCCC00000000
+urxvt*color9 : #EFEF29292929
+! green
+urxvt*color2 : #4E4E9A9A0606
+urxvt*color10 : #8A8AE2E23434
+! yellow
+urxvt*color3 : #C4C4A0A00000
+urxvt*color11 : #FCFCE9E94F4F
+! blue
+urxvt*color4 : #34346565A4A4
+urxvt*color12 : #72729F9FCFCF
+! magenta
+urxvt*color5 : #757550507B7B
+urxvt*color13 : #ADAD7F7FA8A8
+! cyan
+urxvt*color6 : #060698209A9A
+urxvt*color14 : #3434E2E2E2E2
+! white
+urxvt*color7 : #D3D3D7D7CFCF
+urxvt*color15 : #EEEEEEEEECEC
+
+! xterm
+xterm*termName: xterm-256color
+xterm*faceName: Ubuntu Mono
+xterm*faceSize: 17
+xterm*background: rgb:1C/1C/1C
+xterm*foreground: rgb:FF/FF/FF
+! tango color scheme
+xterm*color0: #2e3436
+xterm*color1: #cc0000
+xterm*color2: #4e9a06
+xterm*color3: #c4a000
+xterm*color4: #3465a4
+xterm*color5: #75507b
+xterm*color6: #0b939b
+xterm*color7: #d3d7cf
+xterm*color8: #555753
+xterm*color9: #ef2929
+xterm*color10: #8ae234
+xterm*color11: #fce94f
+xterm*color12: #729fcf
+xterm*color13: #ad7fa8
+xterm*color14: #00f5e9
+xterm*color15: #eeeeec
+
+! better font rendering
 Xft.dpi:        96
 Xft.antialias:  true
 Xft.rgba:       rgb
 Xft.hinting:    true
 Xft.hintstyle:  hintslight
-URxvt.scrollBar: false
-URxvt*saveLines: 0
-! gnome-terminal Tango theme
-! black
-URxvt.color0 : #2E2E34343636
-URxvt.color8 : #555557575353
-! red
-URxvt.color1 : #CCCC00000000
-URxvt.color9 : #EFEF29292929
-! green
-URxvt.color2 : #4E4E9A9A0606
-URxvt.color10 : #8A8AE2E23434
-! yellow
-URxvt.color3 : #C4C4A0A00000
-URxvt.color11 : #FCFCE9E94F4F
-! blue
-URxvt.color4 : #34346565A4A4
-URxvt.color12 : #72729F9FCFCF
-! magenta
-URxvt.color5 : #757550507B7B
-URxvt.color13 : #ADAD7F7FA8A8
-! cyan
-URxvt.color6 : #060698209A9A
-URxvt.color14 : #3434E2E2E2E2
-! white
-URxvt.color7 : #D3D3D7D7CFCF
-URxvt.color15 : #EEEEEEEEECEC
