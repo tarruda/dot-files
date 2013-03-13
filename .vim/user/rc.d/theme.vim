@@ -18,5 +18,6 @@ else
   colorscheme darktwilight-term
   if $TERM =~ 'tmux'
     highlight Comment cterm=italic
+    set ttyfast
   endif
 endif
