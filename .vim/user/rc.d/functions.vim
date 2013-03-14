@@ -28,3 +28,41 @@ endfun
 fun! s:IndentLevel(lnum)
   return indent(a:lnum) / &shiftwidth
 endfun
+
+if $TERM =~ 'tmux'
+  " integrate movement between tmux/vim panes/windows
+
+  fun! TmuxMove(direction)
+    " Check if we are currently focusing on a edge window.
+    " To achieve that,  move to/from the requested window and
+    " see if the window number changed
+    let oldw = winnr()
+    silent! exe 'wincmd ' . a:direction
+    let neww = winnr()
+    silent! exe oldw . 'wincmd'
+    if oldw == neww
+      " The focused window is at an edge, so ask tmux to switch panes
+      if a:direction == 'j'
+        !tmux select-pane -D
+      elseif a:direction == 'k'
+        !tmux select-pane -U
+      elseif a:direction == 'h'
+        !tmux select-pane -L
+      elseif a:direction == 'l'
+        !tmux select-pane -R
+      endif
+    else
+      exe 'wincmd ' . a:direction
+    end
+  endfunction
+
+  nnoremap <silent> <c-a>j :silent call TmuxMove('j')<cr><c-l>
+  nnoremap <silent> <c-a>k :silent call TmuxMove('k')<cr><c-l>
+  nnoremap <silent> <c-a>h :silent call TmuxMove('h')<cr><c-l>
+  nnoremap <silent> <c-a>l :silent call TmuxMove('l')<cr><c-l>
+  nnoremap <silent> <c-a><down> :silent call TmuxMove('j')<cr><c-l>
+  nnoremap <silent> <c-a><up> :silent call TmuxMove('k')<cr><c-l>
+  nnoremap <silent> <c-a><left> :silent call TmuxMove('h')<cr><c-l>
+  nnoremap <silent> <c-a><right> :silent call TmuxMove('l')<cr><c-l>
+
+endif
