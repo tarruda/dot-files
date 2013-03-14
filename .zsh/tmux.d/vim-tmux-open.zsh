@@ -30,7 +30,7 @@ while (( $# != 0 )); do
 	while [[ $dir != '/' ]] ; do
 		vim_pane=`tmux show -v "@vim-edit:$dir" 2> /dev/null`
 		# Is there a vim instance open in this directory?
-	  [[ -n $vim_pane ]] && break
+		[[ -n $vim_pane ]] && break
 		# Only work with svn 1.7 +
 		[[ -d "$dir/.git" ||\
 			-d "$dir/.svn" ||\
