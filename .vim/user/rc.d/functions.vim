@@ -43,13 +43,13 @@ if $TERM =~ 'tmux'
     if oldw == neww
       " The focused window is at an edge, so ask tmux to switch panes
       if a:direction == 'j'
-        !tmux select-pane -D
+        call system("tmux select-pane -D")
       elseif a:direction == 'k'
-        !tmux select-pane -U
+        call system("tmux select-pane -U")
       elseif a:direction == 'h'
-        !tmux select-pane -L
+        call system("tmux select-pane -L")
       elseif a:direction == 'l'
-        !tmux select-pane -R
+        call system("tmux select-pane -R")
       endif
     else
       exe 'wincmd ' . a:direction
