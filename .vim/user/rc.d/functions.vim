@@ -56,13 +56,13 @@ if $TERM =~ 'tmux'
     end
   endfunction
 
-  nnoremap <silent> <c-a>j :silent call TmuxMove('j')<cr><c-l>
-  nnoremap <silent> <c-a>k :silent call TmuxMove('k')<cr><c-l>
-  nnoremap <silent> <c-a>h :silent call TmuxMove('h')<cr><c-l>
-  nnoremap <silent> <c-a>l :silent call TmuxMove('l')<cr><c-l>
-  nnoremap <silent> <c-a><down> :silent call TmuxMove('j')<cr><c-l>
-  nnoremap <silent> <c-a><up> :silent call TmuxMove('k')<cr><c-l>
-  nnoremap <silent> <c-a><left> :silent call TmuxMove('h')<cr><c-l>
-  nnoremap <silent> <c-a><right> :silent call TmuxMove('l')<cr><c-l>
+  nnoremap <silent> <c-a>j :silent call TmuxMove('j')<cr>
+  nnoremap <silent> <c-a>k :silent call TmuxMove('k')<cr>
+  nnoremap <silent> <c-a>h :silent call TmuxMove('h')<cr>
+  nnoremap <silent> <c-a>l :silent call TmuxMove('l')<cr>
+  nnoremap <silent> <c-a><down> :silent call TmuxMove('j')<cr>
+  nnoremap <silent> <c-a><up> :silent call TmuxMove('k')<cr>
+  nnoremap <silent> <c-a><left> :silent call TmuxMove('h')<cr>
+  nnoremap <silent> <c-a><right> :silent call TmuxMove('l')<cr>
 
 endif
