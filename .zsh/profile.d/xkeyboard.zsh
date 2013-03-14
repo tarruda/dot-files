@@ -7,6 +7,6 @@ if which xmodmap &> /dev/null; then
 	remove Lock = Super_L
 	keysym Super_L = F12
 	clear Lock
-	keycode 0x42 = Escape
+	keycode 0x42 = Control_L
 	EOF
 fi
