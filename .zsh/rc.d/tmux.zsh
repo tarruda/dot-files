@@ -1,10 +1,5 @@
 if [[ -z $NOTMUX && -z $TMUX ]]; then
-	if which tmux &>/dev/null; then
-		exec zsh -c 'tmux attach || tmux new'
-	else
-		[[ -n $NOTMUX ]] && unset NOTMUX
-		alias vi=vim
-	fi
+	alias vi=vim
 else
 
 	if [[ -r "$HOME/.tmux-local.conf" ]]; then
