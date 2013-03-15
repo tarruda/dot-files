@@ -29,7 +29,7 @@ fun! s:IndentLevel(lnum)
   return indent(a:lnum) / &shiftwidth
 endfun
 
-if $TERM =~ 'tmux'
+if $TMUX != ''
   " integrate movement between tmux/vim panes/windows
 
   fun! TmuxMove(direction)
@@ -56,13 +56,13 @@ if $TERM =~ 'tmux'
     end
   endfunction
 
-  nnoremap <silent> <c-a>j :silent call TmuxMove('j')<cr>
-  nnoremap <silent> <c-a>k :silent call TmuxMove('k')<cr>
-  nnoremap <silent> <c-a>h :silent call TmuxMove('h')<cr>
-  nnoremap <silent> <c-a>l :silent call TmuxMove('l')<cr>
-  nnoremap <silent> <c-a><down> :silent call TmuxMove('j')<cr>
-  nnoremap <silent> <c-a><up> :silent call TmuxMove('k')<cr>
-  nnoremap <silent> <c-a><left> :silent call TmuxMove('h')<cr>
-  nnoremap <silent> <c-a><right> :silent call TmuxMove('l')<cr>
+  nnoremap <silent> <c-w>j :silent call TmuxMove('j')<cr>
+  nnoremap <silent> <c-w>k :silent call TmuxMove('k')<cr>
+  nnoremap <silent> <c-w>h :silent call TmuxMove('h')<cr>
+  nnoremap <silent> <c-w>l :silent call TmuxMove('l')<cr>
+  nnoremap <silent> <c-w><down> :silent call TmuxMove('j')<cr>
+  nnoremap <silent> <c-w><up> :silent call TmuxMove('k')<cr>
+  nnoremap <silent> <c-w><left> :silent call TmuxMove('h')<cr>
+  nnoremap <silent> <c-w><right> :silent call TmuxMove('l')<cr>
 
 endif
