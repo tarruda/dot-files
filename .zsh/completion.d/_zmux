@@ -7,14 +7,20 @@ local curcontext=$curcontext sessions="$repo/*(.N:t)" state line
 declare -A opt_args
 
 _arguments\
-	"1: :->cmd"\
-	'2: :->session'
+	'1: :->cmd'\
+	'2: :->session'\
+	'3: :->directory'
 
 case $state in
 	cmd)
-		_arguments "1:Command:(open register unregister edit)"
+		_arguments "1:Command:(open create rm edit)"
 		;;
 	session)
 		_arguments "2:Session:(${~sessions})"
+		;;
+	directory)
+		if [[ $words[2] == 'create' ]]; then
+			_files -/ -X 'Project directory'
+		fi
 		;;
 esac

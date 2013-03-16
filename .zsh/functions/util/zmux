@@ -1,7 +1,11 @@
 local cmd=$1 session_name=$2 session_repository="$HOME/.tmux-sessions"
 local session_file="$session_repository/$session_name"
 local session_dir
-local script_name="tmux-session.zsh"
+local script_name=".tmux-session.zsh"
+local editor=$EDITOR
+if [[ -z $editor ]]; then
+	editor=vi
+fi
 
 if [[ -z $session_name ]]; then
 	print "Requires a session name" 2>&1
@@ -14,7 +18,8 @@ case $cmd in
 			print "Session '$session_name' isn't registered" 2>&1
 			return 1
 		fi
-		session_dir="`cat \"$session_file\"`"	
+		session_dir="`< \"$session_file\"`"	
+		session_dir=${session_dir:a}
 		if [[ ! -r "$session_dir/$script_name" ]]; then
 			print "Session '$session_name' points to inexistent location" 2>&1
 			return 1
@@ -26,14 +31,17 @@ case $cmd in
 		fi
 		tmux attach -t $session_name
 		;;
-	register)
-		if [[ -n $3 && -r "$3/$script_name" ]]; then
-			session_dir="$3"
-		elif [[ -r "$PWD/$script_name" ]]; then
-			session_dir="$PWD"
+	create)
+		if [[ -d $3 ]]; then
+			session_dir=${3:a}
+		else
+			session_dir=$PWD
 		fi
-		if [[ -z $session_dir ]]; then
-			print "Requires a directory containing a '$script_name' file" 2>&1
+		if [[ ! -r "$session_dir/$script_name" ]]; then
+			$editor "$session_dir/$script_name"
+		fi
+		if [[ ! -r "$session_dir/$script_name" ]]; then
+			print "Session was not created" 2>&1
 			return 1
 		fi
 		mkdir -p "$session_repository" &> /dev/null
@@ -42,28 +50,30 @@ case $cmd in
 			return 1
 		fi
 		print "$session_dir" > "$session_file"
-		print "Session '$session_name' registered successfully"
+		print "Session '$session_name' created successfully"
 		;;
-	unregister)
+	rm)
 		if [[ ! -r "$session_file" ]]; then
 			print "Session '$session_name' doesn't exist" 2>&1
 			return 1
 		fi
 		rm -f "$session_file"
+		print "Session '$session_name' removed successfully"
 		;;
 	edit)
 		if [[ ! -r "$session_file" ]]; then
 			print "Session '$session_name' isn't registered" 2>&1
 			return 1
 		fi
-		session_dir="`cat \"$session_file\"`"	
+		session_dir="`< \"$session_file\"`"	
+		session_dir=${session_dir:a}
 		if [[ ! -r "$session_dir/$script_name" ]]; then
 			print "Session '$session_name' points to inexistent location" 2>&1
 			return 1
 		fi
-		$EDITOR "$session_dir/$script_name"
+		$editor "$session_dir/$script_name"
 		;;
 	*)
-		print "Requires a command (create|open|rm)" 2>&1
+		print "Requires a command (open|create|rm|edit)" 2>&1
 		;;
 esac
