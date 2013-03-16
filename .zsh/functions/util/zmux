@@ -1,16 +1,26 @@
 local cmd=$1 session_name=$2 session_repository="$HOME/.tmux-sessions"
 local session_file="$session_repository/$session_name"
 local session_dir
-local script_name=".tmux-session.zsh"
-local editor=$EDITOR
-if [[ -z $editor ]]; then
-	editor=vi
-fi
+local script_name="tmux.zsh"
 
 if [[ -z $session_name ]]; then
 	print "Requires a session name" 2>&1
 	return 1
 fi
+
+local session_template
+read -d '' -r session_template << "EOF"
+local vim_session_file="$session_dir/.zmux/session.vim"
+local initcmd=":mksession! ${vim_session_file:q}"
+if [[ -r $vim_session_file ]]; then
+	initcmd=":so \"$vim_session_file\""
+fi
+
+tmux split-window -d -t $session_name -p 75 "vim \
+	-c \"$initcmd\" \
+	-c 'set autowriteall' \
+	-c \"au VimLeave * mksession! ${vim_session_file:q}\""
+EOF
 
 case $cmd in
 	open)
@@ -20,14 +30,14 @@ case $cmd in
 		fi
 		session_dir="`< \"$session_file\"`"	
 		session_dir=${session_dir:a}
-		if [[ ! -r "$session_dir/$script_name" ]]; then
+		if [[ ! -r "$session_dir/.zmux/$script_name" ]]; then
 			print "Session '$session_name' points to inexistent location" 2>&1
 			return 1
 		fi
 		if ! tmux has-session -t $session_name &> /dev/null; then
 			(cd $session_dir; tmux new-session -d -s $session_name -n main)
 			tmux set-option -t $session_name default-path $session_dir &> /dev/null
-			source "$session_dir/$script_name"
+			source "$session_dir/.zmux/$script_name"
 		fi
 		tmux attach -t $session_name
 		;;
@@ -37,10 +47,12 @@ case $cmd in
 		else
 			session_dir=$PWD
 		fi
-		if [[ ! -r "$session_dir/$script_name" ]]; then
-			$editor "$session_dir/$script_name"
+		if [[ ! -r "$session_dir/.zmux/$script_name" ]]; then
+			mkdir -p "$session_dir/.zmux" &> /dev/null
+			echo $session_template | \
+				vim - +"file $session_dir/.zmux/$script_name" +"setf zsh"
 		fi
-		if [[ ! -r "$session_dir/$script_name" ]]; then
+		if [[ ! -r "$session_dir/.zmux/$script_name" ]]; then
 			print "Session was not created" 2>&1
 			return 1
 		fi
@@ -67,11 +79,11 @@ case $cmd in
 		fi
 		session_dir="`< \"$session_file\"`"	
 		session_dir=${session_dir:a}
-		if [[ ! -r "$session_dir/$script_name" ]]; then
+		if [[ ! -r "$session_dir/.zmux/$script_name" ]]; then
 			print "Session '$session_name' points to inexistent location" 2>&1
 			return 1
 		fi
-		$editor "$session_dir/$script_name"
+		vim "$session_dir/.zmux/$script_name"
 		;;
 	*)
 		print "Requires a command (open|create|rm|edit)" 2>&1
