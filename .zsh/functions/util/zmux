@@ -1,0 +1,69 @@
+local cmd=$1 session_name=$2 session_repository="$HOME/.tmux-sessions"
+local session_file="$session_repository/$session_name"
+local session_dir
+local script_name="tmux-session.zsh"
+
+if [[ -z $session_name ]]; then
+	print "Requires a session name" 2>&1
+	return 1
+fi
+
+case $cmd in
+	open)
+		if [[ ! -r "$session_file" ]]; then
+			print "Session '$session_name' isn't registered" 2>&1
+			return 1
+		fi
+		session_dir="`cat \"$session_file\"`"	
+		if [[ ! -r "$session_dir/$script_name" ]]; then
+			print "Session '$session_name' points to inexistent location" 2>&1
+			return 1
+		fi
+		if ! tmux has-session -t $session_name &> /dev/null; then
+			(cd $session_dir; tmux new-session -d -s $session_name -n main)
+			tmux set-option -t $session_name default-path $session_dir &> /dev/null
+			source "$session_dir/$script_name"
+		fi
+		tmux attach -t $session_name
+		;;
+	register)
+		if [[ -n $3 && -r "$3/$script_name" ]]; then
+			session_dir="$3"
+		elif [[ -r "$PWD/$script_name" ]]; then
+			session_dir="$PWD"
+		fi
+		if [[ -z $session_dir ]]; then
+			print "Requires a directory containing a '$script_name' file" 2>&1
+			return 1
+		fi
+		mkdir -p "$session_repository" &> /dev/null
+		if [[ ! -d "$session_repository" ]]; then
+			print "Could not create '$session_repository' directory" 2>&1
+			return 1
+		fi
+		print "$session_dir" > "$session_file"
+		print "Session '$session_name' registered successfully"
+		;;
+	unregister)
+		if [[ ! -r "$session_file" ]]; then
+			print "Session '$session_name' doesn't exist" 2>&1
+			return 1
+		fi
+		rm -f "$session_file"
+		;;
+	edit)
+		if [[ ! -r "$session_file" ]]; then
+			print "Session '$session_name' isn't registered" 2>&1
+			return 1
+		fi
+		session_dir="`cat \"$session_file\"`"	
+		if [[ ! -r "$session_dir/$script_name" ]]; then
+			print "Session '$session_name' points to inexistent location" 2>&1
+			return 1
+		fi
+		$EDITOR "$session_dir/$script_name"
+		;;
+	*)
+		print "Requires a command (create|open|rm)" 2>&1
+		;;
+esac
