@@ -1,0 +1,10 @@
+let mapleader = ","
+
+" clear search
+nnoremap <silent> <leader>c :noh<cr>
+
+" gmail
+set passkeys+=mail.google.com:<ESC>,<CR>,j,k,c,r,f,x,e,o,#,/,?,gi,gl,gc
+
+" let scripts focus elements
+set nostrictfocus

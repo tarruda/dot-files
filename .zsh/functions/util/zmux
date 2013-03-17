@@ -11,14 +11,14 @@ fi
 local session_template
 read -d '' -r session_template << "EOF"
 local vim_session_file="$session_dir/.zmux/session.vim"
-local initcmd=":mksession! ${vim_session_file:q}"
+local initcmd="mksession! ${vim_session_file:q}"
 if [[ -r $vim_session_file ]]; then
-	initcmd=":so \"$vim_session_file\""
+	initcmd="so \"$vim_session_file\""
 fi
 
 tmux split-window -d -t $session_name -p 75 "vim \
 	-c \"$initcmd\" \
-	-c 'set autowriteall' \
+	-c \"au VimLeave * if v:dying | wall | endif\" \
 	-c \"au VimLeave * mksession! ${vim_session_file:q}\""
 EOF
 
@@ -50,7 +50,7 @@ case $cmd in
 		if [[ ! -r "$session_dir/.zmux/$script_name" ]]; then
 			mkdir -p "$session_dir/.zmux" &> /dev/null
 			echo $session_template | \
-				vim - +"file $session_dir/.zmux/$script_name" +"setf zsh"
+				vim - -c "file $session_dir/.zmux/$script_name" -c "setf zsh"
 		fi
 		if [[ ! -r "$session_dir/.zmux/$script_name" ]]; then
 			print "Session was not created" 2>&1
