@@ -4,7 +4,10 @@ let mapleader = ","
 nnoremap <silent> <leader>c :noh<cr>
 
 " gmail
-set passkeys+=mail.google.com:<ESC>,<CR>,j,k,c,r,f,x,e,o,#,/,?,gi,gl,gc
+set passkeys+=mail.google.com:,j,k,c,r,f,x,e,o,#,/,?,gi,gl
 
 " let scripts focus elements
 set nostrictfocus
+
+" go to gmail
+nnoremap gm :buffer https://mail.google.com<tab>
