@@ -1,0 +1,10 @@
+let mapleader = ","
+
+" clear search
+nnoremap <leader>c :noh<cr>
+
+ignorekeys add -except=\:,<esc>,<cr>,o,t,b mail\.google\.com
+
+" go to gmail
+nnoremap gm :buffer https://mail.google.com<tab>
+
