@@ -3,9 +3,9 @@ let mapleader = ","
 " clear search
 nnoremap <leader>c :noh<cr>
 
-ignorekeys add -except=\:,;,<esc>,<cr>,o,t,b,f,F mail\.google\.com
+ignorekeys add -except=\:,;,<ESC>,<CR>,<C-i>,<C-n>,<C-f>,<C-b>,<C-d>,<C-u>,o,t,b mail\.google\.com
 
-" quick shortcut to gmail tabs
+" go to gmail
 nnoremap gm :buffer https://mail.google.com<tab>
 
 set gui=noaddons,nobookmarks,nomenu,nonavigation,tabs
