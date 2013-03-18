@@ -1,4 +1,12 @@
 let mapleader = ","
-" Leader mappings
-" Type , + space to clear search
-nnoremap <silent> <leader>c :noh<cr>
+
+" clear search
+nnoremap <leader>c :noh<cr>
+
+ignorekeys add -except=\:,;,<esc>,<cr>,o,t,b,f,F mail\.google\.com
+
+" quick shortcut to gmail tabs
+nnoremap gm :buffer https://mail.google.com<tab>
+
+set gui=noaddons,nobookmarks,nomenu,nonavigation,tabs
+colorscheme indigo
