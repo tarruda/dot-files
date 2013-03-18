@@ -22,7 +22,6 @@
 "   directories(plugin, ftplugin, syntax...).                                 "
 "                                                                             "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 let g:is_windows = has('win32') || has('win64')
 
 " Little hack to set the $MYVIMRC from the $VIMINIT in the case it was used to 
@@ -73,11 +72,7 @@ Bundle 'vim-scripts/info.vim'
 " Themes
 Bundle 'altercation/vim-colors-solarized'
 " Snipmate
-Bundle 'MarcWeber/vim-addon-mw-utils'
-Bundle 'tomtom/tlib_vim'
-Bundle 'honza/snipmate-snippets'
-Bundle 'garbas/vim-snipmate'
-"
+Bundle 'SirVer/ultisnips'
 Bundle 'ervandew/supertab'
 Bundle 'Rip-Rip/clang_complete'
 Bundle 'scrooloose/nerdtree'
@@ -86,7 +81,6 @@ Bundle 'majutsushi/tagbar'
 Bundle 'walm/jshint.vim'
 Bundle 'Townk/vim-autoclose'
 Bundle 'tpope/vim-fugitive'
-Bundle 'bingaman/vim-sparkup'
 Bundle 'vim-scripts/scratch.vim'
 Bundle 'tpope/vim-commentary'
 Bundle 'godlygeek/csapprox'

@@ -3,7 +3,7 @@ let mapleader = ","
 " clear search
 nnoremap <leader>c :noh<cr>
 
-ignorekeys add -except=\:,;,<ESC>,<CR>,<C-i>,<C-n>,<C-f>,<C-b>,<C-d>,<C-u>,o,t,b mail\.google\.com
+ignorekeys add -except=\:,;,<ESC>,<CR>,<C-i>,<C-n>,<C-p>,<C-f>,<C-b>,<C-d>,<C-u>,o,t,b mail\.google\.com
 
 " go to gmail
 nnoremap gm :buffer https://mail.google.com<tab>
