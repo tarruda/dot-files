@@ -1,4 +1,4 @@
-if which vim &>/dev/null; then
+if which vim &>/dev/null && [[ -n $SHELL ]]; then
 		VIM="`which vim`"
     export PAGER="$SHELL -c \"unset PAGER;col -b -x | \
     command vim -R -c 'set ft=man nomod nolist' -c 'map q :q<CR>' \

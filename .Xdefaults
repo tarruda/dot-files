@@ -4,7 +4,7 @@ urxvt*perl-ext-common: fullscreen
 urxvt*keysym.F11: perl:fullscreen:switch
 urxvt*background: #1C1C1C
 urxvt*foreground: #FFFFFF
-urxvt*font: xft:Ubuntu Mono:pixelsize=22
+urxvt*font: xft:Monospace:pixelsize=20
 urxvt*letterSpace: -1
 urxvt*url-launcher: /usr/bin/firefox
 urxvt*underlineURLs: true

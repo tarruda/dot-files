@@ -1,0 +1,14 @@
+# Menu for the XWin tray icon
+
+menu apps {
+  rxvt-unicode    exec    "urxvt -fn 'xft:Consolas:pixelsize=22' -e /bin/zsh -c 'cd; exec zsh'"
+  vim             exec    "gvim"
+}
+
+menu root {
+  "Reload .XWinrc" RELOAD
+  "Applications" menu apps
+  SEPARATOR
+}
+
+RootMenu root

@@ -32,8 +32,8 @@
   pushInsteadOf = "git://gist.github.com/"
   pushInsteadOf = "gist:"
 
-[push]
-	default = simple
+#[push]
+#	default = simple
 
 [imap] 
   folder = "[Gmail]/Drafts" 

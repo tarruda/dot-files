@@ -5,6 +5,8 @@ if has('gui_running')
   colorscheme darktwilight
   if g:is_windows
     set guifont=Consolas:h12
+  elseif has('win32unix')
+    set guifont=Consolas\ 16
   else
     set guifont=Ubuntu\ Mono\ 16,Monospace\ 14
   endif

@@ -9,7 +9,7 @@ case $OSTYPE in
 		alias la='l -lah $@'
 		alias p='ps -auxww'
 		;;
-	linux*)
+	*)
 		alias l="command ls --color=auto $@"
 		alias ls=l
 		alias la="l -lah $@"
