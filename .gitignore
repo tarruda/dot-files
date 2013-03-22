@@ -2,6 +2,8 @@
 !/.bin/
 !/.zsh/
 !/.vim/
+!/.vimperator/
+/.vimperator/info
 /.bin/phantomjs
 /.vim/sessions/
 /.vim/bundle/*
