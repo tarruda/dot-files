@@ -332,12 +332,7 @@
     </keybind>
     <keybind key="C-A-t">
       <action name="Execute">
-        <command>urxvt</command>
-      </action>
-    </keybind>
-    <keybind key="C-A-r">
-      <action name="Execute">
-        <command>sh -c 'NOTMUX=1 exec urxvt -geometry 132x43+0+0'</command>
+        <command>urxvt -fn 'xft:Ubuntu Mono:pixelsize=23' -fn 'xft:Consolas:pixelsize=22'</command>
       </action>
     </keybind>
     <keybind key="A-F11">
