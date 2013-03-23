@@ -11,5 +11,5 @@ nnoremap gm :buffer https://mail.google.com<tab>
 set gui=noaddons,nobookmarks,nomenu,nonavigation,tabs
 colorscheme indigo
 
-" TODO figure a way to test if gvim is available on PATH before doing this
-set editor="D:/LiberKey/MyApps/CygwinPortable/bin/zsh.exe /usr/bin/vimperator-edit -wait"
+" This must be done only in windows
+set editor="~/.vimperator/edit-cygwin.bat"

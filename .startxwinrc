@@ -1,1 +1,4 @@
-#run urxvtd-X -wait -q -f -o
+#while true; do
+#  run urxvtd-X -wait -q -f -o
+#done
+urxvtd -q -o -f
