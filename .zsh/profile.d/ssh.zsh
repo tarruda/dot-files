@@ -10,7 +10,7 @@ if [ ! -e "$HOME/.ssh/config" ]; then
 fi
 
 # Ensure ssh agent is running
-SSHPID=`ps ax | grep -c "[s]sh-agent"`
+SSHPID=`ps ax | grep -c "[s]sh-agent" 2> /dev/null`
 if [ $SSHPID -eq 0 ]; then
 	ssh-agent > "$HOME/.ssh-env"
 fi

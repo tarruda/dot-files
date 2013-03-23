@@ -18,7 +18,7 @@ if has('gui_running')
   set guioptions-=lr
 else
   colorscheme darktwilight-term
-  if $TERM =~ 'tmux'
+  if $TERM =~ 'tmux' || $TERM =~ 'rxvt-unicode-256color'
     highlight Comment cterm=italic
     set ttyfast
   endif
