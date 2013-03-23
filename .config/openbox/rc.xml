@@ -332,7 +332,7 @@
     </keybind>
     <keybind key="C-A-t">
       <action name="Execute">
-        <command>urxvt -fn 'xft:Ubuntu Mono:pixelsize=23' -fn 'xft:Consolas:pixelsize=22'</command>
+        <command>urxvt -fn 'xft:Ubuntu Mono:pixelsize=23' -fn 'xft:Consolas:pixelsize=22' -letsp -3</command>
       </action>
     </keybind>
     <keybind key="A-F11">
