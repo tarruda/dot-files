@@ -13,3 +13,5 @@ colorscheme indigo
 
 " This must be done only in windows
 set editor="~/.vimperator/edit-cygwin.bat"
+
+nnoremap <leader>f :firebug toggle<cr>
