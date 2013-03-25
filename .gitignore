@@ -4,6 +4,7 @@
 !/.vim/
 !/.vimperator/
 /.vimperator/info
+/.vimperator/plugin/local.vimp
 /.bin/phantomjs
 /.vim/sessions/
 /.vim/bundle/*
