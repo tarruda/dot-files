@@ -327,7 +327,7 @@
     </keybind>
     <keybind key="C-A-f">
       <action name="Execute">
-        <command>chromium</command>
+        <command>firefox</command>
       </action>
     </keybind>
     <keybind key="C-A-t">
