@@ -1,0 +1,44 @@
+# Instructions for setting my basic working cygwin environment
+
+# Install the following packages using the setup.exe utility:
+
+X-start-menu-icons
+autoconf
+automake
+gcc4
+git
+git-svn
+libX11-devel
+libXt-devel
+libatk1.0-devel
+libcairo-devel
+libglib2.0-devel
+libgtk2.0-devel
+libmpfr4
+libncurses-devel
+libpango1.0-devel
+libpixman1-devel
+make
+mercurial
+openssh
+perl
+pkg-config
+python
+rsh
+ruby
+rxvt-unicode-X
+wget
+xhost
+xinit
+xorg-docs
+xorg-server
+xrdb
+zsh
+
+# Compile vim from source since the one packaged by cygwin is stripped:
+
+$ hg clone https://vim.googlecode.com/hg/ vim
+$ cd vim
+$ hg checkout [some version]
+$ ./configure --prefix=/usr --enable-multibyte --enable-pythoninterp --enable-rubyinterp --enable-perlinterp --enable-gui=gtk2 --disable-gtktest
+$ make && make install
