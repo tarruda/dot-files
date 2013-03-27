@@ -12,6 +12,6 @@ set gui=addons,nobookmarks,nomenu,nonavigation,tabs
 colorscheme indigo
 
 " This must be done only in windows
-set editor="~/.vimperator/edit-cygwin.bat"
+set editor="~/.cygwin-resources/edit-cygwin.bat"
 
 nnoremap <leader>f :firebug toggle<cr>

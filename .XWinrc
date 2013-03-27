@@ -7,13 +7,15 @@ menu apps {
   urxvt                    exec    "zsh -c 'cd; urxvtc -fn xft:Consolas:pixelsize=22 -e /bin/zsh'"
   gvim                     exec    "zsh -c 'cd; gvim'"
   SEPARATOR
-  # Ubuntu background virtualbox programs for development
-  urxvt-devbox             exec    "rsh devbox 'zsh -l -c urxvt\ -fn\ xft:Inconsolata:pixelsize=23'"
+  # Easy access to background virtualbox instance running ubuntu
+  urxvt-devbox             exec    "rsh devbox 'zsh -l -c urxvt\ -fn\ xft:Consolas:pixelsize=22\ -fn\ xft:Ubuntu\\\ Mono:pixelsize=22'"
   chromium-devbox          exec    "rsh devbox 'zsh -l -c chromium-browser'"
   gvim-devbox              exec    "rsh devbox 'zsh -l -c gvim\ -f'"
+  lxtask-devbox            exec    "rsh devbox 'zsh -l -c lxtask'"
 }
 
 menu root {
+  "Edit .XWinrc" exec "zsh -c 'cd; gvim .XWinrc'"
   "Reload .XWinrc" RELOAD
   "Applications" menu apps
   SEPARATOR
