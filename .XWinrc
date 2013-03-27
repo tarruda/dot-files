@@ -12,6 +12,7 @@ menu apps {
   chromium-devbox          exec    "rsh devbox 'zsh -l -c chromium-browser'"
   gvim-devbox              exec    "rsh devbox 'zsh -l -c gvim\ -f'"
   lxtask-devbox            exec    "rsh devbox 'zsh -l -c lxtask'"
+  tmux-devbox              exec    "rsh devbox 'zsh -l -c urxvt\ -fn\ xft:Consolas:pixelsize=22\ -fn\ xft:Ubuntu\\\ Mono:pixelsize=22\ -e\ tmux\ attach\ ||\ tmux\ new'"
 }
 
 menu root {
