@@ -1,0 +1,23 @@
+# Some windows shortcut command-lines that took me a while to figure right,
+# so I'm saving here in case I ever need to recreate again(windows shortcuts are binary files, so I'd rather use this):
+
+# Start XWin with a login environment(put on startup directory)
+T:\cygwin\bin\run.exe /usr/bin/zsh -l -c 'exec startxwin'
+
+# Start gvim
+T:\cygwin\bin\run.exe -p /bin ash -c 'cd; CYGWIN_X=1 DISPLAY=:0.0 exec zsh -l -c 'gvim'
+
+# Start urxvt
+T:\cygwin\bin\run.exe -p /bin ash -c 'cd; CYGWIN_X=1 DISPLAY=:0.0 exec urxvtc -fn "xft:Consolas:pixelsize=22" -e /bin/zsh -l'
+
+# Start chromium in virtual machine
+T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox  'zsh -l -c chromium-browser'"
+
+# Start gvim in virtual machine
+T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox  'zsh -l -c gvim\ -f'"
+
+# Start urxvt in virtual machine
+T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox  'zsh -l -c urxvt\ -fn\ xft:Consolas:pixelsize=22\ -fn\ xft:Ubuntu\\\\\ Mono:pixelsize=22'"
+
+# Start lxtask in virtual machine
+T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox  'zsh -l -c lxtask'"
