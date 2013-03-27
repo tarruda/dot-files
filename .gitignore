@@ -10,6 +10,7 @@
 /.vim/bundle/*
 /.zsh/profile-local.d/
 /.zsh/rc-local.d/
+/.zsh/login-local.d/
 /.zsh/.zcompdump
 /.zsh/.zsh_history
 /.zsh/.zcalc_history
