@@ -12,6 +12,6 @@ set gui=addons,nobookmarks,nomenu,nonavigation,tabs
 colorscheme indigo
 
 " This must be done only in windows
-set editor="~/.cygwin-resources/edit-gvim.bat"
+set editor="~/.cygwin-resources/edit-gvim-vimperator.bat"
 
 nnoremap <leader>f :firebug toggle<cr>
