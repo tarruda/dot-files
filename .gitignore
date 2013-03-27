@@ -3,6 +3,7 @@
 !/.zsh/
 !/.vim/
 !/.vimperator/
+!/.cygwin-resources/
 /.vimperator/info
 /.vimperator/plugin/local.vimp
 /.bin/phantomjs
