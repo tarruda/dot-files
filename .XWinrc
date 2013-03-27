@@ -1,8 +1,16 @@
 # Menu for the XWin tray icon
 
 menu apps {
-  rxvt-unicode    exec    "zsh -c 'cd; urxvtc -fn xft:Consolas:pixelsize=22 -e /bin/zsh'"
-  gvim            exec    "zsh -c 'cd; gvim'"
+  # When started from the tray icon, these programs inherit
+  # XWin environment so they dont have to be executed as
+  # login shell commands
+  urxvt                    exec    "zsh -c 'cd; urxvtc -fn xft:Consolas:pixelsize=22 -e /bin/zsh'"
+  gvim                     exec    "zsh -c 'cd; gvim'"
+  SEPARATOR
+  # Ubuntu background virtualbox programs for development
+  urxvt-devbox             exec    "rsh devbox 'zsh -l -c urxvt\ -fn\ xft:Inconsolata:pixelsize=23'"
+  chromium-devbox          exec    "rsh devbox 'zsh -l -c chromium-browser'"
+  gvim-devbox              exec    "rsh devbox 'zsh -l -c gvim\ -f'"
 }
 
 menu root {
