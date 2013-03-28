@@ -23,6 +23,7 @@ mercurial
 openssh
 perl
 pkg-config
+pulseaudio # if you want sound support for the VM
 python
 rsh
 ruby
@@ -42,3 +43,16 @@ $ cd vim
 $ hg checkout [some version]
 $ ./configure --prefix=/usr --enable-multibyte --enable-pythoninterp --enable-rubyinterp --enable-perlinterp --enable-gui=gtk2 --disable-gtktest
 $ make && make install
+
+# Pulseaudio configuration
+on the file /etc/pulse/default.pa, add the following line:
+
+  load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1;192.168.0.0/24 auth-anonymous=1
+
+it will enable remote anonymous connections in the virtualbox network. On a
+ubuntu VM, install some required packages:
+  sudo apt-get install libasound2 libasound2-plugins alsa-utils alsa-oss
+
+# Tips:
+- In the guest, use LIBGL_ALWAYS_INDIRECT=1 to perform rendering on the
+# Xserver(host)

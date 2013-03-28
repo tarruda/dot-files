@@ -1,27 +1,40 @@
 # Menu for the XWin tray icon
 
-menu apps {
+MENU apps {
   # When started from the tray icon, these programs inherit
   # XWin environment so they dont have to be executed as
   # login shell commands
-  urxvt                    exec    "zsh -c 'cd; urxvt -fn xft:Consolas:pixelsize=22 -e /bin/zsh'"
-  gvim                     exec    "zsh -c 'cd; gvim'"
+  urxvt                    EXEC    "zsh -c 'cd; urxvt -title rxvt-unicode -sl 10000 -sb -sr -fn xft:Consolas:pixelsize=22 -e /bin/zsh'"
+  gvim                     EXEC    "zsh -c 'cd; gvim'"
   SEPARATOR
   # Easy access to background virtualbox instance running ubuntu
   # The zsh login scripts in the vm are responsible for setting up
   # the DISPLAY environment variable correctly
-  urxvt-devbox             exec    "rsh devbox 'zsh -l -c urxvt\ -fn\ xft:Ubuntu\\\ Mono:pixelsize=22\ -fn\ xft:Consolas:pixelsize=22\ -letsp\ -3'"
-  chromium-devbox          exec    "rsh devbox 'zsh -l -c chromium-browser'"
-  gvim-devbox              exec    "rsh devbox 'zsh -l -c gvim\ -f'"
-  lxtask-devbox            exec    "rsh devbox 'zsh -l -c lxtask'"
-  tmux-devbox              exec    "rsh devbox 'zsh -l -c urxvt\ -title\ tmux\ -fn\ xft:Ubuntu\\\ Mono:pixelsize=22\ -fn\ xft:Consolas:pixelsize=22\ -letsp\ -3\ -e\ sh\ -c\ tmux\\\ attach\\\ \\\|\\\|\\\ tmux\\\ new'"
+  urxvt-devbox             EXEC    "rsh devbox 'zsh -l -c urxvt\ -title\ rxvt-unicode\ -fn\ xft:Ubuntu\\\ Mono:pixelsize=22\ -fn\ xft:Consolas:pixelsize=22\ -letsp\ -3'"
+  chromium-devbox          EXEC    "rsh devbox 'zsh -l -c chromium-browser'"
+  gvim-devbox              EXEC    "rsh devbox 'zsh -l -c gvim\ -f'"
+  lxtask-devbox            EXEC    "rsh devbox 'zsh -l -c lxtask'"
+  tmux-devbox              EXEC    "rsh devbox 'zsh -l -c urxvt\ -title\ tmux\ -fn\ xft:Ubuntu\\\ Mono:pixelsize=22\ -fn\ xft:Consolas:pixelsize=22\ -letsp\ -3\ -e\ sh\ -c\ tmux\\\ attach\\\ \\\|\\\|\\\ tmux\\\ new'"
 }
 
-menu root {
-  "Edit .XWinrc" exec "zsh -c 'cd; gvim .XWinrc'"
+MENU root {
+  "Edit .XWinrc" EXEC "zsh -c 'cd; gvim .XWinrc'"
   "Reload .XWinrc" RELOAD
-  "Applications" menu apps
+  "Applications" MENU apps
   SEPARATOR
 }
 
-RootMenu root
+ROOTMENU root
+
+ICONDIRECTORY T:\cygwin\home\tarruda\.cygwin-resources\icons
+
+ICONS {
+  tmux terminal.ico
+  "Task Manager" system-monitor.ico
+  rxvt-unicode rxvt.ico
+}
+
+STYLES {
+  tmux MAXIMIZE
+  Chromium MAXIMIZE
+}

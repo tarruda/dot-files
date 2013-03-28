@@ -1,14 +1,14 @@
 # Some windows shortcut command-lines that took me a while to figure right,
-# so I'm saving here in case I ever need to recreate again(windows shortcuts are binary files, so I'd rather use this):
+# so I'm saving here in case I ever need to recreate again(windows shortcuts are # binary files, so I'd rather version control this text file):
 
-# Start XWin with a login environment(put on startup directory)
-T:\cygwin\bin\run.exe /usr/bin/zsh -l -c 'exec startxwin -- -nowgl'
+# Start XWin using a login shell(put this shortcut on windows startup directory)
+T:\cygwin\bin\run.exe /usr/bin/zsh -l -c 'exec startxwin -- -wgl'
 
 # Start gvim
 T:\cygwin\bin\run.exe -p /bin ash -c 'cd; CYGWIN_X=1 DISPLAY=:0.0 exec zsh -l -c 'gvim'
 
 # Start urxvt
-T:\cygwin\bin\run.exe -p /bin ash -c 'cd; CYGWIN_X=1 DISPLAY=:0.0 exec urxvtc -fn "xft:Consolas:pixelsize=22" -e /bin/zsh -l'
+T:\cygwin\bin\run.exe -p /bin ash -c 'cd; CYGWIN_X=1 DISPLAY=:0.0 exec urxvtc -title rxvt-unicode -fn "xft:Consolas:pixelsize=22" -e /bin/zsh -l'
 
 # Start chromium in the VM
 T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c chromium-browser'"
@@ -17,7 +17,7 @@ T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c chromium-browser'"
 T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c gvim\ -f'"
 
 # Start urxvt in the VM
-T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c urxvt\ -fn\ xft:Ubuntu\\\\\ Mono:pixelsize=22\ -fn\ xft:Consolas:pixelsize=22\ -letsp\ -3'"
+T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c urxvt\ -title\ rxvt-unicode\ -fn\ xft:Ubuntu\\\\\ Mono:pixelsize=22\ -fn\ xft:Consolas:pixelsize=22\ -letsp\ -3'"
 
 # Start lxtask in the VM
 T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c lxtask'"
