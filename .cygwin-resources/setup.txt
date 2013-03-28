@@ -42,3 +42,7 @@ $ cd vim
 $ hg checkout [some version]
 $ ./configure --prefix=/usr --enable-multibyte --enable-pythoninterp --enable-rubyinterp --enable-perlinterp --enable-gui=gtk2 --disable-gtktest
 $ make && make install
+
+# Tips:
+- In the guest, use LIBGL_ALWAYS_INDIRECT=1 to perform rendering on the
+# Xserver(host)
