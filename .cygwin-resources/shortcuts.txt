@@ -2,7 +2,7 @@
 # so I'm saving here in case I ever need to recreate again(windows shortcuts are binary files, so I'd rather use this):
 
 # Start XWin with a login environment(put on startup directory)
-T:\cygwin\bin\run.exe /usr/bin/zsh -l -c 'exec startxwin'
+T:\cygwin\bin\run.exe /usr/bin/zsh -l -c 'exec startxwin -- -nowgl'
 
 # Start gvim
 T:\cygwin\bin\run.exe -p /bin ash -c 'cd; CYGWIN_X=1 DISPLAY=:0.0 exec zsh -l -c 'gvim'

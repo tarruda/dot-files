@@ -1,6 +1,5 @@
 #!/bin/sh
+xrdb "$HOME/.Xresources"
 if [[ -r "$HOME/.startxwinrc-local" ]]; then
 	source "$HOME/.startxwinrc-local"
 fi
-xrdb "$HOME/.Xresources"
-urxvtd -q -o -f
