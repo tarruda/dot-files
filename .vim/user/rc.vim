@@ -12,6 +12,12 @@ set dir=.,/tmp
 set history=500
 " show the cursor position all the time
 set ruler	
+" enable mouse in terminal
+set mouse=a
+if &term =~ 'tmux'
+  " tmux knows the extended mouse mode
+  set ttymouse=xterm2
+endi
 " display incomplete commands
 set showcmd
 " Complete options (disable preview scratch window)
