@@ -3,3 +3,6 @@ xrdb "$HOME/.Xresources"
 if [[ -r "$HOME/.startxwinrc-local" ]]; then
 	source "$HOME/.startxwinrc-local"
 fi
+if which pulseaudio &> /dev/null; then
+	pulseaudio --start
+fi
