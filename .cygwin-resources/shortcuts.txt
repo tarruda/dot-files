@@ -11,16 +11,16 @@ T:\cygwin\bin\run.exe -p /bin ash -c 'cd; CYGWIN_X=1 DISPLAY=:0.0 exec zsh -l -c
 T:\cygwin\bin\run.exe -p /bin ash -c 'cd; CYGWIN_X=1 DISPLAY=:0.0 exec urxvtc -fn "xft:Consolas:pixelsize=22" -e /bin/zsh -l'
 
 # Start chromium in the VM
-T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox  'zsh -l -c chromium-browser'"
+T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c chromium-browser'"
 
 # Start gvim in the VM
-T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox  'zsh -l -c gvim\ -f'"
+T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c gvim\ -f'"
 
 # Start urxvt in the VM
-T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox  'zsh -l -c urxvt\ -fn\ xft:Consolas:pixelsize=22\ -fn\ xft:Ubuntu\\\\\ Mono:pixelsize=22'"
+T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c urxvt\ -fn\ xft:Ubuntu\\\\\ Mono:pixelsize=22\ -fn\ xft:Consolas:pixelsize=22\ -letsp\ -3'"
 
 # Start lxtask in the VM
-T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox  'zsh -l -c lxtask'"
+T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c lxtask'"
 
 # Start urxvt with a tmux session in the VM
-T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox  'zsh -l -c urxvt\ -fn\ xft:Consolas:pixelsize=22\ -fn\ xft:Ubuntu\\\\\ Mono:pixelsize=22\ -e\ tmux\ attach\ ||\ tmux\ new'"
+T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c urxvt\ -fn\ xft:Ubuntu\\\\\ Mono:pixelsize=22\ -fn\ xft:Consolas:pixelsize=22\ -letsp\ -3\ -e\ tmux\ attach\ ||\ tmux\ new'"
