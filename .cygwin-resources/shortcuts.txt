@@ -22,5 +22,6 @@ T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c urxvt\ -fn\ xft:Ubun
 # Start lxtask in the VM
 T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c lxtask'"
 
-# Start urxvt with a tmux session in the VM
-T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c urxvt\ -fn\ xft:Ubuntu\\\\\ Mono:pixelsize=22\ -fn\ xft:Consolas:pixelsize=22\ -letsp\ -3\ -e\ tmux\ attach\ ||\ tmux\ new'"
+# Start urxvt and create or attach to tmux session in the VM
+T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c urxvt\ -title\ tmux\ -fn\ xft:Ubuntu\\\\\ Mono:pixelsize=22\ -fn\ xft:Consolas:pixelsize=22\ -letsp\ -3\ -e\ sh\\ -c\\ tmux\\\\\ attach\\\\\ \\\\\|\\\\\|\\\\\ tmux\\\\\ new'"
+
