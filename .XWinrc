@@ -4,7 +4,7 @@ MENU apps {
   # When started from the tray icon, these programs inherit
   # XWin environment so they dont have to be executed as
   # login shell commands
-  urxvt                    EXEC    "zsh -c 'cd; urxvt -title rxvt-unicode -fn xft:Consolas:pixelsize=22 -e /bin/zsh'"
+  urxvt                    EXEC    "zsh -c 'cd; urxvt -title rxvt-unicode -sl 5000 -fn xft:Consolas:pixelsize=22 -e /bin/zsh'"
   gvim                     EXEC    "zsh -c 'cd; gvim'"
   SEPARATOR
   # Easy access to background virtualbox instance running ubuntu
