@@ -45,14 +45,39 @@ $ ./configure --prefix=/usr --enable-multibyte --enable-pythoninterp --enable-ru
 $ make && make install
 
 # Pulseaudio configuration
-on the file /etc/pulse/default.pa, add the following line:
+
+On the file /etc/pulse/default.pa, add the following line:
 
   load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1;192.168.0.0/24 auth-anonymous=1
 
-it will enable remote anonymous connections in the virtualbox network. On a
-ubuntu VM, install some required packages:
-  sudo apt-get install libasound2 libasound2-plugins alsa-utils alsa-oss
+This will enable remote anonymous connections in the virtualbox network.
+On a ubuntu VM, install the required packages:
 
-# Tips:
-- In the guest, use LIBGL_ALWAYS_INDIRECT=1 to perform rendering on the
-# Xserver(host)
+  sudo apt-get install libasound2 libasound2-plugins alsa-utils
+
+And configure ALSA to send its output to pulseaudio by default, put this
+on ~/.asoundrc:
+
+  pcm.pulse {
+      type pulse
+  }
+  ctl.pulse {
+      type pulse
+  }
+  pcm.!default {
+      type pulse
+      hint.description "Default Audio Device"
+  }
+  ctl.!default {
+      type pulse
+  }
+
+In the guest, create a shell startup file with this content
+
+  # use cygwin x-server to display graphical applications
+  export DISPLAY='192.168.56.1:0.0'
+  # use cygwin x-server to render opengl apps
+  export LIBGL_ALWAYS_INDIRECT=1
+  # use cygwin pulseaudio server as the default sink for audio
+  export PULSE_SERVER='192.168.56.1' 
+
