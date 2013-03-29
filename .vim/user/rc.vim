@@ -35,12 +35,6 @@ set softtabstop=2
 set modelines=0
 " Creates <FILENAME>.un~ for undoing changes after closing files
 set undofile
-" set autowriteall
-" augroup AutoWrite
-"   autocmd! BufLeave * :update
-"   autocmd! BufHidden * :update
-"   autocmd! BufUnload * :update
-" augroup END
 " Search options:
 " - Ignore case if all characters in pattern are lowercase
 set ignorecase
