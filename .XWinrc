@@ -13,6 +13,7 @@ MENU apps {
   urxvt-devbox             EXEC    "rsh devbox 'zsh -l -c urxvt\ -title\ rxvt-unicode\ -fn\ xft:Ubuntu\\\ Mono:pixelsize=22\ -fn\ xft:Consolas:pixelsize=22\ -letsp\ -3'"
   chromium-devbox          EXEC    "rsh devbox 'zsh -l -c chromium-browser'"
   gvim-devbox              EXEC    "rsh devbox 'zsh -l -c gvim\ -f'"
+  emacs-devbox             EXEC    "rsh devbox 'zsh -l -c emacs'"
   lxtask-devbox            EXEC    "rsh devbox 'zsh -l -c lxtask'"
   tmux-devbox              EXEC    "rsh devbox 'zsh -l -c urxvt\ -title\ tmux\ -fn\ xft:Ubuntu\\\ Mono:pixelsize=22\ -fn\ xft:Consolas:pixelsize=22\ -letsp\ -3\ -e\ sh\ -c\ tmux\\\ attach\\\ \\\|\\\|\\\ tmux\\\ new'"
 }

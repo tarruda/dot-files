@@ -16,6 +16,9 @@ T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c chromium-browser'"
 # Start gvim in the VM
 T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c gvim\ -f'"
 
+# Start emacs in the VM
+T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c emacs'"
+
 # Start urxvt in the VM
 T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c urxvt\ -title\ rxvt-unicode\ -fn\ xft:Ubuntu\\\\\ Mono:pixelsize=22\ -fn\ xft:Consolas:pixelsize=22\ -letsp\ -3'"
 
