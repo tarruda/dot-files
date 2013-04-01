@@ -16,6 +16,7 @@
 *.pyc
 *.pyd
 *.pyo
+*.elc
 .netrwhist
 cscope.out
 tags

@@ -4,6 +4,9 @@
 !/.vim/
 !/.vimperator/
 !/.cygwin-resources/
+!/.emacs.d/
+/.emacs.d/el-get/
+/.emacs.d/elpa/
 /.vimperator/info
 /.vimperator/plugin/local.vimp
 /.bin/phantomjs

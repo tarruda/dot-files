@@ -1,0 +1,132 @@
+;;{{{ General
+
+;;enable common lisp extensions
+(require 'cl)
+
+;;}}}
+
+;;{{{ Backup settings
+
+;; prefix with a dot as well as postfix with a tilde
+(defun custom-make-backup-file-name ( file )
+  (let ((d (file-name-directory file))
+        (f (file-name-nondirectory file)))
+    (concat d "." f "~")))
+(setq make-backup-file-name-function 'custom-make-backup-file-name)
+(defun backup-file-name-p ( file )
+  (let ((letters (string-to-list (file-name-nondirectory file))))
+    (and (> 2 (length letters))
+         (equal "." (first letters))
+         (equal "~" (last letters)))))
+(defun file-name-sans-versions ( file )
+  (if (not (backup-file-name-p file))
+      file
+    (let ((d (file-name-directory file))
+          (f (file-name-nondirectory file)))
+      (let ((letters (string-to-list f)))
+        (concat d (subseq letters 1 (- (length f) 1)))))))
+
+;;}}}
+
+;;{{{ UI settings
+
+;; hide toolbar
+(tool-bar-mode 0)
+;; hide menubar
+(menu-bar-mode 0)
+;; hide scrollbar
+(scroll-bar-mode 0)
+;; don't blink
+(blink-cursor-mode 0)
+
+;;}}} 
+
+;;{{{ Behavior
+
+;; show matching parens
+(show-paren-mode 1)
+;; show line numbers
+(line-number-mode 1)
+(column-number-mode 1)
+(global-linum-mode t)
+
+;;}}}
+
+;;{{{ Font
+
+;; Set the first font available
+(condition-case nil
+    (set-default-font "Ubuntu Mono 16")
+  (error (condition-case nil
+	     (set-default-font "Cousine")
+           (error (condition-case nil
+                      (set-default-font "Monaco")
+                    (error nil))))))
+
+;;}}}
+
+;;{{{ Packages
+
+;; helper to evaluate a remote emacs lisp file
+(defun eval-url (url)
+  (let ((buffer (url-retrieve-synchronously url)))
+    (save-excursion
+      (set-buffer buffer)
+      (goto-char (point-min))
+      (re-search-forward "^$" nil 'move)
+      (eval-region (point) (point-max))
+      (kill-buffer (current-buffer)))))
+;; helper to install el-get
+(defun install-el-get ()
+  (eval-url "https://github.com/dimitri/el-get/raw/master/el-get-install.el")
+  (el-get-emacswiki-refresh))
+;; initialize el-get
+(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
+;; install el-get if not installed already
+(unless (require 'el-get nil t)
+  (install-el-get))
+;; set package-specific intialization directory
+(setq el-get-user-package-directory "~/.emacs.d/packages.d")
+;; declare required packages
+(setq
+ my:el-get-packages
+ '(el-get
+   evil
+   evil-surround
+   linum-relative
+   color-theme
+   color-theme-twilight
+   color-theme-almost-monokai))
+;; local recipes
+(setq
+  el-get-sources
+  '((:name evil-leader
+        :after (progn
+                 (setq evil-leader/leader ",")))
+    (:name evil-nerd-commenter
+           :website "http://github.com/redguardtoo/evil-nerd-commenter"
+           :description "Emulate NERDCommenter plugin for vim"
+           :type github
+           :pkgname "redguardtoo/evil-nerd-commenter"
+           :features evil-nerd-commenter
+           :depends evil
+           :after (progn
+                    (global-set-key "\M-;" 'evilnc-comment-or-uncomment-lines)))))
+
+(setq my:el-get-packages
+      (append my:el-get-packages
+              (loop for src in el-get-sources
+                    collect (el-get-source-name src))))
+
+;; ensure required packages are installed/loaded
+(el-get 'sync my:el-get-packages)
+
+;;}}}
+
+
+;;{{{ Ido
+
+(require 'ido)
+(ido-mode t)
+
+;;}}}
