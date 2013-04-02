@@ -30,14 +30,13 @@
 (setq
  my:el-get-packages
  '(el-get
-   evil-surround
-   linum-relative
-   color-theme-almost-monokai))
+   evil-surround))
 ;; local recipes/overrides
 (setq
  el-get-sources
  '((:name evil
 	  :after (progn
+		   (evil-mode 1)
 		   (global-set-key (kbd "M-h") 'evil-window-left)
 		   (global-set-key (kbd "M-l") 'evil-window-right)
 		   (global-set-key (kbd "M-k") 'evil-window-up)
@@ -63,6 +62,18 @@
 		     evil-normal-state-map
 		     (kbd "\\\\")
 		     'evilnc-comment-or-uncomment-lines)))
+
+   (:name linum-relative
+	  :after (progn
+		   (custom-set-faces
+		    '(linum-relative-current-face ((t :foreground "red"))))
+		   (setq linum-relative-current-symbol "->")))
+
+   (:name color-theme-almost-monokai
+	  :after (progn
+		   ;; (require 'color-theme)
+		   (color-theme-initialize)
+		   (color-theme-almost-monokai)))
 
    (:name move-text
 	  :depends evil
@@ -134,14 +145,14 @@
 (global-linum-mode t)
 ;;}}}
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(safe-local-variable-values (quote ((eval setq default-directory (locate-dominating-file buffer-file-name ".dir-locals.el"))))))
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(linum-relative-current-face ((t :foreground "red"))))

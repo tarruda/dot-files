@@ -1,2 +1,0 @@
-(require 'folding)
-folding-mode
