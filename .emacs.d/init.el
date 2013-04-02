@@ -1,72 +1,11 @@
 ;;{{{ General
-
-;;enable common lisp extensions
+;; enable common lisp extensions
 (require 'cl)
-
+;; disable beep
+(setq visible-bell 1)
 ;;}}}
 
-;;{{{ Backup settings
-
-;; prefix with a dot as well as postfix with a tilde
-(defun custom-make-backup-file-name ( file )
-  (let ((d (file-name-directory file))
-        (f (file-name-nondirectory file)))
-    (concat d "." f "~")))
-(setq make-backup-file-name-function 'custom-make-backup-file-name)
-(defun backup-file-name-p ( file )
-  (let ((letters (string-to-list (file-name-nondirectory file))))
-    (and (> 2 (length letters))
-         (equal "." (first letters))
-         (equal "~" (last letters)))))
-(defun file-name-sans-versions ( file )
-  (if (not (backup-file-name-p file))
-      file
-    (let ((d (file-name-directory file))
-          (f (file-name-nondirectory file)))
-      (let ((letters (string-to-list f)))
-        (concat d (subseq letters 1 (- (length f) 1)))))))
-
-;;}}}
-
-;;{{{ UI settings
-
-;; hide toolbar
-(tool-bar-mode 0)
-;; hide menubar
-(menu-bar-mode 0)
-;; hide scrollbar
-(scroll-bar-mode 0)
-;; don't blink
-(blink-cursor-mode 0)
-
-;;}}} 
-
-;;{{{ Behavior
-
-;; show matching parens
-(show-paren-mode 1)
-;; show line numbers
-(line-number-mode 1)
-(column-number-mode 1)
-(global-linum-mode t)
-
-;;}}}
-
-;;{{{ Font
-
-;; Set the first font available
-(condition-case nil
-    (set-default-font "Ubuntu Mono 16")
-  (error (condition-case nil
-	     (set-default-font "Cousine")
-           (error (condition-case nil
-                      (set-default-font "Monaco")
-                    (error nil))))))
-
-;;}}}
-
-;;{{{ Packages
-
+;{{{ Packages
 ;; helper to evaluate a remote emacs lisp file
 (defun eval-url (url)
   (let ((buffer (url-retrieve-synchronously url)))
@@ -91,42 +30,96 @@
 (setq
  my:el-get-packages
  '(el-get
-   evil
    evil-surround
    linum-relative
-   color-theme
-   color-theme-twilight
    color-theme-almost-monokai))
-;; local recipes
+;; local recipes/overrides
 (setq
-  el-get-sources
-  '((:name evil-leader
-        :after (progn
-                 (setq evil-leader/leader ",")))
-    (:name evil-nerd-commenter
-           :website "http://github.com/redguardtoo/evil-nerd-commenter"
-           :description "Emulate NERDCommenter plugin for vim"
-           :type github
-           :pkgname "redguardtoo/evil-nerd-commenter"
-           :features evil-nerd-commenter
-           :depends evil
-           :after (progn
-                    (global-set-key "\M-;" 'evilnc-comment-or-uncomment-lines)))))
+ el-get-sources
+ '((:name evil
+	  :after (progn
+		   (global-set-key (kbd "M-h") 'evil-window-left)
+		   (global-set-key (kbd "M-l") 'evil-window-right)
+		   (global-set-key (kbd "M-k") 'evil-window-up)
+		   (global-set-key (kbd "M-j") 'evil-window-down)))
 
+   (:name evil-leader
+	  :after (progn
+		   (setq evil-leader/leader ",")))
+
+   (:name evil-nerd-commenter
+	  :website "http://github.com/redguardtoo/evil-nerd-commenter"
+	  :description "Emulate NERDCommenter plugin for vim"
+	  :type github
+	  :pkgname "redguardtoo/evil-nerd-commenter"
+	  :features evil-nerd-commenter
+	  :depends evil
+	  :after (progn
+		   (define-key
+		     evil-normal-state-map
+		     (kbd "\\\\")
+		     'evilnc-comment-or-uncomment-lines)))
+
+   (:name folding
+	  :post-init (folding-mode-add-find-file-hook))
+   ))
+;; put the custom recipes in the my:el-get-packages variable
 (setq my:el-get-packages
       (append my:el-get-packages
-              (loop for src in el-get-sources
-                    collect (el-get-source-name src))))
-
+	      (loop for src in el-get-sources
+		    collect (el-get-source-name src))))
 ;; ensure required packages are installed/loaded
 (el-get 'sync my:el-get-packages)
+;;}}}
+
+;;{{{ Backup
+;; prefix with a dot as well as postfix with a tilde
+(defun custom-make-backup-file-name ( file )
+  (let ((d (file-name-directory file))
+	(f (file-name-nondirectory file)))
+    (concat d "." f "~")))
+(setq make-backup-file-name-function 'custom-make-backup-file-name)
+(defun backup-file-name-p ( file )
+  (let ((letters (string-to-list (file-name-nondirectory file))))
+    (and (> 2 (length letters))
+	 (equal "." (first letters))
+	 (equal "~" (last letters)))))
+(defun file-name-sans-versions ( file )
+  (if (not (backup-file-name-p file))
+      file
+    (let ((d (file-name-directory file))
+	  (f (file-name-nondirectory file)))
+      (let ((letters (string-to-list f)))
+	(concat d (subseq letters 1 (- (length f) 1)))))))
 
 ;;}}}
 
+;;{{{ UI
+(setq default-frame-alist '((font-backend . "xft")
+			    (font . "Ubuntu Mono-17")
+			    (scroll-bar-mode . 0)
+			    (menu-bar-lines . 0)
+			    (tool-bar-lines . 0)))
+;; hide toolbar
+(tool-bar-mode 0)
+;; hide menubar
+(menu-bar-mode 0)
+;; hide scrollbar
+(scroll-bar-mode 0)
+;; don't blink
+(blink-cursor-mode 0)
+;;}}} 
+
+;;{{{ Behavior
+;; show matching parens
+(show-paren-mode 1)
+;; show line numbers
+(line-number-mode 1)
+(column-number-mode 1)
+(global-linum-mode t)
+;;}}}
 
 ;;{{{ Ido
-
 (require 'ido)
 (ido-mode t)
-
 ;;}}}
