@@ -5,7 +5,7 @@
 (setq visible-bell 1)
 ;;}}}
 
-;{{{ Packages
+;;{{{ Packages
 ;; helper to evaluate a remote emacs lisp file
 (defun eval-url (url)
   (let ((buffer (url-retrieve-synchronously url)))
@@ -41,7 +41,11 @@
 		   (global-set-key (kbd "M-h") 'evil-window-left)
 		   (global-set-key (kbd "M-l") 'evil-window-right)
 		   (global-set-key (kbd "M-k") 'evil-window-up)
-		   (global-set-key (kbd "M-j") 'evil-window-down)))
+		   (global-set-key (kbd "M-j") 'evil-window-down)
+		   (global-set-key (kbd "M-<left>") 'evil-window-left)
+		   (global-set-key (kbd "M-<right>") 'evil-window-right)
+		   (global-set-key (kbd "M-<up>") 'evil-window-up)
+		   (global-set-key (kbd "M-<down>") 'evil-window-down)))
 
    (:name evil-leader
 	  :after (progn
@@ -59,6 +63,18 @@
 		     evil-normal-state-map
 		     (kbd "\\\\")
 		     'evilnc-comment-or-uncomment-lines)))
+
+   (:name move-text
+	  :depends evil
+	  :after (progn
+		   (global-set-key [M-up] 'move-text-up)
+		   (global-set-key [M-down] 'move-text-down)
+		   ))
+
+   (:name helm
+   	  :depends evil
+   	  :after (progn
+   		   (define-key evil-normal-state-map (kbd "C-p") 'helm-find)))
 
    (:name folding
 	  :post-init (folding-mode-add-find-file-hook))
@@ -91,7 +107,6 @@
 	  (f (file-name-nondirectory file)))
       (let ((letters (string-to-list f)))
 	(concat d (subseq letters 1 (- (length f) 1)))))))
-
 ;;}}}
 
 ;;{{{ UI
@@ -108,7 +123,7 @@
 (scroll-bar-mode 0)
 ;; don't blink
 (blink-cursor-mode 0)
-;;}}} 
+;;}}}
 
 ;;{{{ Behavior
 ;; show matching parens
@@ -118,8 +133,15 @@
 (column-number-mode 1)
 (global-linum-mode t)
 ;;}}}
-
-;;{{{ Ido
-(require 'ido)
-(ido-mode t)
-;;}}}
+(custom-set-variables
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(safe-local-variable-values (quote ((eval setq default-directory (locate-dominating-file buffer-file-name ".dir-locals.el"))))))
+(custom-set-faces
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(linum-relative-current-face ((t :foreground "red"))))
