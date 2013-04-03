@@ -1,14 +1,13 @@
 " Title:	My vimrc
 " Author:	Thiago de Arruda (github.com/tarruda)
-" Description: This file initializes my vim customizations/addons.
-"              It was tested on vim 7.3 compiled with most features.
-"              A lot here was taken from this vimrc:
-"              https://bitbucket.org/sjl/dotfiles/src/tip/vim/vimrc
+" Description:
+"   This file initializes my vim customizations/addons.  It was tested on vim
+"   7.3 compiled with most features.  A lot here was taken from this vimrc:
+"   https://bitbucket.org/sjl/dotfiles/src/tip/vim/vimrc
 
 " Basic initialization {{{
 "
 if !exists('g:vimrc_done_basic_init')
-  let g:vimrc_done_basic_init = 1
   let g:is_windows = has('win32') || has('win64')
   " Little hack to set the $MYVIMRC from the $VIMINIT in the case it was used to 
   " initialize vim.
@@ -362,9 +361,7 @@ if !exists('g:vimrc_done_basic_init')
   else
     let g:vim_addon_manager.drop_git_sources = 1
   endif
-  if !exists('g:vam_activated')
-    let g:vam_activated = 1
-    call vam#ActivateAddons(s:vim_addons)
-  endif
+  call vam#ActivateAddons(s:vim_addons)
+  let g:vimrc_done_basic_init = 1
 endif
 " }}}

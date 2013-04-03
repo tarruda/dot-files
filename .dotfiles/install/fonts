@@ -1,13 +1,13 @@
 #!/usr/bin/env zsh
 function() {
-zmodload zsh/parameter
-setopt extended_glob
-local this_file="${funcsourcetrace[1]%:*}"
-local cur_dir="${${this_file:h}:h}"
-mkdir -p ~/.fonts
-echo $cur_dir
-cp -a ${cur_dir:h}/fonts/**/*.(ttf)(.N) ~/.fonts
-mkfontscale
-mkfontdir
-fc-cache -fv ~/.fonts
+	zmodload zsh/parameter
+	setopt extended_glob
+	local this_file="${funcsourcetrace[1]%:*}"
+	local cur_dir="${${this_file:h}:h}"
+	mkdir -p ~/.fonts
+	echo $cur_dir
+	cp -a ${cur_dir:h}/fonts/**/*.(ttf)(.N) ~/.fonts
+	mkfontscale
+	mkfontdir
+	fc-cache -fv ~/.fonts
 }
