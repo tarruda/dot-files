@@ -41,11 +41,17 @@ if &term =~ 'tmux' " requires my custom terminfo file
 endi
 set noerrorbells visualbell t_vb= " disable annoying terminal sounds
 set encoding=utf-8 " universal text encoding, compatible with ascii
+set list
+set listchars=tab:▸\ ,eol:¬,extends:❯,precedes:❮
+set showbreak=↪
+set fillchars=diff:⣿,vert:│
 set showcmd " display incomplete commands
 set completeopt=menu,menuone,longest " disable preview scratch window
 set pumheight=15 " limit completion menu height
 set nonumber " don't display line numbers on the left
 set relativenumber " shows relative line numbers for easy motions
+set splitbelow " put horizontal splits below 
+set splitright " put vertical splits to the right
 set expandtab " expand tabs into spaces
 set softtabstop=2 " number of spaces used with tab/bs
 set tabstop=2 " display tabs with the width of two spaces
