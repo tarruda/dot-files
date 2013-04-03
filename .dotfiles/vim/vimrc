@@ -153,7 +153,7 @@ let s:vim_addons = []
 if $TMUX != ''
   call add(s:vim_addons, 'github:epeli/slimux')
   " tranparent window/pane movement
-  fun! TmuxMove(direction)
+  function! TmuxMove(direction)
     " Check if we are currently focusing on a edge window.
     " To achieve that,  move to/from the requested window and
     " see if the window number changed
@@ -258,6 +258,7 @@ endif
 call vam#ActivateAddons(s:vim_addons)
 " }}} 
 " Mappings {{{
+" General {{{
 " clear last search highlight
 nnoremap <silent> <leader>c :noh<cr>
 " move between bracket pairs using tab (in normal and visual mode)
@@ -273,6 +274,8 @@ vnoremap <C-k> :m '<-2<CR>gv=gv
 inoremap <F1> <ESC>
 nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
+" }}}
+" Tmux {{{
 if $TMUX != ''
   " fix arrow mappings in insert mode
   inoremap <Esc>A <up>
@@ -289,6 +292,18 @@ if $TMUX != ''
   nnoremap <silent> <c-w><right> :silent call TmuxMove('l')<cr>
   map <F6> :SlimuxREPLSendLine<CR>
   vmap <F6> :SlimuxREPLSendSelection<CR>
+else
+  nnoremap <silent> <a-j> :wincmd j<cr>
+  nnoremap <silent> <a-k> :wincmd k<cr>
+  nnoremap <silent> <a-h> :wincmd h<cr>
+  nnoremap <silent> <a-l> :wincmd l<cr>
+  nnoremap <silent> <a-down> :wincmd j<cr>
+  nnoremap <silent> <a-up> :wincmd k<cr>
+  nnoremap <silent> <a-left> :wincmd h<cr>
+  nnoremap <silent> <a-right> :wincmd l<cr>
 endif
+" }}}
+" CtrlP {{{
 nnoremap <silent> <leader>p :CtrlPTag<CR>
+" }}}
 " }}}
