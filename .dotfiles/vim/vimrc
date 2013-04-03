@@ -2,29 +2,38 @@
 " Author:	Thiago de Arruda (github.com/tarruda)
 " Description: This file initializes my vim customizations/addons.
 "              It was tested on vim 7.3 compiled with most features.
+"              A lot here was taken from this vimrc:
+"              https://bitbucket.org/sjl/dotfiles/src/tip/vim/vimrc
 
 " Basic initialization {{{
-let g:is_windows = has('win32') || has('win64')
-" Little hack to set the $MYVIMRC from the $VIMINIT in the case it was used to 
-" initialize vim.
-let s:default_vimrc = 1
-if empty($MYVIMRC)
-  let $MYVIMRC = substitute($VIMINIT, "^source ", "", "g")
-  let s:default_vimrc = 0
+"
+if !exists('g:vimrc_done_basic_init')
+  let g:vimrc_done_basic_init = 1
+  let g:is_windows = has('win32') || has('win64')
+  " Little hack to set the $MYVIMRC from the $VIMINIT in the case it was used to 
+  " initialize vim.
+  let s:default_vimrc = 1
+  if empty($MYVIMRC)
+    let $MYVIMRC = substitute($VIMINIT, "^source ", "", "g")
+    let s:default_vimrc = 0
+  endif
+  " Extract the directory from $MYVIMRC
+  if g:is_windows
+    let g:rc_dir = strpart($MYVIMRC, 0, strridx($MYVIMRC, '\'))
+  else
+    let g:rc_dir = strpart($MYVIMRC, 0, strridx($MYVIMRC, '/'))
+  endif
+  if s:default_vimrc
+    " Set .vim as the rc_dir
+    let g:rc_dir = g:rc_dir.'/.vim'
+  endif
+  let g:vam_plugins_dir = g:rc_dir.'/addons'
+  let &runtimepath = g:rc_dir.','.g:vam_plugins_dir.'/vim-addon-manager,'.$VIMRUNTIME
 endif
-" Extract the directory from $MYVIMRC
-if g:is_windows
-  let g:rc_dir = strpart($MYVIMRC, 0, strridx($MYVIMRC, '\'))
-else
-  let g:rc_dir = strpart($MYVIMRC, 0, strridx($MYVIMRC, '/'))
-endif
-if s:default_vimrc
-  " Set .vim as the rc_dir
-  let g:rc_dir = g:rc_dir.'/.vim'
-endif
-let &runtimepath = g:rc_dir.','.$VIMRUNTIME
-"}}}
+
+" }}}
 " Global settings {{{
+"
 set nocompatible
 let mapleader = ","
 set backspace=indent,eol,start " backspace over everything in insert mode
@@ -47,6 +56,7 @@ set showbreak=↪
 set fillchars=diff:⣿,vert:│
 set showcmd " display incomplete commands
 set completeopt=menu,menuone,longest " disable preview scratch window
+set complete=.,w,b,u,t " h: 'complete'
 set pumheight=15 " limit completion menu height
 set nonumber " don't display line numbers on the left
 set relativenumber " shows relative line numbers for easy motions
@@ -62,16 +72,147 @@ set smartcase " disable 'ignorecase' if search pattern has uppercase characters
 set incsearch " highlight matches while typing search pattern
 set hlsearch " highlight previous search matches
 set showmatch " briefly jump to the matching bracket on insert
+set matchtime=2 " time in decisecons to jump back from matching bracket 
 set textwidth=80 " number of character allowed in a line
 set wrap " automatically wrap text when 'textwidth' is reached
 set foldmethod=indent " by default, fold using indentation
 set nofoldenable " don't fold by default
 set foldlevel=0 " if fold everything if 'foldenable' is set
 set foldnestmax=10 " maximum fold depth
+set synmaxcol=500 " maximum length to apply syntax highlighting
 syntax on " enable syntax highlighting
 filetype plugin indent on " enable file-specific plugins/settings
+set backupskip=/tmp/*,/private/tmp/* " make it possible to use vim to edit crontab
+augroup global_settings
+  au!
+  au VimResized * :wincmd = " resize windows when vim is resized 
+  " only show cursorline in the current window and in normal mode.
+  au WinLeave,InsertEnter * set nocursorline
+  au WinEnter,InsertLeave * set cursorline
+  " return to the same line when file is reopened
+  " au BufReadPost *
+  "       \ if line("'\"") > 0 && line("'\"") <= line("$") |
+  "       \     execute 'normal! g`"zvzz' |
+  "       \ endif
+augroup END
+
+" }}}
+" Custom commands {{{
+" Allows saving files which needs root permission with ':w!!'. This uses  one of
+" the forms of the ':w' command, which instead of writing to a file, takes all
+" lines in a range(or the whole buffer if not range is specified) and pipes as
+" standard input for the command after '!'. In this case 'tee' will redirect its
+" standard input(the entire buffer) to the file being edited(%)
+cnoremap w!! w !sudo tee % >/dev/null
+" Convenient command to see the difference between the current buffer and the
+" file it was loaded from, thus the changes you made.  Only define it when not
+" defined already.
+command! DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
+      \ | wincmd p | diffthis
+" }}}
+" Mappings {{{
+" General {{{
+" clear last search highlight
+nnoremap <silent> <leader>c :noh<cr>
+" move between bracket pairs using tab (in normal and visual mode)
+nnoremap <tab> %
+vnoremap <tab> % 
+" move single lines
+nnoremap <C-j> :m .+1<CR>==
+nnoremap <C-k> :m .-2<CR>==
+" move selections
+vnoremap <C-j> :m '>+1<CR>gv=gv
+vnoremap <C-k> :m '<-2<CR>gv=gv
+" disable help key
+inoremap <F1> <ESC>
+nnoremap <F1> <ESC>
+vnoremap <F1> <ESC>
+" }}}
+" Tmux {{{
+if $TMUX != ''
+  " fix arrow mappings in insert mode
+  inoremap <Esc>A <up>
+  inoremap <Esc>B <down>
+  inoremap <Esc>C <right>
+  inoremap <Esc>D <left>
+  nnoremap <silent> <c-w>j :silent call TmuxMove('j')<cr>
+  nnoremap <silent> <c-w>k :silent call TmuxMove('k')<cr>
+  nnoremap <silent> <c-w>h :silent call TmuxMove('h')<cr>
+  nnoremap <silent> <c-w>l :silent call TmuxMove('l')<cr>
+  nnoremap <silent> <c-w><down> :silent call TmuxMove('j')<cr>
+  nnoremap <silent> <c-w><up> :silent call TmuxMove('k')<cr>
+  nnoremap <silent> <c-w><left> :silent call TmuxMove('h')<cr>
+  nnoremap <silent> <c-w><right> :silent call TmuxMove('l')<cr>
+  map <F6> :SlimuxREPLSendLine<CR>
+  vmap <F6> :SlimuxREPLSendSelection<CR>
+else
+  nnoremap <silent> <a-j> :wincmd j<cr>
+  nnoremap <silent> <a-k> :wincmd k<cr>
+  nnoremap <silent> <a-h> :wincmd h<cr>
+  nnoremap <silent> <a-l> :wincmd l<cr>
+  nnoremap <silent> <a-down> :wincmd j<cr>
+  nnoremap <silent> <a-up> :wincmd k<cr>
+  nnoremap <silent> <a-left> :wincmd h<cr>
+  nnoremap <silent> <a-right> :wincmd l<cr>
+endif
+" }}}
+" CtrlP {{{
+nnoremap <silent> <leader>p :CtrlPTag<CR>
+" }}}
+" }}}
+" Filetype local settings {{{
+augroup filetype_settings
+  au!
+  " Filetype detection {{{
+  " my vimrc may not have the usual path
+  au BufNewFile,BufRead $MYVIMRC setl filetype=vim
+  au BufWritePost $MYVIMRC source %
+  au BufNewFile,BufRead *.vimp setl filetype=vim " vimperator files
+  " automatically put files with binary extensions in hex mode
+  au BufReadPre *.bin,*.hex,*.exe let &bin=1
+  au BufReadPost *.bin,*.hex,*.exe if &bin | %!xxd
+  au BufReadPost *.bin,*.hex,*.exe setl ft=xxd | endif
+  au BufWritePre *.bin,*.hex,*.exe if &bin | %!xxd -r
+  au BufWritePre *.bin,*.hex,*.exe endif
+  au BufWritePost *.bin,*.hex,*.exe if &bin | %!xxd
+  au BufWritePost *.bin,*.hex,*.exe setl nomod | endif
+  " tmux rc file
+  au  BufNewFile,BufRead .tmux*.conf setl filetype=tmux
+  " html with mustaches
+  au  BufNewFile,BufRead *.html.mustache,*.html.handlebars,*.html.hbs,*.html.hogan,*.html.hulk setl filetype=html.mustache
+  " extra zsh files without extensions 
+  au BufNewFile,BufRead $ZDOTDIR/functions/**/* setl filetype=zsh
+  au BufNewFile,BufRead $ZDOTDIR/completion.d/* setl filetype=zsh
+  au BufNewFile,BufRead $ZDOTDIR/plugins/**/functions/* setl filetype=zsh
+  " }}}
+  " Vim {{{
+  au FileType vim
+        \   setl foldmethod=marker
+        \ | setl foldenable
+  " }}}
+  " Zsh/sh {{{
+  au FileType zsh 
+        \   runtime! indent/sh.vim
+        \ | setl noexpandtab
+  au FileType sh | setl noexpandtab
+  " }}}
+  " Nasm {{{
+  au FileType nasm 
+        \   setl softtabstop=4
+        \ | setl shiftwidth=4 
+        \ | setl textwidth=150
+  " }}}
+  " Python {{{
+  au FileType python 
+        \   setl softtabstop=4
+        \ | setl shiftwidth=4 
+        \ | setl textwidth79=
+  " }}}
+augroup END
+
 " }}}
 " Appearance {{{
+"
 if has('gui_running') " gvim
   colorscheme molokai
   if g:is_windows
@@ -91,61 +232,6 @@ else
     colorscheme twilight-term256
     highlight Comment cterm=italic
   endif
-endif
-" }}}
-" Autocommands {{{
-augroup filetype_detection
-  au BufNewFile,BufRead $MYVIMRC setl filetype=vim | setl foldmethod=marker | setl foldenable
-  au BufNewFile,BufRead *.vimp setl filetype=vim " vimperator files
-augroup END
-augroup Binary " automatically files with binary extensions in hex mode
-  au BufReadPre *.bin,*.hex,*.exe let &bin=1
-  au BufReadPost *.bin,*.hex,*.exe if &bin | %!xxd
-  au BufReadPost *.bin,*.hex,*.exe set ft=xxd | endif
-  au BufWritePre *.bin,*.hex,*.exe if &bin | %!xxd -r
-  au BufWritePre *.bin,*.hex,*.exe endif
-  au BufWritePost *.bin,*.hex,*.exe if &bin | %!xxd
-  au BufWritePost *.bin,*.hex,*.exe set nomod | endif
-augroup END
-" }}}
-" Custom commands {{{
-" Allows saving files which needs root permission with ':W'. This is one of
-" the forms of the ':w' command, which instead of writing to a file, takes
-" all lines in a range(or the whole buffer if not range is specified) and
-" pipes as standard input for the command after '!'. In this case 'tee' will
-" redirect its standard input(the entire buffer) to the file being edited(%)
-if !exists(":W")
-  command W :w !sudo tee % > /dev/null 
-endif
-" Convenient command to see the difference between the current buffer and the
-" file it was loaded from, thus the changes you made.
-" Only define it when not defined already.
-if !exists(":DiffOrig")
-  command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
-        \ | wincmd p | diffthis
-endif
-" }}}
-" Package management(vim-addon-manager setup) {{{
-let g:vim_addon_manager = {}
-let g:vim_addon_manager.auto_install = 1
-let g:vim_addon_manager.shell_commands_run_method = 'system'
-let g:vim_addon_manager.plugin_root_dir = g:rc_dir.'/addons'
-if !isdirectory(g:vim_addon_manager.plugin_root_dir)
-  call mkdir(g:vim_addon_manager.plugin_root_dir, "p")
-endif
-let &rtp .= (empty(&rtp)?'':',').g:vim_addon_manager.plugin_root_dir.'/vim-addon-manager'
-if !isdirectory(g:vim_addon_manager.plugin_root_dir.'/vim-addon-manager/autoload')
-  execute '!git clone git://github.com/MarcWeber/vim-addon-manager '
-        \ shellescape(g:vim_addon_manager.plugin_root_dir.'/vim-addon-manager', 1)
-endif
-let g:vim_addon_manager.scms = {'scms': {}}
-if executable('git')
-  fun! VamGitClone(repository, targetDir)
-    return vam#utils#RunShell('git clone $.url $p', a:repository, a:targetDir)
-  endfun
-  let g:vim_addon_manager.scms.git = {'clone': ['VamGitClone']}
-else
-  let g:vim_addon_manager.drop_git_sources = 1
 endif
 " }}}
 " Addons {{{
@@ -184,15 +270,15 @@ call add(s:vim_addons, 'github:kien/ctrlp.vim')
 set wildignore+=*.o,*.so,*.dll,*.exe,*.bak,*.swp,*.class,*.pyc,*.pyd,*.pyo,*~
 set wildignore+=*.zip,*.tgz,*.gz,*.bz2,*.lz,*.rar,*.7z,*.jar
 let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/](\.(git|hg|svn|bzr)|node_modules)$',
-  \ }
+      \ 'dir':  '\v[\/](\.(git|hg|svn|bzr)|node_modules)$',
+      \ }
 let g:ctrlp_extensions = ['tag']
 let g:ctrlp_cmd = 'Ctrlp'
 fun! s:search()
   SourceLocalVimrcOnce
   CtrlP
 endf
-command Ctrlp call s:search()
+command! Ctrlp call s:search()
 " }}}
 " Clang(C/C++) {{{
 " Disable auto popup, use <Tab> to autocomplete
@@ -256,55 +342,32 @@ else
   echo "ERROR: Need python support for ultisnips"
 endif
 " }}}
-call vam#ActivateAddons(s:vim_addons)
 " }}} 
-" Mappings {{{
-" General {{{
-" clear last search highlight
-nnoremap <silent> <leader>c :noh<cr>
-" move between bracket pairs using tab (in normal and visual mode)
-nnoremap <tab> %
-vnoremap <tab> % 
-" move single lines
-nnoremap <C-j> :m .+1<CR>==
-nnoremap <C-k> :m .-2<CR>==
-" move selections
-vnoremap <C-j> :m '>+1<CR>gv=gv
-vnoremap <C-k> :m '<-2<CR>gv=gv
-" disable help key
-inoremap <F1> <ESC>
-nnoremap <F1> <ESC>
-vnoremap <F1> <ESC>
-" }}}
-" Tmux {{{
-if $TMUX != ''
-  " fix arrow mappings in insert mode
-  inoremap <Esc>A <up>
-  inoremap <Esc>B <down>
-  inoremap <Esc>C <right>
-  inoremap <Esc>D <left>
-  nnoremap <silent> <c-w>j :silent call TmuxMove('j')<cr>
-  nnoremap <silent> <c-w>k :silent call TmuxMove('k')<cr>
-  nnoremap <silent> <c-w>h :silent call TmuxMove('h')<cr>
-  nnoremap <silent> <c-w>l :silent call TmuxMove('l')<cr>
-  nnoremap <silent> <c-w><down> :silent call TmuxMove('j')<cr>
-  nnoremap <silent> <c-w><up> :silent call TmuxMove('k')<cr>
-  nnoremap <silent> <c-w><left> :silent call TmuxMove('h')<cr>
-  nnoremap <silent> <c-w><right> :silent call TmuxMove('l')<cr>
-  map <F6> :SlimuxREPLSendLine<CR>
-  vmap <F6> :SlimuxREPLSendSelection<CR>
-else
-  nnoremap <silent> <a-j> :wincmd j<cr>
-  nnoremap <silent> <a-k> :wincmd k<cr>
-  nnoremap <silent> <a-h> :wincmd h<cr>
-  nnoremap <silent> <a-l> :wincmd l<cr>
-  nnoremap <silent> <a-down> :wincmd j<cr>
-  nnoremap <silent> <a-up> :wincmd k<cr>
-  nnoremap <silent> <a-left> :wincmd h<cr>
-  nnoremap <silent> <a-right> :wincmd l<cr>
+" Package management(vim-addon-manager setup) {{{
+if !exists('g:vimrc_done_basic_init')
+  let g:vim_addon_manager = {}
+  let g:vim_addon_manager.auto_install = 1
+  let g:vim_addon_manager.shell_commands_run_method = 'system'
+  let g:vim_addon_manager.plugin_root_dir = g:vam_plugins_dir
+  if !isdirectory(g:vim_addon_manager.plugin_root_dir)
+    call mkdir(g:vim_addon_manager.plugin_root_dir, "p")
+  endif
+  if !isdirectory(g:vim_addon_manager.plugin_root_dir.'/vim-addon-manager/autoload')
+    execute '!git clone git://github.com/MarcWeber/vim-addon-manager '
+          \ shellescape(g:vim_addon_manager.plugin_root_dir.'/vim-addon-manager', 1)
+  endif
+  let g:vim_addon_manager.scms = {'scms': {}}
+  if executable('git')
+    fun! VamGitClone(repository, targetDir)
+      return vam#utils#RunShell('git clone $.url $p', a:repository, a:targetDir)
+    endfun
+    let g:vim_addon_manager.scms.git = {'clone': ['VamGitClone']}
+  else
+    let g:vim_addon_manager.drop_git_sources = 1
+  endif
+  if !exists('g:vam_activated')
+    let g:vam_activated = 1
+    call vam#ActivateAddons(s:vim_addons)
+  endif
 endif
-" }}}
-" CtrlP {{{
-nnoremap <silent> <leader>p :CtrlPTag<CR>
-" }}}
 " }}}
