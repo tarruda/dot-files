@@ -75,7 +75,7 @@ filetype plugin indent on " enable file-specific plugins/settings
 if has('gui_running') " gvim
   colorscheme molokai
   if g:is_windows
-    set guifont=Consolas:h12
+    set guifont=Ubuntu\ Mono:h16
   elseif has('win32unix') " cygwin
     set guifont=Consolas\ 16
   else
@@ -85,9 +85,10 @@ if has('gui_running') " gvim
   set guioptions-=T " remove toolbar
   set guioptions-=lr " remove scroll bars
 else
-  colorscheme twilight-term256
   if &term =~ 'tmux' || &term =~ 'rxvt-unicode-256color'
-    " assuming tmux to be backed by urxvt(which support italics)
+    " assuming tmux to be backed by urxvt256(which supports italics
+    " and 256 colors)
+    colorscheme twilight-term256
     highlight Comment cterm=italic
   endif
 endif

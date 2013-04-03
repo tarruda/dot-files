@@ -1,2 +1,2 @@
 install-fonts:
-	@./install/fonts.zsh
+	@./install/fonts
