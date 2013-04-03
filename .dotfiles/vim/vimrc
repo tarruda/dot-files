@@ -1,0 +1,288 @@
+" Title:	My vimrc
+" Author:	Thiago de Arruda (github.com/tarruda)
+" Description: This file initializes my vim customizations/addons.
+"              It was tested on vim 7.3 compiled with most features.
+
+" Basic initialization {{{
+let g:is_windows = has('win32') || has('win64')
+" Little hack to set the $MYVIMRC from the $VIMINIT in the case it was used to 
+" initialize vim.
+let s:default_vimrc = 1
+if empty($MYVIMRC)
+  let $MYVIMRC = substitute($VIMINIT, "^source ", "", "g")
+  let s:default_vimrc = 0
+endif
+" Extract the directory from $MYVIMRC
+if g:is_windows
+  let g:rc_dir = strpart($MYVIMRC, 0, strridx($MYVIMRC, '\'))
+else
+  let g:rc_dir = strpart($MYVIMRC, 0, strridx($MYVIMRC, '/'))
+endif
+if s:default_vimrc
+  " Set .vim as the rc_dir
+  let g:rc_dir = g:rc_dir.'/.vim'
+endif
+let &runtimepath = g:rc_dir.','.$VIMRUNTIME
+"}}}
+" Global settings {{{
+set nocompatible
+let mapleader = ","
+set backspace=indent,eol,start " backspace over everything in insert mode
+set nobackup " no need for backup files(use undo files instead)
+set undofile " create '.<FILENAME>.un~' for persiting undo history
+set dir=.,/tmp " swap files storage, first try in the cwd then in /tmp
+set undodir=. " undo files storage, only allow the same directory
+set history=500 " 500 lines of command-line history
+set ruler " display cursor position at bottom
+set mouse=a " enable terminal mouse extensions
+if &term =~ 'tmux' " requires my custom terminfo file
+  set ttymouse=xterm2 " integrate mouse extensions with tmux
+  set ttyfast " normally this is only set for certain known terminals
+endi
+set noerrorbells visualbell t_vb= " disable annoying terminal sounds
+set encoding=utf-8 " universal text encoding, compatible with ascii
+set showcmd " display incomplete commands
+set completeopt=menu,menuone,longest " disable preview scratch window
+set pumheight=15 " limit completion menu height
+set nonumber " don't display line numbers on the left
+set relativenumber " shows relative line numbers for easy motions
+set expandtab " expand tabs into spaces
+set softtabstop=2 " number of spaces used with tab/bs
+set tabstop=2 " display tabs with the width of two spaces
+set shiftwidth=2 " indent with two spaces 
+set modelines=0 " running code in comments is not cool
+set ignorecase " ignore case when searching
+set smartcase " disable 'ignorecase' if search pattern has uppercase characters
+set incsearch " highlight matches while typing search pattern
+set hlsearch " highlight previous search matches
+set showmatch " briefly jump to the matching bracket on insert
+set textwidth=80 " number of character allowed in a line
+set wrap " automatically wrap text when 'textwidth' is reached
+set foldmethod=indent " by default, fold using indentation
+set nofoldenable " don't fold by default
+set foldlevel=0 " if fold everything if 'foldenable' is set
+set foldnestmax=10 " maximum fold depth
+syntax on " enable syntax highlighting
+filetype plugin indent on " enable file-specific plugins/settings
+" }}}
+" Appearance {{{
+if has('gui_running') " gvim
+  colorscheme molokai
+  if g:is_windows
+    set guifont=Consolas:h12
+  elseif has('win32unix') " cygwin
+    set guifont=Consolas\ 16
+  else
+    set guifont=Ubuntu\ Mono\ 16,Inconsolata\ 16,Monospace\ 14
+  endif
+  set guioptions-=m " remove menu bar
+  set guioptions-=T " remove toolbar
+  set guioptions-=lr " remove scroll bars
+else
+  colorscheme twilight-term256
+  if &term =~ 'tmux' || &term =~ 'rxvt-unicode-256color'
+    " assuming tmux to be backed by urxvt(which support italics)
+    highlight Comment cterm=italic
+  endif
+endif
+" }}}
+" Autocommands {{{
+augroup filetype_detection
+  au BufNewFile,BufRead $MYVIMRC setl filetype=vim | setl foldmethod=marker | setl foldenable
+  au BufNewFile,BufRead *.vimp setl filetype=vim " vimperator files
+augroup END
+augroup Binary " automatically files with binary extensions in hex mode
+  au BufReadPre *.bin,*.hex,*.exe let &bin=1
+  au BufReadPost *.bin,*.hex,*.exe if &bin | %!xxd
+  au BufReadPost *.bin,*.hex,*.exe set ft=xxd | endif
+  au BufWritePre *.bin,*.hex,*.exe if &bin | %!xxd -r
+  au BufWritePre *.bin,*.hex,*.exe endif
+  au BufWritePost *.bin,*.hex,*.exe if &bin | %!xxd
+  au BufWritePost *.bin,*.hex,*.exe set nomod | endif
+augroup END
+" }}}
+" Custom commands {{{
+" Allows saving files which needs root permission with ':W'. This is one of
+" the forms of the ':w' command, which instead of writing to a file, takes
+" all lines in a range(or the whole buffer if not range is specified) and
+" pipes as standard input for the command after '!'. In this case 'tee' will
+" redirect its standard input(the entire buffer) to the file being edited(%)
+if !exists(":W")
+  command W :w !sudo tee % > /dev/null 
+endif
+" Convenient command to see the difference between the current buffer and the
+" file it was loaded from, thus the changes you made.
+" Only define it when not defined already.
+if !exists(":DiffOrig")
+  command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
+        \ | wincmd p | diffthis
+endif
+" }}}
+" Package management(vim-addon-manager setup) {{{
+let g:vim_addon_manager = {}
+let g:vim_addon_manager.auto_install = 1
+let g:vim_addon_manager.shell_commands_run_method = 'system'
+let g:vim_addon_manager.plugin_root_dir = g:rc_dir.'/addons'
+if !isdirectory(g:vim_addon_manager.plugin_root_dir)
+  call mkdir(g:vim_addon_manager.plugin_root_dir, "p")
+endif
+let &rtp .= (empty(&rtp)?'':',').g:vim_addon_manager.plugin_root_dir.'/vim-addon-manager'
+if !isdirectory(g:vim_addon_manager.plugin_root_dir.'/vim-addon-manager/autoload')
+  execute '!git clone git://github.com/MarcWeber/vim-addon-manager '
+        \ shellescape(g:vim_addon_manager.plugin_root_dir.'/vim-addon-manager', 1)
+endif
+let g:vim_addon_manager.scms = {'scms': {}}
+if executable('git')
+  fun! VamGitClone(repository, targetDir)
+    return vam#utils#RunShell('git clone $.url $p', a:repository, a:targetDir)
+  endfun
+  let g:vim_addon_manager.scms.git = {'clone': ['VamGitClone']}
+else
+  let g:vim_addon_manager.drop_git_sources = 1
+endif
+" }}}
+" Addons {{{
+let s:vim_addons = []
+" Tmux integration {{{
+if $TMUX != ''
+  call add(s:vim_addons, 'github:epeli/slimux')
+  " tranparent window/pane movement
+  fun! TmuxMove(direction)
+    " Check if we are currently focusing on a edge window.
+    " To achieve that,  move to/from the requested window and
+    " see if the window number changed
+    let oldw = winnr()
+    silent! exe 'wincmd ' . a:direction
+    let neww = winnr()
+    silent! exe oldw . 'wincmd'
+    if oldw == neww
+      " The focused window is at an edge, so ask tmux to switch panes
+      if a:direction == 'j'
+        call system("tmux select-pane -D")
+      elseif a:direction == 'k'
+        call system("tmux select-pane -U")
+      elseif a:direction == 'h'
+        call system("tmux select-pane -L")
+      elseif a:direction == 'l'
+        call system("tmux select-pane -R")
+      endif
+    else
+      exe 'wincmd ' . a:direction
+    end
+  endfunction
+endif
+" }}}
+" CtrlP(fuzzy finder) {{{
+call add(s:vim_addons, 'github:kien/ctrlp.vim')
+set wildignore+=*.o,*.so,*.dll,*.exe,*.bak,*.swp,*.class,*.pyc,*.pyd,*.pyo,*~
+set wildignore+=*.zip,*.tgz,*.gz,*.bz2,*.lz,*.rar,*.7z,*.jar
+let g:ctrlp_custom_ignore = {
+  \ 'dir':  '\v[\/](\.(git|hg|svn|bzr)|node_modules)$',
+  \ }
+let g:ctrlp_extensions = ['tag']
+let g:ctrlp_cmd = 'Ctrlp'
+fun! s:search()
+  SourceLocalVimrcOnce
+  CtrlP
+endf
+command Ctrlp call s:search()
+" }}}
+" Clang(C/C++) {{{
+" Disable auto popup, use <Tab> to autocomplete
+let g:clang_complete_auto = 0
+" Show clang errors in the quickfix window
+let g:clang_complete_copen = 1
+" Use clang library instead of the executable
+" This requires both libclang and its headers to be installed
+let g:clang_use_library = 1
+" clang integration
+call add(s:vim_addons, 'github:Rip-Rip/clang_complete')
+" }}}
+" NERDTree {{{
+call add(s:vim_addons, 'github:scrooloose/nerdtree')
+" close VIM if NERDTree is the only buffer left
+autocmd BufEnter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
+" toggle NERDTree
+nnoremap <silent> <F2> :NERDTreeToggle<CR>
+" }}}
+" SuperTab {{{
+call add(s:vim_addons, 'github:ervandew/supertab')
+" superTab option for context aware completion
+let g:SuperTabDefaultCompletionType = "context"
+" }}}
+" Typescript {{{
+call add(s:vim_addons, 'github:leafgarland/typescript-vim')
+setl textwidth=80
+setl shiftwidth=2
+setl expandtab
+" }}}
+" Project-local vimrc {{{
+call add(s:vim_addons, 'github:MarcWeber/vim-addon-local-vimrc')
+let g:local_vimrc = {
+      \ 'names': ['.lvimrc'],
+      \ 'hash_fun': 'LVRHashOfFile'
+      \ }
+" }}}
+" Other {{{
+call add(s:vim_addons, 'github:tpope/vim-repeat')
+call add(s:vim_addons, 'github:tpope/vim-surround')
+call add(s:vim_addons, 'github:tpope/vim-fugitive')
+call add(s:vim_addons, 'github:tpope/vim-commentary')
+call add(s:vim_addons, 'github:juvenn/mustache.vim')
+call add(s:vim_addons, 'github:pangloss/vim-javascript')
+call add(s:vim_addons, 'github:kchmck/vim-coffee-script')
+call add(s:vim_addons, 'github:kelan/gyp.vim')
+call add(s:vim_addons, 'github:groenewege/vim-less')
+call add(s:vim_addons, 'github:danro/rename.vim')
+call add(s:vim_addons, 'github:mattn/webapi-vim')
+call add(s:vim_addons, 'github:mattn/gist-vim')
+call add(s:vim_addons, 'github:walm/jshint.vim')
+call add(s:vim_addons, 'github:Townk/vim-autoclose')
+call add(s:vim_addons, 'github:vim-scripts/scratch.vim')
+call add(s:vim_addons, 'github:godlygeek/csapprox')
+call add(s:vim_addons, 'github:mileszs/ack.vim')
+call add(s:vim_addons, 'github:vim-scripts/TTCoach')
+call add(s:vim_addons, 'github:gabemc/powershell-vim')
+if has('python')
+  call add(s:vim_addons, 'github:SirVer/ultisnips')
+else
+  echo "ERROR: Need python support for ultisnips"
+endif
+" }}}
+call vam#ActivateAddons(s:vim_addons)
+" }}} 
+" Mappings {{{
+" clear last search highlight
+nnoremap <silent> <leader>c :noh<cr>
+" move between bracket pairs using tab (in normal and visual mode)
+nnoremap <tab> %
+vnoremap <tab> % 
+" move single lines
+nnoremap <C-j> :m .+1<CR>==
+nnoremap <C-k> :m .-2<CR>==
+" move selections
+vnoremap <C-j> :m '>+1<CR>gv=gv
+vnoremap <C-k> :m '<-2<CR>gv=gv
+" disable help key
+inoremap <F1> <ESC>
+nnoremap <F1> <ESC>
+vnoremap <F1> <ESC>
+if $TMUX != ''
+  " fix arrow mappings in insert mode
+  inoremap <Esc>A <up>
+  inoremap <Esc>B <down>
+  inoremap <Esc>C <right>
+  inoremap <Esc>D <left>
+  nnoremap <silent> <c-w>j :silent call TmuxMove('j')<cr>
+  nnoremap <silent> <c-w>k :silent call TmuxMove('k')<cr>
+  nnoremap <silent> <c-w>h :silent call TmuxMove('h')<cr>
+  nnoremap <silent> <c-w>l :silent call TmuxMove('l')<cr>
+  nnoremap <silent> <c-w><down> :silent call TmuxMove('j')<cr>
+  nnoremap <silent> <c-w><up> :silent call TmuxMove('k')<cr>
+  nnoremap <silent> <c-w><left> :silent call TmuxMove('h')<cr>
+  nnoremap <silent> <c-w><right> :silent call TmuxMove('l')<cr>
+  map <F6> :SlimuxREPLSendLine<CR>
+  vmap <F6> :SlimuxREPLSendSelection<CR>
+endif
+nnoremap <silent> <leader>p :CtrlPTag<CR>
+" }}}
