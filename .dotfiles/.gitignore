@@ -1,0 +1,11 @@
+/vim/sessions/
+/vim/addons/
+/vimperator/info
+/vimperator/plugin/local.vimp
+/zsh/.site-zprofile
+/zsh/.site-zshrc
+/zsh/.site-zlogin
+/zsh/.zsh_history
+/zsh/.zcompdump
+/zsh/.zcalc_history
+.VimballRecord
