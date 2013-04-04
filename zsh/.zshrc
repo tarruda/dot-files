@@ -214,11 +214,8 @@ precmd_functions+=cnf_precmd
 				alias vi=vim
 			fi
 		else
-			if [[ -r $DOTDIR/tmux/.tmux.conf ]]; then
-				tmux source-file $DOTDIR/.tmux.conf
-			fi
-			if [[ -r $DOTDIR/tmux/.site-tmux.conf ]]; then
-				tmux source-file $DOTDIR/.site-tmux.conf
+			if [[ -r $HOME/.site-tmux.conf ]]; then
+				tmux source-file $HOME/.site-tmux.conf
 			fi
 			vi() {
 				zsh $DOTDIR/tmux/scripts/vim-tmux-open.zsh "$@"

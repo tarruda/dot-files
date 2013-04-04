@@ -5,9 +5,9 @@ install:
 	ln -s $(PWD)/.XWinrc $(HOME)/.XWinrc
 	ln -s $(PWD)/.Xresources $(HOME)/.Xresources
 	ln -s $(PWD)/.startxwinrc $(HOME)/.startxwinrc
-	ln -s $(PWD)/.tmux.conf $(HOME)/.tmux.conf
-	ln -s $(PWD)/.emacs.d $(HOME)/.emacs.d
-	ln -s $(PWD)/.terminfo $(HOME)/.terminfo
+	ln -s $(PWD)/tmux/tmux.conf $(HOME)/.tmux.conf
+	ln -s $(PWD)/emacs.d $(HOME)/.emacs.d
+	ln -s $(PWD)/terminfo $(HOME)/.terminfo
 
 uninstall:
 	rm $(HOME)/.zshenv
