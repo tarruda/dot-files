@@ -10,8 +10,6 @@ function() {
 	.gitconfig .gitconfig
 	.global.gitignore .global.gitignore
 	.XWinrc .XWinrc
-	.Xresources .Xresources
-	.startxwinrc .startxwinrc
 	tmux/.tmux.conf .tmux.conf
 	emacs.d .emacs.d
 	terminfo .terminfo

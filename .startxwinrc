@@ -1,7 +1,7 @@
 #!/bin/sh
-xrdb "$HOME/.Xresources"
-if [[ -r "$HOME/.startxwinrc-local" ]]; then
-	source "$HOME/.startxwinrc-local"
+xrdb $DOTDIR/.Xresources
+if [[ -r $DOTDIR/.startxwinrc-local ]]; then
+	source $DOTDIR/.startxwinrc-local
 fi
 if which pulseaudio &> /dev/null; then
 	pulseaudio --start
