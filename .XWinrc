@@ -27,7 +27,7 @@ MENU root {
 
 ROOTMENU root
 
-ICONDIRECTORY T:\cygwin\home\tarruda\.cygwin-resources\icons
+ICONDIRECTORY T:\cygwin\home\tarruda\.dotfiles\cygwin-resources\icons
 
 ICONS {
   tmux terminal.ico
