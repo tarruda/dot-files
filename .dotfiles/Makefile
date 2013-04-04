@@ -7,6 +7,7 @@ install:
 	ln -s $(PWD)/.startxwinrc $(HOME)/.startxwinrc
 	ln -s $(PWD)/.tmux.conf $(HOME)/.tmux.conf
 	ln -s $(PWD)/.emacs.d $(HOME)/.emacs.d
+	ln -s $(PWD)/.terminfo $(HOME)/.terminfo
 
 uninstall:
 	rm $(HOME)/.zshenv
@@ -17,6 +18,7 @@ uninstall:
 	rm $(HOME)/.startxwinrc
 	rm $(HOME)/.tmux.conf
 	rm $(HOME)/.emacs.d
+	rm $(HOME)/.terminfo
 
 install-fonts:
 	@./install/fonts
