@@ -176,16 +176,8 @@ augroup filetype_settings
   au BufNewFile,BufRead $MYVIMRC setl filetype=vim
   au BufWritePost $MYVIMRC source %
   au BufNewFile,BufRead *.vimp setl filetype=vim " vimperator files
-  " automatically put files with binary extensions in hex mode
-  au BufReadPre *.bin,*.hex,*.exe let &bin=1
-  au BufReadPost *.bin,*.hex,*.exe if &bin | %!xxd
-  au BufReadPost *.bin,*.hex,*.exe setl ft=xxd | endif
-  au BufWritePre *.bin,*.hex,*.exe if &bin | %!xxd -r
-  au BufWritePre *.bin,*.hex,*.exe endif
-  au BufWritePost *.bin,*.hex,*.exe if &bin | %!xxd
-  au BufWritePost *.bin,*.hex,*.exe setl nomod | endif
   " tmux rc file
-  au  BufNewFile,BufRead .tmux.conf,.tmux.conf,.site-tmux.conf setl filetype=tmux
+  au  BufNewFile,BufRead .tmux.conf,tmuxrc,site-tmuxrc setl filetype=tmux
   " html with mustaches
   au  BufNewFile,BufRead *.html.mustache,*.html.handlebars,*.html.hbs,*.html.hogan,*.html.hulk setl filetype=html.mustache
   " extra zsh files without extensions 
@@ -204,6 +196,7 @@ augroup filetype_settings
         \   runtime! indent/sh.vim
         \ | setl foldmethod=marker
         \ | setl foldenable
+        " \ | setl listchars=tab:\ \ ,eol:¬,extends:❯,precedes:❮
   " }}}
   " Nasm {{{
   au FileType nasm 

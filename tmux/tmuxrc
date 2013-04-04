@@ -1,9 +1,7 @@
 unbind C-b
 set -g prefix C-a
-bind C-a send-prefix
+bind C-a send-prefix # send ctrl+a by pressing it again
 bind -n C-\ send-prefix # send prefix in remote nested tmux
-#set -g default-path "$HOME"
-set -g default-terminal "tmux"
 set -g status-left-length 52
 set -g status-right-length 451
 set -g status-fg white
@@ -37,7 +35,7 @@ bind h select-pane -L
 unbind l
 bind l select-pane -R
 
-# Disable esc delay
+# Lower esc delay
 set -g escape-time 5
 
 # Fully integrate with vim navigation
@@ -50,19 +48,8 @@ bind -n M-Up run 'zsh $DOTDIR/tmux/scripts/vim-tmux-move.zsh k'
 bind -n M-Left run 'zsh $DOTDIR/tmux/scripts/vim-tmux-move.zsh h'
 bind -n M-Right run 'zsh $DOTDIR/tmux/scripts/vim-tmux-move.zsh l'
 
-
-# bind : to command-prompt like vim
-# this is the default in tmux already
-bind : command-prompt
-
 # vi-style controls for copy mode
 setw -g mode-keys vi
-
-# easily switch panes
-# On X, configure Super_L(windows key) to send F12 using xmodmap
-bind -n F12 select-pane -t :.+
-# zoom pane
-bind -n C-F12 resize-pane -Z
 
 # move x clipboard into tmux paste buffer
 bind C-p run "tmux set-buffer \"$(xclip -o -selection clipboard)\"; tmux paste-buffer"

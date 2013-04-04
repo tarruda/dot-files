@@ -1,5 +1,6 @@
 /vim/sessions/
 /vim/addons/
+/vim/site-vimrc
 /vimperator/info
 /vimperator/plugin/local.vimp
 /zsh/.site-zprofile
@@ -8,6 +9,7 @@
 /zsh/.zsh_history
 /zsh/.zcompdump
 /zsh/.zcalc_history
+/tmux/site-tmuxrc
 .VimballRecord
-/.emacs.d/el-get/
-/.emacs.d/elpa/
+/emacs.d/el-get/
+/emacs.d/elpa/

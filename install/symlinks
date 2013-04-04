@@ -1,0 +1,46 @@
+#!/usr/bin/env zsh
+
+action=$1
+function() {
+	zmodload zsh/parameter
+	setopt extended_glob
+	typeset -A map
+	map=(
+	zsh/.zshenv .zshenv
+	.gitconfig .gitconfig
+	.global.gitignore .global.gitignore
+	.XWinrc .XWinrc
+	.Xresources .Xresources
+	.startxwinrc .startxwinrc
+	tmux/.tmux.conf .tmux.conf
+	emacs.d .emacs.d
+	terminfo .terminfo
+	)
+	case $action in
+		install)
+			this_file=${funcsourcetrace[1]%:*}
+			cur_dir=${${this_file:h:A}:h}
+			for source in ${(k)map}; do
+				target=$HOME/${map[$source]}
+				if [[ -e $target ]]; then
+					print "'$target' already exists, skipping"
+					continue
+				fi
+				ln -sv $cur_dir/$source $target 
+			done
+			;;
+		uninstall)
+			for source in ${(k)map}; do
+				target=$HOME/${map[$source]}
+				if [[ -e $target ]]; then
+					if [[ ! -L $target ]]; then
+						print "'$target' is not a symbolic link"
+						continue
+					fi
+					print "Removing '$target'"
+					rm $target
+				fi
+			done
+			;;
+	esac
+}
