@@ -60,7 +60,7 @@ done
 # path to user programs
 paths=(
 $HOME/.git-extras/bin
-$HOME/.bin
+$DOTDIR/bin
 )
 for dir in $paths; do
 	if [[ -d $dir ]]; then
