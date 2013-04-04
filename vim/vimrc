@@ -185,7 +185,7 @@ augroup filetype_settings
   au BufWritePost *.bin,*.hex,*.exe if &bin | %!xxd
   au BufWritePost *.bin,*.hex,*.exe setl nomod | endif
   " tmux rc file
-  au  BufNewFile,BufRead .tmux*.conf setl filetype=tmux
+  au  BufNewFile,BufRead .tmux.conf,.tmux.conf,.site-tmux.conf setl filetype=tmux
   " html with mustaches
   au  BufNewFile,BufRead *.html.mustache,*.html.handlebars,*.html.hbs,*.html.hogan,*.html.hulk setl filetype=html.mustache
   " extra zsh files without extensions 
