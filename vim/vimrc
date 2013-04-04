@@ -154,7 +154,7 @@ if $TMUX != ''
   vnoremap <silent> <f6> :SlimuxREPLSendSelection<cr>
   " use alt+y/alt+p to copy and paste transparently between/to X11 and tmux
   vnoremap <silent> <esc>y "ty:call TmuxSharedYank()<cr>
-  nnoremap <silent> <esc>y "ty:call TmuxSharedYank()<cr>
+  vnoremap <silent> <esc>d "td:call TmuxSharedYank()<cr>
   nnoremap <silent> <esc>p :call TmuxSharedPaste()<cr>"tp
   vnoremap <silent> <esc>p :call TmuxSharedPaste()<cr>"tp
 elseif has('gui_running')
@@ -290,7 +290,8 @@ if !exists('g:vimrc_done_basic_init')
       call delete(tmpfile)
     endfunction
     function! TmuxSharedPaste()
-      " put tmux copy buffer into the t register
+      " put tmux copy buffer into the t register, the mapping will handle
+      " pasting into the buffer
       let @t = system('tmux show-buffer')
     endfunction
   endif
