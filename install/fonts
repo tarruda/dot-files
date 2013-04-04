@@ -6,6 +6,7 @@ function() {
 	local cur_dir="${${this_file:A:h}:h}"
 	mkdir -p ~/.fonts
 	cp -a ${cur_dir}/fonts/**/*.(ttf)(.N) ~/.fonts
+	cd ~/.fonts
 	mkfontscale
 	mkfontdir
 	fc-cache -fv ~/.fonts
