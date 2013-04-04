@@ -9,6 +9,7 @@
 export LANG=en_US.UTF-8
 export VIMINIT="source $DOTDIR/vim/vimrc"
 export VIMPERATOR_INIT="source $DOTDIR/vimperator/vimperatorrc"
+export STARTXWINRC=$DOTDIR/.startxwinrc
 export INPUTRC=$DOTDIR/.inputrc
 export PYTHONSTARTUP=$DOTDIR/.pythonrc
 export WINEARCH=win32

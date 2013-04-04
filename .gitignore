@@ -13,3 +13,4 @@
 .VimballRecord
 /emacs.d/el-get/
 /emacs.d/elpa/
+.startxwinrc-local

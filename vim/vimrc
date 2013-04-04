@@ -348,6 +348,7 @@ if !exists('g:vimrc_done_basic_init')
   " Package management(vim-addon-manager setup) {{{
   let g:vim_addon_manager = {}
   let g:vim_addon_manager.auto_install = 1
+  let g:vim_addon_manager.log_to_buf = 1
   let g:vim_addon_manager.shell_commands_run_method = 'system'
   let g:vim_addon_manager.plugin_root_dir = g:vam_plugins_dir
   if !isdirectory(g:vim_addon_manager.plugin_root_dir)
