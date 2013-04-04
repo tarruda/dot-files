@@ -21,10 +21,6 @@ setw -g mode-mouse on
 # Easily reload configuration
 bind r source-file ~/.tmux.conf \; display "Reloaded!"
 
-# Select/yank like vim
-bind -t vi-copy 'v' begin-selection
-bind -t vi-copy 'y' copy-selection
-
 # Navigate windows similarily to vim
 unbind j
 bind j select-pane -D
@@ -51,7 +47,10 @@ bind -n M-Right run 'zsh $DOTDIR/tmux/scripts/vim-tmux-move.zsh l'
 # vi-style controls for copy mode
 setw -g mode-keys vi
 
-# move x clipboard into tmux paste buffer
-bind C-p run "tmux set-buffer \"$(xclip -o -selection clipboard)\"; tmux paste-buffer"
-# move tmux copy buffer into x clipboard
-bind C-y run "tmux show-buffer | xclip -i -selection clipboard"
+# Select/yank like vim
+bind -t vi-copy 'v' begin-selection
+bind -t vi-copy 'y' copy-selection
+# use alt+y/alt+p to seamless copy and paste between tmux, vim and the
+# x11 clipboard
+bind -t vi-copy M-y copy-pipe 'xclip -i -selection clipboard'
+bind -n M-p run "zsh $DOTDIR/tmux/scripts/vim-tmux-xpaste.zsh"

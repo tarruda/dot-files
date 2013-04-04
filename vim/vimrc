@@ -79,9 +79,6 @@ set nofoldenable " don't fold by default
 set foldlevel=0 " if fold everything if 'foldenable' is set
 set foldnestmax=10 " maximum fold depth
 set synmaxcol=500 " maximum length to apply syntax highlighting
-" set notimeout
-" set ttimeout
-" set ttimeoutlen=10
 syntax on " enable syntax highlighting
 filetype plugin indent on " enable file-specific plugins/settings
 set backupskip=/tmp/*,/private/tmp/* " make it possible to use vim to edit crontab
@@ -109,6 +106,16 @@ cnoremap w!! w !sudo tee % >/dev/null
 command! DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
       \ | wincmd p | diffthis
 " }}}
+" Utility functions {{{
+function! GetVisualSelection()
+  let [lnum1, col1] = getpos("'<")[1:2]
+  let [lnum2, col2] = getpos("'>")[1:2]
+  let lines = getline(lnum1, lnum2)
+  let lines[-1] = lines[-1][: col2 - 2]
+  let lines[0] = lines[0][col1 - 1:]
+  return join(lines, "\n")
+endfunction
+" }}}
 " Mappings {{{
 " General {{{
 " clear last search highlight
@@ -130,10 +137,10 @@ vnoremap <F1> <ESC>
 " Tmux {{{
 if $TMUX != ''
   " fix arrow mappings in insert mode
-  inoremap <Esc>A <up>
-  inoremap <Esc>B <down>
-  inoremap <Esc>C <right>
-  inoremap <Esc>D <left>
+  inoremap <esc>A <up>
+  inoremap <esc>B <down>
+  inoremap <esc>C <right>
+  inoremap <esc>D <left>
   nnoremap <silent> <c-w>j :silent call TmuxMove('j')<cr>
   nnoremap <silent> <c-w>k :silent call TmuxMove('k')<cr>
   nnoremap <silent> <c-w>h :silent call TmuxMove('h')<cr>
@@ -142,8 +149,14 @@ if $TMUX != ''
   nnoremap <silent> <c-w><up> :silent call TmuxMove('k')<cr>
   nnoremap <silent> <c-w><left> :silent call TmuxMove('h')<cr>
   nnoremap <silent> <c-w><right> :silent call TmuxMove('l')<cr>
-  map <F6> :SlimuxREPLSendLine<CR>
-  vmap <F6> :SlimuxREPLSendSelection<CR>
+  nnoremap <silent> <f6> :SlimuxREPLSendLine<cr>
+  inoremap <silent> <f6> <esc>:SlimuxREPLSendLine<cr>i
+  vnoremap <silent> <f6> :SlimuxREPLSendSelection<cr>
+  " use alt+y/alt+p to copy and paste transparently between/to X11 and tmux
+  vnoremap <silent> <esc>y "ty:call TmuxSharedYank()<cr>
+  nnoremap <silent> <esc>y "ty:call TmuxSharedYank()<cr>
+  nnoremap <silent> <esc>p :call TmuxSharedPaste()<cr>"tp
+  vnoremap <silent> <esc>p :call TmuxSharedPaste()<cr>"tp
 elseif has('gui_running')
   nnoremap <silent> <a-j> :wincmd j<cr>
   nnoremap <silent> <a-k> :wincmd k<cr>
@@ -266,6 +279,20 @@ if !exists('g:vimrc_done_basic_init')
         exe 'wincmd ' . a:direction
       end
     endfunction
+    function! TmuxSharedYank()
+      " Send the contents of the 't' register to a temporary file, invoke
+      " copy to tmux using load-buffer, and then to xclip
+      " FIXME for some reason, the 'tmux load-buffer -' form will hang
+      " when used with 'system()' which takes a second argument as stdin.
+      let tmpfile = tempname()
+      call writefile(split(@t, '\n', 'b'), tmpfile)
+      call system('tmux load-buffer '.shellescape(tmpfile).';tmux show-buffer | xclip -i -selection clipboard')
+      call delete(tmpfile)
+    endfunction
+    function! TmuxSharedPaste()
+      " put tmux copy buffer into the t register
+      let @t = system('tmux show-buffer')
+    endfunction
   endif
   " }}}
   " CtrlP(fuzzy finder) {{{
@@ -340,8 +367,12 @@ if !exists('g:vimrc_done_basic_init')
   call add(s:vim_addons, 'github:gabemc/powershell-vim')
   if has('python')
     call add(s:vim_addons, 'github:SirVer/ultisnips')
+    " call add(s:vim_addons, 'github:')
+    "
+    "
+
   else
-    echo "ERROR: Need python support for ultisnips"
+    echo "ERROR: Need python support for some addons"
   endif
   " }}}
   " }}} 
