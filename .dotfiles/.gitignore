@@ -9,3 +9,5 @@
 /zsh/.zcompdump
 /zsh/.zcalc_history
 .VimballRecord
+/.emacs.d/el-get/
+/.emacs.d/elpa/

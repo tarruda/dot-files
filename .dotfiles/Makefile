@@ -6,6 +6,7 @@ install:
 	ln -s $(PWD)/.Xresources $(HOME)/.Xresources
 	ln -s $(PWD)/.startxwinrc $(HOME)/.startxwinrc
 	ln -s $(PWD)/.tmux.conf $(HOME)/.tmux.conf
+	ln -s $(PWD)/.emacs.d $(HOME)/.emacs.d
 
 uninstall:
 	rm $(HOME)/.zshenv
@@ -15,6 +16,7 @@ uninstall:
 	rm $(HOME)/.XWinrc
 	rm $(HOME)/.startxwinrc
 	rm $(HOME)/.tmux.conf
+	rm $(HOME)/.emacs.d
 
 install-fonts:
 	@./install/fonts
