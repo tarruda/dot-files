@@ -13,7 +13,7 @@ fi
 # }}}
 # X Keyboard {{{
 
-if [[ -z $WINDOWS ]]; then
+if [[ -z $X11_WINDOWS ]]; then
 	echo 'Configuring X keyboard'
 	if which setxkbmap &> /dev/null; then
 		setxkbmap us_intl
