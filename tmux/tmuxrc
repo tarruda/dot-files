@@ -47,6 +47,9 @@ bind -n M-Right run 'zsh $DOTDIR/tmux/scripts/vim-tmux-move.zsh l'
 # vi-style controls for copy mode
 setw -g mode-keys vi
 
+# better binding for copy mode
+bind v copy-mode
+
 # Select/yank like vim
 bind -t vi-copy 'v' begin-selection
 bind -t vi-copy 'y' copy-selection
