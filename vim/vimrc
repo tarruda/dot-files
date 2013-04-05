@@ -80,6 +80,9 @@ set foldlevel=0 " if fold everything if 'foldenable' is set
 set foldnestmax=10 " maximum fold depth
 set synmaxcol=500 " maximum length to apply syntax highlighting
 set clipboard= " disable automatic use of the * register
+set notimeout " dont timeout on mappings(wait until a mapping is complete)
+set ttimeout " timeout on key codes
+set ttimeoutlen=10 " timeout length in milliseconds
 syntax on " enable syntax highlighting
 filetype plugin indent on " enable file-specific plugins/settings
 set backupskip=/tmp/*,/private/tmp/* " make it possible to use vim to edit crontab
@@ -92,6 +95,12 @@ augroup global_settings
         \     execute 'normal! g`"zvzz' |
         \ endif
 augroup END
+" if available, store temporary files in shared memory
+if isdirectory('/run/shm')
+  let $TMPDIR = '/run/shm'
+elseif isdirectory('/dev/shm')
+  let $TMPDIR = '/dev/shm'
+endif
 
 " }}}
 " Custom commands {{{
@@ -121,19 +130,29 @@ endfunction
 " General {{{
 " clear last search highlight
 nnoremap <silent> <leader>c :noh<cr>
-" move between bracket pairs using tab (in normal and visual mode)
+" Move between bracket pairs using tab (in normal and visual mode)
 nnoremap <tab> %
 vnoremap <tab> % 
-" move single lines
-nnoremap <C-j> :m .+1<CR>==
-nnoremap <C-k> :m .-2<CR>==
-" move selections
-vnoremap <C-j> :m '>+1<CR>gv=gv
-vnoremap <C-k> :m '<-2<CR>gv=gv
-" disable help key
-inoremap <F1> <ESC>
-nnoremap <F1> <ESC>
-vnoremap <F1> <ESC>
+" Move single lines
+nnoremap <silent> <c-j> :m .+1<cr>==
+nnoremap <silent> <c-k> :m .-2<cr>==
+" Move selections
+vnoremap <silent> <c-j> :m '>+1<cr>gv=gv
+vnoremap <silent> <c-k> :m '<-2<cr>gv=gv
+" Disable help key
+inoremap <f1> <esc>
+nnoremap <f1> <esc>
+vnoremap <f1> <esc>
+" Quickly toggle spell on/off
+nnoremap <silent> <leader>s :set spell!<cr>
+" Capitalize the first word of every sentence in a selection and format it.
+" Useful for quickly formatting comments. The capitalize part was taken from:
+" http://societyserver.org/mbaehr/vim-tips--capitalize-the-first-word-of-every-sentence
+vnoremap <silent> <leader>f :s/\v(\w)(\_[^.?!:;]*)/\u\1\2/g<cr>:noh<cr>gvgq
+" quickly edit vimrc
+nnoremap <leader>e :e $MYVIMRC<cr>
+" quickly reload vimrc
+nnoremap <leader>r :source $MYVIMRC<cr>:e<cr>
 " }}}
 " Tmux {{{
 if $TMUX != ''
@@ -188,7 +207,6 @@ augroup filetype_settings
   " Filetype detection {{{
   " my vimrc may not have the usual path
   au BufNewFile,BufRead $MYVIMRC setl filetype=vim
-  au BufWritePost $MYVIMRC source %
   au BufNewFile,BufRead *.vimp setl filetype=vim " vimperator files
   " tmux rc file
   au  BufNewFile,BufRead .tmux.conf,tmuxrc,site-tmuxrc setl filetype=tmux
@@ -281,18 +299,21 @@ if !exists('g:vimrc_done_basic_init')
       end
     endfunction
     function! TmuxSharedYank()
-      " Send the contents of the 't' register to a temporary file, invoke
-      " copy to tmux using load-buffer, and then to xclip
-      " FIXME for some reason, the 'tmux load-buffer -' form will hang
-      " when used with 'system()' which takes a second argument as stdin.
+      " Send the contents of the 't' register to a temporary file, invoke copy
+      " to tmux using load-buffer, and then to xclip
+
+      " FIXME for some reason, the form 'tmux load-buffer -' will hang when used
+      " with 'system()' which takes a second argument as stdin. In practice
+      " however, 'system()' will also create a temporary file instead of piping
+      " the data directly, so it is more a matter of aesthetics than peformance.
       let tmpfile = tempname()
       call writefile(split(@t, '\n'), tmpfile, 'b')
       call system('tmux load-buffer '.shellescape(tmpfile).';tmux show-buffer | xclip -i -selection clipboard')
       call delete(tmpfile)
     endfunction
     function! TmuxSharedPaste()
-      " put tmux copy buffer into the t register, the mapping will handle
-      " pasting into the buffer
+      " pull clipboard data into tmux copy buffer, and then load into the t
+      " register. the mapping will handle pasting into the buffer
       let @t = system('xclip -o -selection clipboard | tmux load-buffer -;tmux show-buffer')
     endfunction
   endif
@@ -349,6 +370,7 @@ if !exists('g:vimrc_done_basic_init')
         \ }
   " }}}
   " Other {{{
+  call add(s:vim_addons, 'github:tpope/vim-tbone')
   call add(s:vim_addons, 'github:tpope/vim-repeat')
   call add(s:vim_addons, 'github:tpope/vim-surround')
   call add(s:vim_addons, 'github:tpope/vim-fugitive')
