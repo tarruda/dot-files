@@ -202,7 +202,7 @@ precmd_functions+=cnf_precmd
 		# SSH {{{
 		# automatically add key to ssh-agent
 		ssh() {
-			{ ssh-add -l &> /dev/null || ssh-add } && { TERM=xterm-256color command ssh "$@" }
+			{ ssh-add -l &> /dev/null || ssh-add } && { command ssh "$@" }
 		}
 		# }}}
 		# Tmux {{{

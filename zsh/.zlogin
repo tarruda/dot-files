@@ -4,9 +4,16 @@
 #   This file is sourced by zsh when started as a login shell(-l) but after
 #   .zshrc is sourced.
 
+# X Resources {{{
+
+if [[ $(xrdb -query) == '' ]]; then
+	xrdb $DOTDIR/.Xresources
+fi
+
+# }}}
 # X Keyboard {{{
 
-if [[ -z $CYGWIN_X ]]; then
+if [[ -z $WINDOWS ]]; then
 	echo 'Configuring X keyboard'
 	if which setxkbmap &> /dev/null; then
 		setxkbmap us_intl
