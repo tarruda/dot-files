@@ -79,6 +79,7 @@ set nofoldenable " don't fold by default
 set foldlevel=0 " if fold everything if 'foldenable' is set
 set foldnestmax=10 " maximum fold depth
 set synmaxcol=500 " maximum length to apply syntax highlighting
+set clipboard= " disable automatic use of the * register
 syntax on " enable syntax highlighting
 filetype plugin indent on " enable file-specific plugins/settings
 set backupskip=/tmp/*,/private/tmp/* " make it possible to use vim to edit crontab
@@ -156,7 +157,7 @@ if $TMUX != ''
   vnoremap <silent> <esc>y "ty:call TmuxSharedYank()<cr>
   vnoremap <silent> <esc>d "td:call TmuxSharedYank()<cr>
   nnoremap <silent> <esc>p :call TmuxSharedPaste()<cr>"tp
-  vnoremap <silent> <esc>p :call TmuxSharedPaste()<cr>"tp
+  vnoremap <silent> <esc>p d:call TmuxSharedPaste()<cr>h"tp
 elseif has('gui_running')
   nnoremap <silent> <a-j> :wincmd j<cr>
   nnoremap <silent> <a-k> :wincmd k<cr>
@@ -285,14 +286,14 @@ if !exists('g:vimrc_done_basic_init')
       " FIXME for some reason, the 'tmux load-buffer -' form will hang
       " when used with 'system()' which takes a second argument as stdin.
       let tmpfile = tempname()
-      call writefile(split(@t, '\n', 'b'), tmpfile)
+      call writefile(split(@t, '\n'), tmpfile, 'b')
       call system('tmux load-buffer '.shellescape(tmpfile).';tmux show-buffer | xclip -i -selection clipboard')
       call delete(tmpfile)
     endfunction
     function! TmuxSharedPaste()
       " put tmux copy buffer into the t register, the mapping will handle
       " pasting into the buffer
-      let @t = system('tmux show-buffer')
+      let @t = system('xclip -o -selection clipboard | tmux load-buffer -;tmux show-buffer')
     endfunction
   endif
   " }}}
@@ -364,14 +365,10 @@ if !exists('g:vimrc_done_basic_init')
   call add(s:vim_addons, 'github:Townk/vim-autoclose')
   call add(s:vim_addons, 'github:vim-scripts/scratch.vim')
   call add(s:vim_addons, 'github:godlygeek/csapprox')
+  call add(s:vim_addons, 'github:godlygeek/tabular.git')
   call add(s:vim_addons, 'github:mileszs/ack.vim')
-  call add(s:vim_addons, 'github:gabemc/powershell-vim')
   if has('python')
     call add(s:vim_addons, 'github:SirVer/ultisnips')
-    " call add(s:vim_addons, 'github:')
-    "
-    "
-
   else
     echo "ERROR: Need python support for some addons"
   endif
