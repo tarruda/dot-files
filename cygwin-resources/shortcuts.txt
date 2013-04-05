@@ -8,7 +8,7 @@ T:\cygwin\bin\run.exe /usr/bin/zsh -l -c 'exec startxwin -- -wgl'
 T:\cygwin\bin\run.exe -p /bin ash -c 'cd; CYGWIN_X=1 DISPLAY=:0.0 exec zsh -l -c 'gvim'
 
 # Start urxvt
-T:\cygwin\bin\run.exe -p /bin ash -c 'cd; CYGWIN_X=1 DISPLAY=:0.0 exec urxvtc -title rxvt-unicode -e /bin/zsh -l'
+T:\cygwin\bin\run.exe -p /bin ash -c 'cd; CYGWIN_X=1 DISPLAY=:0.0 exec urxvtc -title rxvt-unicode -sl 10000 -sb -sr -e /bin/zsh -l'
 
 # Start chromium in the VM
 T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c chromium-browser'"
