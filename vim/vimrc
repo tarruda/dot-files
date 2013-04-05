@@ -186,6 +186,10 @@ elseif has('gui_running')
   nnoremap <silent> <a-up> :wincmd k<cr>
   nnoremap <silent> <a-left> :wincmd h<cr>
   nnoremap <silent> <a-right> :wincmd l<cr>
+  vnoremap <silent> <a-y> "+y
+  vnoremap <silent> <a-d> "+d
+  nnoremap <silent> <a-p> "+p
+  vnoremap <silent> <a-p> "+p
 else
   nnoremap <silent> <esc>j :wincmd j<cr>
   nnoremap <silent> <esc>k :wincmd k<cr>
@@ -195,6 +199,10 @@ else
   nnoremap <silent> <esc><up> :wincmd k<cr>
   nnoremap <silent> <esc><left> :wincmd h<cr>
   nnoremap <silent> <esc><right> :wincmd l<cr>
+  vnoremap <silent> <esc>y "+y
+  vnoremap <silent> <esc>d "+d
+  nnoremap <silent> <esc>p "+p
+  vnoremap <silent> <esc>p "+p
 endif
 " }}}
 " CtrlP {{{
