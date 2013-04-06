@@ -1,0 +1,48 @@
+MENU devbox {
+  urxvt EXEC "tcp-command urxvt -title rxvt-unicode"	
+  gvim EXEC "tcp-command gvim"
+  emacs EXEC "tcp-command emacs"
+  lxtask EXEC "tcp-command lxtask"
+  tmux EXEC "tcp-command urxvt -title tmux -e sh -c tmux attach || tmux new"
+}
+
+MENU cygwin {
+  urxvt EXEC "t:\cygwin\bin\run.exe /bin/ash -c 'export HOME=/home/tarruda;cd;DISPLAY=:0.0 X11_WINDOWS=1 exec urxvt -title rxvt-unicode -sl 10000 -sb -sr -e /bin/zsh -l'"
+  gvim EXEC "t:\cygwin\bin\run.exe /bin/ash -c 'export HOME=/home/tarruda;cd;DISPLAY=:0.0 X11_WINDOWS=1 exec zsh -l -c gvim'"
+}
+
+MENU root {
+  "Reload Xmingrc" RELOAD
+  SEPARATOR
+  devbox MENU devbox
+  cygwin MENU cygwin	
+}
+
+MENU aot {
+  SEPARATOR
+  "Always on Top" ALWAYSONTOP
+}
+
+ROOTMENU root
+
+DEFAULTSYSMENU aot atend
+
+SYSMENU {
+  "xeyes"	xtermspecial atstart
+}
+
+ICONDIRECTORY T:\cygwin\home\tarruda\.dotfiles\cygwin-resources\icons
+
+ICONS {
+  tmux terminal.ico
+  "Task Manager" system-monitor.ico
+  rxvt-unicode rxvt.ico
+}
+
+STYLES {
+  tmux MAXIMIZE
+  Chromium MAXIMIZE
+  emacs MAXIMIZE
+}
+
+DEBUG "Done parsing the configuration file..."
