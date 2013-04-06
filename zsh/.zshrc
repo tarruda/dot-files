@@ -31,6 +31,9 @@ autoload -U colors && colors
 autoload -U promptinit
 
 PROMPT='%m :: %2~ %B»%b '
+if [[ -n $MINGW32_ENV ]]; then
+	PROMPT="(mingw32)$PROMPT"
+fi
 
 # }}}
 # Zle {{{

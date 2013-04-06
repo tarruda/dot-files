@@ -125,6 +125,7 @@ function! GetVisualSelection()
   let lines[0] = lines[0][col1 - 1:]
   return join(lines, "\n")
 endfunction
+
 " }}}
 " Mappings {{{
 " General {{{
@@ -143,6 +144,8 @@ vnoremap <silent> <c-k> :m '<-2<cr>gv=gv
 inoremap <f1> <esc>
 nnoremap <f1> <esc>
 vnoremap <f1> <esc>
+" search/replace the word under the cursor
+nnoremap <leader>z :let @z = expand("<cword>")<cr>q:i%s/\C\v<<esc>"zpa>//g<esc>hi
 " Quickly toggle spell on/off
 nnoremap <silent> <leader>s :set spell!<cr>
 " Capitalize the first word of every sentence in a selection and format it.
@@ -236,7 +239,7 @@ augroup filetype_settings
         \   runtime! indent/sh.vim
         \ | setl foldmethod=marker
         \ | setl foldenable
-        " \ | setl listchars=tab:\ \ ,eol:¬,extends:❯,precedes:❮
+  " \ | setl listchars=tab:\ \ ,eol:¬,extends:❯,precedes:❮
   " }}}
   " Nasm {{{
   au FileType nasm 
