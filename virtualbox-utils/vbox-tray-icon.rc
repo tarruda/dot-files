@@ -1,0 +1,3 @@
+#include "vbox-res.h"
+
+IDI_VBOXICON ICON "vbox.ico"
