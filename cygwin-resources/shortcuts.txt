@@ -4,11 +4,17 @@
 # Start XWin using a login shell(put this shortcut on windows startup directory)
 T:\cygwin\bin\run.exe /usr/bin/zsh -l -c 'exec startxwin -- -wgl'
 
+# Start Xming using custom configuration
+T:\Xming\config.xlaunch
+
+# Start pulseaudio daemon
+T:\pulseaudio\pulseaudio.exe -D
+
 # Start gvim
 T:\cygwin\bin\run.exe -p /bin ash -c 'cd; CYGWIN_X=1 DISPLAY=:0.0 exec zsh -l -c 'gvim'
 
 # Start urxvt
-T:\cygwin\bin\run.exe -p /bin ash -c 'cd; CYGWIN_X=1 DISPLAY=:0.0 exec urxvtc -title rxvt-unicode -sl 10000 -sb -sr -e /bin/zsh -l'
+T:\cygwin\bin\run.exe -p /bin ash -c 'cd; CYGWIN_X=1 DISPLAY=:0.0 exec urxvt -title rxvt-unicode -sl 10000 -sb -sr -e /bin/zsh -l'
 
 # Start chromium in the VM
 T:\cygwin\bin\run.exe -p /bin ash -c "rsh devbox 'zsh -l -c chromium-browser'"

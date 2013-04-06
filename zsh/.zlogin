@@ -6,7 +6,7 @@
 
 # X Resources {{{
 
-if [[ $(xrdb -query) == '' ]]; then
+if which xrdb &> /dev/null && [[ $(xrdb -query) == '' ]]; then
 	xrdb $DOTDIR/.Xresources
 fi
 
