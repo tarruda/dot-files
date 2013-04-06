@@ -1,0 +1,3 @@
+#include "../vbox-tray-icon.h"
+
+IDI_VBOXICON ICON "vbox.ico"

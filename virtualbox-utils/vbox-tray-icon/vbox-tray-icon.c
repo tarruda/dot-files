@@ -4,10 +4,10 @@
 #include <tchar.h>
 #include <shellapi.h>
 
-#include "vbox-res.h"
+#include "vbox-tray-icon.h"
 
 #define WB_TRAY_MSG (WM_USER + 1)
-#define WB_TRAY_EXIT 5000
+#define WB_TRAY_EXIT 1
 
 static TCHAR wclass[] = _T("vboxtrayicon");
 static TCHAR title[] = _T("VirtualBox Tray Icon");
