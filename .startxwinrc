@@ -1,9 +1,0 @@
-#!/usr/bin/env zsh
-xrdb $DOTDIR/.Xresources
-xhost devbox
-if [[ -r $DOTDIR/.startxwinrc-local ]]; then
-	source $DOTDIR/.startxwinrc-local
-fi
-if which pulseaudio &> /dev/null; then
-	pulseaudio --start
-fi

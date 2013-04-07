@@ -20,6 +20,7 @@ libpango1.0-devel
 libpixman1-devel
 make
 mercurial
+nc
 openssh
 perl
 pkg-config

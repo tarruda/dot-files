@@ -1,28 +1,25 @@
 # Menu for the XWin tray icon
+MENU dbox {
+  urxvt EXEC "tcp-command urxvt -title rxvt-unicode"	
+  gvim EXEC "tcp-command gvim"
+  emacs EXEC "tcp-command emacs"
+  lxtask EXEC "tcp-command lxtask"
+  tmux EXEC "tcp-command urxvt -title tmux -e sh -c tmux attach || tmux new"
+}
 
-MENU apps {
-  # When started from the tray icon, these programs inherit
-  # XWin environment so they dont have to be executed as
-  # login shell commands
-  urxvt                    EXEC    "zsh -c 'cd; urxvt -title rxvt-unicode -sl 10000 -sb -sr -e /bin/zsh'"
-  gvim                     EXEC    "zsh -c 'cd; gvim'"
-SEPARATOR
-  # Easy access to background virtualbox instance running ubuntu
-  # The zsh login scripts in the vm are responsible for setting up
-  # the DISPLAY environment variable correctly
-  urxvt-devbox             EXEC    "rsh devbox 'zsh -l -c urxvt\ -title\ rxvt-unicode'"
-  chromium-devbox          EXEC    "rsh devbox 'zsh -l -c chromium-browser'"
-  gvim-devbox              EXEC    "rsh devbox 'zsh -l -c gvim\ -f'"
-  emacs-devbox             EXEC    "rsh devbox 'zsh -l -c emacs'"
-  lxtask-devbox            EXEC    "rsh devbox 'zsh -l -c lxtask'"
-  tmux-devbox              EXEC    "rsh devbox 'zsh -l -c urxvt\ -title\ tmux\ -e\ sh\ -c\ tmux\\\ attach\\\ \\\|\\\|\\\ tmux\\\ new'"
+MENU cygwin {
+  urxvt EXEC "echo 'urxvt -title rxvt-unicode -sl 10000 -sb -sr -e /bin/zsh' | nc 127.0.0.1 55555"
+  gvim EXEC "echo gvim | nc 127.0.0.1 55555"
 }
 
 MENU root {
-  "Edit .XWinrc" EXEC "zsh -c 'cd; gvim .XWinrc'"
-  "Reload .XWinrc" RELOAD
-  "Applications" MENU apps
+  dbox MENU dbox
+  cygwin MENU cygwin	
   SEPARATOR
+  "Edit .XWinrc" EXEC "zsh -c 'cd; gvim .XWinrc'"
+  "Edit .cygwin-session.zsh" EXEC "zsh -c 'cd; gvim .dotfiles/cygwin-resources/cygwin-session.zsh'"
+  SEPARATOR
+  "Reload .XWinrc" RELOAD
 }
 
 ROOTMENU root
