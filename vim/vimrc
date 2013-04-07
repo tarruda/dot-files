@@ -79,7 +79,7 @@ set nofoldenable " don't fold by default
 set foldlevel=0 " if fold everything if 'foldenable' is set
 set foldnestmax=10 " maximum fold depth
 set synmaxcol=500 " maximum length to apply syntax highlighting
-set clipboard= " disable automatic use of the * register
+set clipboard=exclude:tmux " disable clipboard when using tmux
 set notimeout " dont timeout on mappings(wait until a mapping is complete)
 set ttimeout " timeout on key codes
 set ttimeoutlen=10 " timeout length in milliseconds
