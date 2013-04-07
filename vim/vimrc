@@ -79,10 +79,8 @@ set nofoldenable " don't fold by default
 set foldlevel=0 " if fold everything if 'foldenable' is set
 set foldnestmax=10 " maximum fold depth
 set synmaxcol=500 " maximum length to apply syntax highlighting
-set clipboard=exclude:tmux " disable clipboard when using tmux
 set notimeout " dont timeout on mappings(wait until a mapping is complete)
-set ttimeout " timeout on key codes
-set ttimeoutlen=10 " timeout length in milliseconds
+set ttimeout ttimeoutlen=5 " terminals will insert key sequences codes fast
 syntax on " enable syntax highlighting
 filetype plugin indent on " enable file-specific plugins/settings
 set backupskip=/tmp/*,/private/tmp/* " make it possible to use vim to edit crontab
@@ -101,7 +99,27 @@ if isdirectory('/run/shm')
 elseif isdirectory('/dev/shm')
   let $TMPDIR = '/dev/shm'
 endif
+" }}}
+" Terminal key sequences {{{
+if &term == 'tmux'
+  :set <up>=[A
+  :set <down>=[B
+  :set <right>=[C
+  :set <left>=[D
 
+  :set <a-y>=y
+  :set <a-d>=d
+
+  " Prefix used by tmux to send 'special commands' to vim
+  :set <f37>=tmux
+elseif &term =~ 'rxvt-unicode' || &term =~ 'xterm'
+  " with urxvt configured to use xterm control/alt sequences
+  " this should normalize vim/gvim mappings
+  :set <a-k>=k
+  :set <a-j>=j
+  :set <a-l>=l
+  :set <a-h>=h
+endif
 " }}}
 " Custom commands {{{
 " Allows saving files which needs root permission with ':w!!'. This uses  one of
@@ -126,6 +144,58 @@ function! GetVisualSelection()
   return join(lines, "\n")
 endfunction
 
+if &term == 'tmux'
+  " tranparent window/pane movement
+  function! TmuxMove(direction)
+    " Check if we are currently focusing on a edge window.
+    " To achieve that,  move to/from the requested window and
+    " see if the window number changed
+    let oldw = winnr()
+    silent! exe 'wincmd ' . a:direction
+    let neww = winnr()
+    silent! exe oldw . 'wincmd'
+    if oldw == neww
+      " The focused window is at an edge, so ask tmux to switch panes
+      if a:direction == 'j'
+        call system("tmux select-pane -D")
+      elseif a:direction == 'k'
+        call system("tmux select-pane -U")
+      elseif a:direction == 'h'
+        call system("tmux select-pane -L")
+      elseif a:direction == 'l'
+        call system("tmux select-pane -R")
+      endif
+    else
+      exe 'wincmd ' . a:direction
+    end
+  endfunction
+  if has('clipboard') && executable('xclip') && $DISPLAY != ''
+    " use the x11 clipboard as the main storage for shared yank data
+    " tmux should also be configured to use it
+    function! TmuxYank()
+      let @+ = @t " place data from the temp register into the clipboard
+      call system('xclip -o -selection clipboard | tmux load-buffer -')
+    endfunction
+    function! TmuxPaste()
+      let @t = system('xclip -o -selection clipboard')
+    endfunction
+  else
+    function! TmuxYank()
+      " FIXME for some reason, the form 'tmux load-buffer -' will hang when used
+      " with 'system()' which takes a second argument as stdin, so we have to
+      " use a temporary file to load data into tmux. Fixing this it is more a
+      " matter of aesthetics than peformance, because vim will also create a
+      " temporary file instead of piping the data directly.
+      let tmpfile = tempname()
+      call writefile(split(@t, '\n'), tmpfile, 'b')
+      call system('cat '.shellescape(tmpfile).' | tmux load-buffer -')
+      call delete(tmpfile)
+    endfunction
+    function! TmuxPaste()
+      let @t = system('tmux show-buffer')
+    endfunction
+  endif
+endif
 " }}}
 " Mappings {{{
 " General {{{
@@ -156,31 +226,17 @@ vnoremap <silent> <leader>f :s/\v(\w)(\_[^.?!:;]*)/\u\1\2/g<cr>:noh<cr>gvgq
 nnoremap <leader>e :e $MYVIMRC<cr>
 " quickly reload vimrc
 nnoremap <leader>r :source $MYVIMRC<cr>:e<cr>
-" }}}
-" Tmux {{{
-if $TMUX != ''
-  " fix arrow mappings in insert mode
-  inoremap <esc>A <up>
-  inoremap <esc>B <down>
-  inoremap <esc>C <right>
-  inoremap <esc>D <left>
-  nnoremap <silent> <c-w>j :silent call TmuxMove('j')<cr>
-  nnoremap <silent> <c-w>k :silent call TmuxMove('k')<cr>
-  nnoremap <silent> <c-w>h :silent call TmuxMove('h')<cr>
-  nnoremap <silent> <c-w>l :silent call TmuxMove('l')<cr>
-  nnoremap <silent> <c-w><down> :silent call TmuxMove('j')<cr>
-  nnoremap <silent> <c-w><up> :silent call TmuxMove('k')<cr>
-  nnoremap <silent> <c-w><left> :silent call TmuxMove('h')<cr>
-  nnoremap <silent> <c-w><right> :silent call TmuxMove('l')<cr>
-  nnoremap <silent> <f6> :SlimuxREPLSendLine<cr>
-  inoremap <silent> <f6> <esc>:SlimuxREPLSendLine<cr>i
-  vnoremap <silent> <f6> :SlimuxREPLSendSelection<cr>
-  " use alt+y/alt+p to copy and paste transparently between/to X11 and tmux
-  vnoremap <silent> <esc>y "ty:call TmuxSharedYank()<cr>
-  vnoremap <silent> <esc>d "td:call TmuxSharedYank()<cr>
-  nnoremap <silent> <esc>p :call TmuxSharedPaste()<cr>"tp
-  vnoremap <silent> <esc>p d:call TmuxSharedPaste()<cr>h"tp
-elseif has('gui_running')
+if &term == 'tmux'
+  " tmux will handle the actual mappings so we just 
+  nnoremap <silent> <f37>move-down :silent call TmuxMove('j')<cr>
+  nnoremap <silent> <f37>move-up :silent call TmuxMove('k')<cr>
+  nnoremap <silent> <f37>move-left :silent call TmuxMove('h')<cr>
+  nnoremap <silent> <f37>move-right :silent call TmuxMove('l')<cr>
+  nnoremap <silent> <f37>paste-tmux :call TmuxPaste()<cr>"tp
+  vnoremap <silent> <f37>paste-tmux d:call TmuxPaste()<cr>h"tp
+  vnoremap <silent> <a-y> "ty:call TmuxYank()<cr>
+  vnoremap <silent> <a-d> "td:call TmuxYank()<cr>
+else
   nnoremap <silent> <a-j> :wincmd j<cr>
   nnoremap <silent> <a-k> :wincmd k<cr>
   nnoremap <silent> <a-h> :wincmd h<cr>
@@ -189,23 +245,10 @@ elseif has('gui_running')
   nnoremap <silent> <a-up> :wincmd k<cr>
   nnoremap <silent> <a-left> :wincmd h<cr>
   nnoremap <silent> <a-right> :wincmd l<cr>
-  vnoremap <silent> <a-y> "+y
-  vnoremap <silent> <a-d> "+d
   nnoremap <silent> <a-p> "+p
   vnoremap <silent> <a-p> "+p
-else
-  nnoremap <silent> <esc>j :wincmd j<cr>
-  nnoremap <silent> <esc>k :wincmd k<cr>
-  nnoremap <silent> <esc>h :wincmd h<cr>
-  nnoremap <silent> <esc>l :wincmd l<cr>
-  nnoremap <silent> <esc><down> :wincmd j<cr>
-  nnoremap <silent> <esc><up> :wincmd k<cr>
-  nnoremap <silent> <esc><left> :wincmd h<cr>
-  nnoremap <silent> <esc><right> :wincmd l<cr>
-  vnoremap <silent> <esc>y "+y
-  vnoremap <silent> <esc>d "+d
-  nnoremap <silent> <esc>p "+p
-  vnoremap <silent> <esc>p "+p
+  vnoremap <silent> <a-y> "+y
+  vnoremap <silent> <a-d> "+d
 endif
 " }}}
 " CtrlP {{{
@@ -271,62 +314,30 @@ if has('gui_running') " gvim
   set guioptions-=T " remove toolbar
   set guioptions-=lr " remove scroll bars
 else
+
   if &term =~ 'tmux' || &term =~ 'rxvt-unicode-256color'
-    " assuming tmux to be backed by urxvt256(which supports italics
-    " and 256 colors)
+        \ || &term =~ 'xterm-256color'
     colorscheme twilight-term256
+  endif
+
+  if &term =~ 'tmux' || &term =~ 'rxvt-unicode-256color'
+        \ || &term =~ 'xterm-256color-italic'
+    " for tmux, this will only work if the client terminal supports italic
+    " escape sequences
     highlight Comment cterm=italic
   endif
+
 endif
 " }}}
 " Addons {{{
 if !exists('g:vimrc_done_basic_init')
   let s:vim_addons = []
-  " Tmux integration {{{
+  " Slimux {{{
   if $TMUX != ''
     call add(s:vim_addons, 'github:epeli/slimux')
-    " tranparent window/pane movement
-    function! TmuxMove(direction)
-      " Check if we are currently focusing on a edge window.
-      " To achieve that,  move to/from the requested window and
-      " see if the window number changed
-      let oldw = winnr()
-      silent! exe 'wincmd ' . a:direction
-      let neww = winnr()
-      silent! exe oldw . 'wincmd'
-      if oldw == neww
-        " The focused window is at an edge, so ask tmux to switch panes
-        if a:direction == 'j'
-          call system("tmux select-pane -D")
-        elseif a:direction == 'k'
-          call system("tmux select-pane -U")
-        elseif a:direction == 'h'
-          call system("tmux select-pane -L")
-        elseif a:direction == 'l'
-          call system("tmux select-pane -R")
-        endif
-      else
-        exe 'wincmd ' . a:direction
-      end
-    endfunction
-    function! TmuxSharedYank()
-      " Send the contents of the 't' register to a temporary file, invoke copy
-      " to tmux using load-buffer, and then to xclip
-
-      " FIXME for some reason, the form 'tmux load-buffer -' will hang when used
-      " with 'system()' which takes a second argument as stdin. In practice
-      " however, 'system()' will also create a temporary file instead of piping
-      " the data directly, so it is more a matter of aesthetics than peformance.
-      let tmpfile = tempname()
-      call writefile(split(@t, '\n'), tmpfile, 'b')
-      call system('tmux load-buffer '.shellescape(tmpfile).';tmux show-buffer | xclip -i -selection clipboard')
-      call delete(tmpfile)
-    endfunction
-    function! TmuxSharedPaste()
-      " pull clipboard data into tmux copy buffer, and then load into the t
-      " register. the mapping will handle pasting into the buffer
-      let @t = system('xclip -o -selection clipboard | tmux load-buffer -;tmux show-buffer')
-    endfunction
+    nnoremap <silent> <f6> :SlimuxREPLSendLine<cr>
+    inoremap <silent> <f6> <esc>:SlimuxREPLSendLine<cr>i
+    vnoremap <silent> <f6> :SlimuxREPLSendSelection<cr>
   endif
   " }}}
   " CtrlP(fuzzy finder) {{{
@@ -367,7 +378,7 @@ if !exists('g:vimrc_done_basic_init')
   " superTab option for context aware completion
   let g:SuperTabDefaultCompletionType = "context"
   " }}}
-  " Typescript {{{
+  " Typescript-vim {{{
   call add(s:vim_addons, 'github:leafgarland/typescript-vim')
   setl textwidth=80
   setl shiftwidth=2

@@ -1,0 +1,10 @@
+#!/usr/bin/env zsh
+function() {
+	zmodload zsh/parameter
+	setopt extended_glob
+	local this_file="${funcsourcetrace[1]%:*}"
+	local cur_dir="${${this_file:A:h}:h}"
+	for ti in ${cur_dir}/terminfo/*.terminfo; do
+		tic $ti
+	done
+}

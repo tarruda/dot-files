@@ -1,0 +1,8 @@
+let g:ctrlp_custom_ignore = {
+  \ 'dir':  '\v[\/](build)$',
+  \ 'file': '\v\.(ico|res|exe)$',
+  \ }
+
+let &tags=getcwd().'/tags'
+let g:ctrlp_working_path_mode = ''
+nnoremap <silent> <f5> :call SlimuxSendKeys('C-C " make && mv build/vbox-tray-icon.exe ~/Downloads" Enter')<cr>

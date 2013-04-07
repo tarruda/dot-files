@@ -7,4 +7,7 @@ unlink:
 fonts:
 	@./install/fonts
 
-.PHONY: link unlink fonts 
+terminfo:
+	@./install/terminfo
+
+.PHONY: link unlink fonts terminfo

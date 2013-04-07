@@ -31,18 +31,8 @@ bind h select-pane -L
 unbind l
 bind l select-pane -R
 
-# Lower esc delay
+# setting this to 0 seems to randomly mess up alt key combinations in urxvt
 set -g escape-time 5
-
-# Fully integrate with vim navigation
-bind -n M-j run 'zsh $DOTDIR/tmux/scripts/vim-tmux-move.zsh j'
-bind -n M-k run 'zsh $DOTDIR/tmux/scripts/vim-tmux-move.zsh k'
-bind -n M-h run 'zsh $DOTDIR/tmux/scripts/vim-tmux-move.zsh h'
-bind -n M-l run 'zsh $DOTDIR/tmux/scripts/vim-tmux-move.zsh l'
-bind -n M-Down run 'zsh $DOTDIR/tmux/scripts/vim-tmux-move.zsh j'
-bind -n M-Up run 'zsh $DOTDIR/tmux/scripts/vim-tmux-move.zsh k'
-bind -n M-Left run 'zsh $DOTDIR/tmux/scripts/vim-tmux-move.zsh h'
-bind -n M-Right run 'zsh $DOTDIR/tmux/scripts/vim-tmux-move.zsh l'
 
 # vi-style controls for copy mode
 setw -g mode-keys vi
@@ -53,7 +43,3 @@ bind v copy-mode
 # Select/yank like vim
 bind -t vi-copy 'v' begin-selection
 bind -t vi-copy 'y' copy-selection
-# use alt+y/alt+p to seamless copy and paste between tmux, vim and the
-# x11 clipboard
-bind -t vi-copy M-y copy-pipe 'xclip -i -selection clipboard'
-bind -n M-p run "zsh $DOTDIR/tmux/scripts/vim-tmux-xpaste.zsh"

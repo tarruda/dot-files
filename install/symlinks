@@ -13,7 +13,6 @@ function() {
 	.startxwinrc .startxwinrc
 	tmux/.tmux.conf .tmux.conf
 	emacs.d .emacs.d
-	terminfo .terminfo
 	)
 	case $action in
 		install)

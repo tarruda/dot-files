@@ -116,6 +116,13 @@ LRESULT CALLBACK handle_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
     case WM_CREATE:
       init_menu();
       return 0;
+    case WM_QUERYENDSESSION:
+      return TRUE;       
+    case WM_ENDSESSION: 
+      if(wParam) {
+        PostQuitMessage(0);   
+      }
+
     default:
       return DefWindowProc(hWnd, msg, wParam, lParam);
   };
