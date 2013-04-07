@@ -1,4 +1,4 @@
-MENU devbox {
+MENU dbox {
   urxvt EXEC "tcp-command urxvt -title rxvt-unicode"	
   gvim EXEC "tcp-command gvim"
   emacs EXEC "tcp-command emacs"
@@ -14,7 +14,7 @@ MENU cygwin {
 MENU root {
   "Reload Xmingrc" RELOAD
   SEPARATOR
-  devbox MENU devbox
+  dbox MENU dbox
   cygwin MENU cygwin	
 }
 
