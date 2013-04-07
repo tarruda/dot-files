@@ -4,13 +4,6 @@
 #   This file is sourced by zsh when started as a login shell(-l) but after
 #   .zshrc is sourced.
 
-# X Resources {{{
-
-if which xrdb &> /dev/null && [[ $(xrdb -query) == '' ]]; then
-	xrdb $DOTDIR/.Xresources
-fi
-
-# }}}
 # X Keyboard {{{
 
 if [[ -z $X11_WINDOWS ]]; then
