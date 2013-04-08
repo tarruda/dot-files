@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <tchar.h>
 #include <shellapi.h>
@@ -31,12 +32,16 @@ static NOTIFYICONDATA ndata;
 // Tray icon context menu
 static HMENU menu;
 
-int run_command(char *cmdline) 
+void debugbox(char *msg)
 {
-  PROCESS_INFORMATION pi; 
+    MessageBox(NULL, msg, "Debug", MB_OK);
+}
+
+int run_command(char *cmdline, PROCESS_INFORMATION *pi) 
+{
   STARTUPINFO si;
   memset(&si, 0, sizeof(si));
-  memset(&pi, 0, sizeof(pi));
+  memset(pi, 0, sizeof(*pi));
   si.cb = sizeof(si);
   si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
   si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
@@ -44,12 +49,7 @@ int run_command(char *cmdline)
   si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
   si.wShowWindow = SW_HIDE;
   return CreateProcess(NULL, cmdline, NULL, NULL, FALSE, CREATE_NO_WINDOW,
-      NULL, NULL, &si, &pi);
-  /* if (vm_pid == 0) { */
-  /*   char buffer[100]; */
-  /*   sprintf(buffer, "error code: %d", GetLastError()); */
-  /*   MessageBox(NULL, buffer, "Debug", MB_OK); */
-  /* } */
+      NULL, NULL, &si, pi);
 }
 
 void init_menu() {
@@ -63,6 +63,7 @@ void init_menu() {
 
 LRESULT CALLBACK handle_tray_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+  PROCESS_INFORMATION pi;
   UINT clicked;
   POINT point;
   int result;
@@ -80,20 +81,25 @@ LRESULT CALLBACK handle_tray_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
       {
         case WM_TRAY_STARTVM:
           sprintf(format_buffer, STARTVM, vmname);
-          run_command(format_buffer);
+          run_command(format_buffer, &pi);
           break;
         case WM_TRAY_ACPISHUTDOWN:
           sprintf(format_buffer, ACPISHUTDOWN, vmname);
-          run_command(format_buffer);
+          run_command(format_buffer, &pi);
           break;
         case WM_TRAY_SAVESTATE:
           sprintf(format_buffer, SAVESTATE, vmname);
-          run_command(format_buffer);
+          run_command(format_buffer, &pi);
           break;
         case WM_TRAY_EXIT:
           result = MessageBox(NULL, "Are you sure?", "Exit VM instance",
               MB_YESNO);
-          if (result == IDYES) PostQuitMessage(0);
+          if (result == IDYES) {
+            sprintf(format_buffer, SAVESTATE, vmname);
+            run_command(format_buffer, &pi);
+            WaitForSingleObject(pi.hProcess, INFINITE);
+            PostQuitMessage(0);
+          }
           break;
       };
       break;
@@ -104,6 +110,8 @@ LRESULT CALLBACK handle_tray_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 
 LRESULT CALLBACK handle_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+  PROCESS_INFORMATION pi;
+
   if (msg == WM_EXPLORERCRASH) {
     Shell_NotifyIcon(NIM_ADD, &ndata);
     return 0;
@@ -117,12 +125,12 @@ LRESULT CALLBACK handle_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
       init_menu();
       return 0;
     case WM_QUERYENDSESSION:
+      sprintf(format_buffer, SAVESTATE, vmname);
+      run_command(format_buffer, &pi);
+      WaitForSingleObject(pi.hProcess, INFINITE);
       return TRUE;       
     case WM_ENDSESSION: 
-      if(wParam) {
-        PostQuitMessage(0);   
-      }
-
+      return 0;
     default:
       return DefWindowProc(hWnd, msg, wParam, lParam);
   };
@@ -130,14 +138,16 @@ LRESULT CALLBACK handle_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 
 int parse_options()
 {
-  int argCount;
-
   if (__argc == 1)
     return 0;
 
   vmname = *(__argv + 1);
   return 1;
 }
+
+void init_virtualbox();
+void destroy_virtualbox();
+void startvm(char *name);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LPSTR lpCmdLine, int nCmdShow)
@@ -146,6 +156,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   MSG msg;
   HWND hWnd;
 
+  init_virtualbox();
+  startvm("dbox");
   if (parse_options() == 0) {
     MessageBox(NULL, "Need to provide the VM name as first argument", "Invalid command line arguments", MB_OK);
     return 1;
@@ -160,12 +172,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   wcex.cbClsExtra = 0;
   wcex.cbWndExtra = 0;
   wcex.hInstance = hInstance;
-  wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_APPLICATION));
+  wcex.hIcon = LoadIcon(hInstance, IDI_APPLICATION);
   wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
   wcex.hbrBackground = (HBRUSH)COLOR_APPWORKSPACE;
   wcex.lpszMenuName = NULL;
   wcex.lpszClassName = wclass;
-  wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_APPLICATION));
+  wcex.hIconSm = LoadIcon(wcex.hInstance, IDI_APPLICATION);
   RegisterClassEx(&wcex);
 
   // without creating a window no message queue will exist, so this is needed
@@ -178,7 +190,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   ndata.hWnd = hWnd;
   ndata.uCallbackMessage = WM_TRAYEVENT; // custom message to identify tray events 
   ndata.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_VBOXICON));
-  wcscpy(ndata.szTip, "Virtualbox Tray Icon");
+  wcscpy((wchar_t *)ndata.szTip, L"Virtualbox Tray Icon");
   ndata.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
 
   Shell_NotifyIcon(NIM_ADD, &ndata);
@@ -195,6 +207,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   // remote tray icon
   Shell_NotifyIcon(NIM_DELETE, &ndata);
 
+  destroy_virtualbox();
   return (int) msg.wParam;
 }
 
