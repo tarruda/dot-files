@@ -31,8 +31,10 @@ autoload -U colors && colors
 autoload -U promptinit
 
 PROMPT='%m :: %2~ %B»%b '
-if [[ -n $MINGW32_ENV ]]; then
-	PROMPT="(mingw32)$PROMPT"
+if [[ -n $MINGW64_ENV ]]; then
+	PROMPT="(mingw-x64)$PROMPT"
+elif [[ -n $MINGW32_END ]]; then
+	PROMPT="(mingw-i686)$PROMPT"
 fi
 
 # }}}

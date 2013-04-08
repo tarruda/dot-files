@@ -1,4 +1,5 @@
-// this is largely based on the sdk example
+// a lot here was copied from the sdk example, so it may not
+// follow the best practices for virtualbox programming
 #include <stdio.h>
 #include <stdarg.h>
 #include <wchar.h>
@@ -15,61 +16,59 @@
 
 // main interface to virtualbox api
 static IVirtualBox *virtualbox;
+// running vm session
+static ISession *session;
+// running vm console
+static IConsole *console;
 
-void StartVM(const wchar_t *name)
+void VMStart()
 {
   HRESULT rc;
   IMachine *machine = NULL;
-  ISession *session = NULL;
-  IConsole *console = NULL;
   IProgress *progress = NULL;
   BSTR sessiontype;
   BSTR guid;
   BSTR machineName = SysAllocString(name);
 
-  /* Try to find the machine */
+  // try to find the machine //
   rc = virtualbox->FindMachine(machineName, &machine);
 
   if (FAILED(rc)) {
     ShowError(L"Could not find virtual machine named '%s'", name);
     return;
   } else {
-    sessiontype = SysAllocString(L"gui");
+    sessiontype = SysAllocString(L"headless");
 
-     /* Get machine uuid */
+    // get the machine uuid
     rc = machine->get_Id(&guid);
     if (!SUCCEEDED(rc)) {
-      ShowError(L"Failed to get uuid for '%s'", name);
+      ShowError(L"Failed to get uuid for '%s'. rc = 0x%x", name, rc);
       return;
     }
 
-    /* Create the session object. */
+    // create the session object.
     rc = CoCreateInstance(CLSID_Session, NULL, CLSCTX_INPROC_SERVER,
         IID_ISession, (void**)&session);
     if (!SUCCEEDED(rc)) {
-      ShowError(L"Error creating session instance! rc = 0x%x", rc);
+      ShowError(L"Failed to create session instance for '%s'. rc = 0x%x", name, rc);
       return;
     }
 
-    /* Start a VM session using the delivered VBox GUI. */
+    // start a headless VM session //
     rc = machine->LaunchVMProcess(session, sessiontype, NULL, &progress);
     if (!SUCCEEDED(rc)) {
-      ShowError(L"Could not open remote session for '%s'", name);
+      ShowError(L"Failed to start a new remote session for '%s'. rc = 0x%x", name, rc);
       return;
     }
 
-    /* Wait until VM is running. */
-    rc = progress->WaitForCompletion(-1);
+    // wait until VM is running.
+    progress->WaitForCompletion(-1);
 
-    /* Get console object. */
+    // store console object.
     session->get_Console(&console);
 
-    /* Bring console window to front. */
-    machine->ShowConsoleWindow(0);
-
-    SAFE_RELEASE(console);
+    // release uneeded resources
     SAFE_RELEASE(progress);
-    SAFE_RELEASE(session);
     SysFreeString(guid);
     SysFreeString(sessiontype);
     SAFE_RELEASE(machine);
@@ -78,15 +77,68 @@ void StartVM(const wchar_t *name)
   SysFreeString(machineName);
 }
 
-void InitVirtualbox()
+void VMSaveState()
 {
-  /* Initialize the COM subsystem. */
+
+}
+
+int InitVirtualbox(const wchar_t *name)
+{
+  HRESULT rc;
+  IMachine *machine = NULL;
+  BSTR sessiontype;
+  BSTR guid;
+  BSTR machineName = SysAllocString(name);
+
+  // initialize the COM subsystem.
   CoInitialize(NULL);
 
-  /* Instantiate the VirtualBox root object. */
+  // instantiate the VirtualBox root object.
   CoCreateInstance(CLSID_VirtualBox, NULL, CLSCTX_LOCAL_SERVER,
       IID_IVirtualBox, (void**)&virtualbox);
 
+  // try to find the machine
+  rc = virtualbox->FindMachine(machineName, &machine);
+
+  if (FAILED(rc)) {
+    ShowError(L"Could not find virtual machine named '%s'", name);
+    return 0;
+  } else {
+    sessiontype = SysAllocString(L"headless");
+
+    // get the machine uuid
+    rc = machine->get_Id(&guid);
+    if (!SUCCEEDED(rc)) {
+      ShowError(L"Failed to get uuid for '%s'. rc = 0x%x", name, rc);
+      return 0;
+    }
+
+    // create the session object.
+    rc = CoCreateInstance(CLSID_Session, NULL, CLSCTX_INPROC_SERVER,
+        IID_ISession, (void**)&session);
+    if (!SUCCEEDED(rc)) {
+      ShowError(L"Failed to create session instance for '%s'. rc = 0x%x", name, rc);
+      return 0;
+    }
+
+    // lock the machine
+    rc = machine->lockMachine(&session, LockType_Write);
+    if (!SUCCEEDED(rc)) {
+      ShowError(L"Failed to acquire lock for '%s'. rc = 0x%x", name, rc);
+      return 0;
+    }
+
+    // get the vm console
+    session->get_Console(&console);
+
+    // release uneeded resources
+    SAFE_RELEASE(progress);
+    SysFreeString(guid);
+    SysFreeString(sessiontype);
+    SysFreeString(machineName);
+    SAFE_RELEASE(machine);
+    return 1;
+  }
 }
 
 void FreeVirtualbox()

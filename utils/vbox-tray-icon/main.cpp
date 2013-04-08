@@ -9,10 +9,6 @@
 
 #include "api.h"
 
-#define VBOXDIR "C:\\Program Files\\Oracle\\VirtualBox\\"
-#define STARTVM VBOXDIR "VBoxHeadless.exe --startvm %s --vrdp off"
-#define ACPISHUTDOWN VBOXDIR "VBoxManage.exe controlvm %s acpipowerbutton"
-#define SAVESTATE VBOXDIR "VBoxManage.exe controlvm %s savestate"
 
 #define WM_TRAYEVENT (WM_USER + 1)
 #define WM_TRAY_STARTVM 1
@@ -25,34 +21,13 @@ static UINT WM_EXPLORERCRASH = 0;
 static TCHAR wclass[] = _T("vboxtrayicon");
 static TCHAR title[] = _T("VirtualBox Tray Icon");
 
-static wchar_t *vmname;
-
 static NOTIFYICONDATA ndata;
 
 // Tray icon context menu
 static HMENU menu;
 
-void debugbox(char *msg)
-{
-    MessageBox(NULL, msg, "Debug", MB_OK);
-}
 
-int run_command(char *cmdline, PROCESS_INFORMATION *pi) 
-{
-  STARTUPINFO si;
-  memset(&si, 0, sizeof(si));
-  memset(pi, 0, sizeof(*pi));
-  si.cb = sizeof(si);
-  si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
-  si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
-  si.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-  si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
-  si.wShowWindow = SW_HIDE;
-  return CreateProcess(NULL, cmdline, NULL, NULL, FALSE, CREATE_NO_WINDOW,
-      NULL, NULL, &si, pi);
-}
-
-void init_menu() {
+void InitMenu() {
   menu = CreatePopupMenu();
   AppendMenu(menu, MF_STRING, WM_TRAY_STARTVM, "Start VM");
   AppendMenu(menu, MF_STRING, WM_TRAY_ACPISHUTDOWN, "ACPI shutdown");
@@ -61,12 +36,12 @@ void init_menu() {
   AppendMenu(menu, MF_STRING, WM_TRAY_EXIT, "Exit");
 }
 
-LRESULT CALLBACK handle_tray_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK HandleTrayMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
   UINT clicked;
   POINT point;
-  // these flags will disable messages about the context menu and focus on
-  // returning the clicked item id
+  // these flags will disable messages about the context menu
+  // and focus on returning the clicked item id
   UINT flags = TPM_RETURNCMD | TPM_NONOTIFY;
 
   switch(lParam)
@@ -78,21 +53,27 @@ LRESULT CALLBACK handle_tray_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
       switch (clicked)
       {
         case WM_TRAY_STARTVM:
-          StartVM(vmname);
+          VMStart();
+          break;
+        case WM_TRAY_SAVESTATE:
+          VMSaveState();
+          break;
+        case WM_TRAY_ACPISHUTDOWN:
+          VMAcpiShutdown();
           break;
         case WM_TRAY_EXIT:
-          if (Ask(L"The VM '%s' will be suspended. Are you sure?", vmname)) {
+          if (Ask(L"The VM will be suspended. Are you sure?")) {
+            VMSaveState();
             PostQuitMessage(0);
           }
           break;
       };
       break;
-    default:
-      return DefWindowProc(hWnd, msg, wParam, lParam);
   };
+  return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK handle_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
   /* PROCESS_INFORMATION pi; */
 
@@ -104,14 +85,11 @@ LRESULT CALLBACK handle_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
   switch (msg)
   {
     case WM_TRAYEVENT:
-      return handle_tray_message(hWnd, msg, wParam, lParam);
+      return HandleTrayMessage(hWnd, msg, wParam, lParam);
     case WM_CREATE:
-      init_menu();
+      InitMenu();
       return 0;
     case WM_QUERYENDSESSION:
-      /* sprintf(format_buffer, SAVESTATE, vmname); */
-      /* run_command(format_buffer, &pi); */
-      /* WaitForSingleObject(pi.hProcess, INFINITE); */
       return TRUE;       
     case WM_ENDSESSION: 
       return 0;
@@ -139,17 +117,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   MSG msg;
   HWND hWnd;
 
-  InitVirtualbox();
   if (ParseOptions() == 0) {
     ShowError(L"Need to provide the VM name as first argument");
     return 1;
   }
-
   // every application that wants to use a message loop needs to
   // initialize/register this structure
   wcex.cbSize = sizeof(WNDCLASSEX);
   wcex.style = CS_HREDRAW | CS_VREDRAW;
-  wcex.lpfnWndProc = handle_message;
+  wcex.lpfnWndProc = HandleMessage;
   wcex.cbClsExtra = 0;
   wcex.cbWndExtra = 0;
   wcex.hInstance = hInstance;
@@ -177,8 +153,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   Shell_NotifyIcon(NIM_ADD, &ndata);
 
-  // listen for the "explorer crash event" so we can add the icon again
+  // listen for the "explorer crash event" so we can add the icon
+  // again
   WM_EXPLORERCRASH = RegisterWindowMessageA("TaskbarCreated");
+
+  // initialize the virtualbox api
+  InitVirtualbox(vmname);
 
   while (GetMessage(&msg, NULL, 0, 0))
   {
@@ -188,7 +168,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   // remote tray icon
   Shell_NotifyIcon(NIM_DELETE, &ndata);
-
+  // cleanup virtualbox api resources
   FreeVirtualbox();
   return (int) msg.wParam;
 }

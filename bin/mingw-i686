@@ -1,0 +1,15 @@
+#!/bin/sh
+export CC=i686-w64-mingw32-gcc
+export CXX=i686-w64-mingw32-g++
+export CPP=i686-w64-mingw32-cpp
+export AR=i686-w64-mingw32-ar
+export RANLIB=i686-w64-mingw32-ranlib
+export ADD2LINE=i686-w64-mingw32-addr2line
+export AS=i686-w64-mingw32-as
+export LD=i686-w64-mingw32-ld
+export NM=i686-w64-mingw32-nm
+export STRIP=i686-w64-mingw32-strip
+ 
+export PATH="/usr/i686-w64-mingw32/bin:$PATH"
+export MINGW64_ENV=1
+exec "$SHELL"

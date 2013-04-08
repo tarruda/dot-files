@@ -10,7 +10,7 @@ urxvt*scrollBar: false
 urxvt*saveLines: 0
 ! the following is the default but set it explicitily anyway
 urxvt*meta8: false
-! make urxvt behave like xterm when using certain control keys
+/* make urxvt behave like xterm when control/alt keys */
 urxvt.keysym.M-Up:      \033[1;3A
 urxvt.keysym.M-Down:    \033[1;3B
 urxvt.keysym.M-Right:   \033[1;3C
