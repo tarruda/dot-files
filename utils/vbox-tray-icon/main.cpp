@@ -63,46 +63,30 @@ void init_menu() {
 
 LRESULT CALLBACK handle_tray_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-  /* PROCESS_INFORMATION pi; */
-  /* UINT clicked; */
-  /* POINT point; */
-  /* int result; */
+  UINT clicked;
+  POINT point;
   // these flags will disable messages about the context menu and focus on
   // returning the clicked item id
-  /* UINT flags = TPM_RETURNCMD | TPM_NONOTIFY; */
+  UINT flags = TPM_RETURNCMD | TPM_NONOTIFY;
 
   switch(lParam)
   {
-    /* case WM_RBUTTONDOWN: */
-    /*   GetCursorPos(&point); */
-    /*   SetForegroundWindow(hWnd); */ 
-    /*   clicked = TrackPopupMenu(menu, flags, point.x, point.y, 0, hWnd, NULL); */
-    /*   switch (clicked) */
-    /*   { */
-    /*     case WM_TRAY_STARTVM: */
-    /*       sprintf(format_buffer, STARTVM, vmname); */
-    /*       run_command(format_buffer, &pi); */
-    /*       break; */
-    /*     case WM_TRAY_ACPISHUTDOWN: */
-    /*       sprintf(format_buffer, ACPISHUTDOWN, vmname); */
-    /*       run_command(format_buffer, &pi); */
-    /*       break; */
-    /*     case WM_TRAY_SAVESTATE: */
-    /*       sprintf(format_buffer, SAVESTATE, vmname); */
-    /*       run_command(format_buffer, &pi); */
-    /*       break; */
-    /*     case WM_TRAY_EXIT: */
-    /*       result = MessageBox(NULL, "Are you sure?", "Exit VM instance", */
-    /*           MB_YESNO); */
-    /*       if (result == IDYES) { */
-    /*         sprintf(format_buffer, SAVESTATE, vmname); */
-    /*         run_command(format_buffer, &pi); */
-    /*         WaitForSingleObject(pi.hProcess, INFINITE); */
-    /*         PostQuitMessage(0); */
-    /*       } */
-    /*       break; */
-    /*   }; */
-    /*   break; */
+    case WM_RBUTTONDOWN:
+      GetCursorPos(&point);
+      SetForegroundWindow(hWnd); 
+      clicked = TrackPopupMenu(menu, flags, point.x, point.y, 0, hWnd, NULL);
+      switch (clicked)
+      {
+        case WM_TRAY_STARTVM:
+          StartVM(vmname);
+          break;
+        case WM_TRAY_EXIT:
+          if (Ask(L"The VM '%s' will be suspended. Are you sure?", vmname)) {
+            PostQuitMessage(0);
+          }
+          break;
+      };
+      break;
     default:
       return DefWindowProc(hWnd, msg, wParam, lParam);
   };
@@ -136,7 +120,7 @@ LRESULT CALLBACK handle_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
   };
 }
 
-int parse_options()
+int ParseOptions()
 {
   if (__argc == 1)
     return 0;
@@ -155,16 +139,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   MSG msg;
   HWND hWnd;
 
-  init_virtualbox();
-  startvm(L"dbox");
-  if (parse_options() == 0) {
-    MessageBox(NULL, "Need to provide the VM name as first argument", "Invalid command line arguments", MB_OK);
+  InitVirtualbox();
+  if (ParseOptions() == 0) {
+    ShowError(L"Need to provide the VM name as first argument");
     return 1;
   }
 
   // every application that wants to use a message loop needs to
-  // initialize/register this structure, as it points to the message handler
-  // function.
+  // initialize/register this structure
   wcex.cbSize = sizeof(WNDCLASSEX);
   wcex.style = CS_HREDRAW | CS_VREDRAW;
   wcex.lpfnWndProc = handle_message;
@@ -179,8 +161,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   wcex.hIconSm = LoadIcon(wcex.hInstance, IDI_APPLICATION);
   RegisterClassEx(&wcex);
 
-  // without creating a window no message queue will exist, so this is needed
-  // even if the window will be hidden most of the time
+  // without creating a window no message queue will exist, so this is
+  // needed even if the window will be hidden most(or all) of the time
   hWnd = CreateWindow(wclass, title, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
       CW_USEDEFAULT, 500, 100, NULL, NULL, hInstance, NULL);
 
@@ -191,6 +173,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   ndata.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_VBOXICON));
   wcscpy((wchar_t *)ndata.szTip, L"Virtualbox Tray Icon");
   ndata.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+
 
   Shell_NotifyIcon(NIM_ADD, &ndata);
 
@@ -206,7 +189,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   // remote tray icon
   Shell_NotifyIcon(NIM_DELETE, &ndata);
 
-  destroy_virtualbox();
+  FreeVirtualbox();
   return (int) msg.wParam;
 }
 
