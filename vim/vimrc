@@ -82,6 +82,7 @@ set synmaxcol=500 " maximum length to apply syntax highlighting
 set timeout " enable timeout of maps and code sequences
 set timeoutlen=3000 " 3 seconds is more than enought to finish any map
 set ttimeoutlen=5 " 5 milliseconds is enough for terminals to send the entire code sequence
+set clipboard= " disable automatic clipboard integration
 syntax on " enable syntax highlighting
 filetype plugin indent on " enable file-specific plugins/settings
 set backupskip=/tmp/*,/private/tmp/* " make it possible to use vim to edit crontab

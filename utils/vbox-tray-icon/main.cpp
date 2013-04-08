@@ -7,6 +7,8 @@
 
 #include "resources/resources.h"
 
+#include "api.h"
+
 #define VBOXDIR "C:\\Program Files\\Oracle\\VirtualBox\\"
 #define STARTVM VBOXDIR "VBoxHeadless.exe --startvm %s --vrdp off"
 #define ACPISHUTDOWN VBOXDIR "VBoxManage.exe controlvm %s acpipowerbutton"
@@ -23,9 +25,7 @@ static UINT WM_EXPLORERCRASH = 0;
 static TCHAR wclass[] = _T("vboxtrayicon");
 static TCHAR title[] = _T("VirtualBox Tray Icon");
 
-static char format_buffer[200];
-
-static char *vmname;
+static wchar_t *vmname;
 
 static NOTIFYICONDATA ndata;
 
@@ -63,46 +63,46 @@ void init_menu() {
 
 LRESULT CALLBACK handle_tray_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-  PROCESS_INFORMATION pi;
-  UINT clicked;
-  POINT point;
-  int result;
+  /* PROCESS_INFORMATION pi; */
+  /* UINT clicked; */
+  /* POINT point; */
+  /* int result; */
   // these flags will disable messages about the context menu and focus on
   // returning the clicked item id
-  UINT flags = TPM_RETURNCMD | TPM_NONOTIFY;
+  /* UINT flags = TPM_RETURNCMD | TPM_NONOTIFY; */
 
   switch(lParam)
   {
-    case WM_RBUTTONDOWN:
-      GetCursorPos(&point);
-      SetForegroundWindow(hWnd); 
-      clicked = TrackPopupMenu(menu, flags, point.x, point.y, 0, hWnd, NULL);
-      switch (clicked)
-      {
-        case WM_TRAY_STARTVM:
-          sprintf(format_buffer, STARTVM, vmname);
-          run_command(format_buffer, &pi);
-          break;
-        case WM_TRAY_ACPISHUTDOWN:
-          sprintf(format_buffer, ACPISHUTDOWN, vmname);
-          run_command(format_buffer, &pi);
-          break;
-        case WM_TRAY_SAVESTATE:
-          sprintf(format_buffer, SAVESTATE, vmname);
-          run_command(format_buffer, &pi);
-          break;
-        case WM_TRAY_EXIT:
-          result = MessageBox(NULL, "Are you sure?", "Exit VM instance",
-              MB_YESNO);
-          if (result == IDYES) {
-            sprintf(format_buffer, SAVESTATE, vmname);
-            run_command(format_buffer, &pi);
-            WaitForSingleObject(pi.hProcess, INFINITE);
-            PostQuitMessage(0);
-          }
-          break;
-      };
-      break;
+    /* case WM_RBUTTONDOWN: */
+    /*   GetCursorPos(&point); */
+    /*   SetForegroundWindow(hWnd); */ 
+    /*   clicked = TrackPopupMenu(menu, flags, point.x, point.y, 0, hWnd, NULL); */
+    /*   switch (clicked) */
+    /*   { */
+    /*     case WM_TRAY_STARTVM: */
+    /*       sprintf(format_buffer, STARTVM, vmname); */
+    /*       run_command(format_buffer, &pi); */
+    /*       break; */
+    /*     case WM_TRAY_ACPISHUTDOWN: */
+    /*       sprintf(format_buffer, ACPISHUTDOWN, vmname); */
+    /*       run_command(format_buffer, &pi); */
+    /*       break; */
+    /*     case WM_TRAY_SAVESTATE: */
+    /*       sprintf(format_buffer, SAVESTATE, vmname); */
+    /*       run_command(format_buffer, &pi); */
+    /*       break; */
+    /*     case WM_TRAY_EXIT: */
+    /*       result = MessageBox(NULL, "Are you sure?", "Exit VM instance", */
+    /*           MB_YESNO); */
+    /*       if (result == IDYES) { */
+    /*         sprintf(format_buffer, SAVESTATE, vmname); */
+    /*         run_command(format_buffer, &pi); */
+    /*         WaitForSingleObject(pi.hProcess, INFINITE); */
+    /*         PostQuitMessage(0); */
+    /*       } */
+    /*       break; */
+    /*   }; */
+    /*   break; */
     default:
       return DefWindowProc(hWnd, msg, wParam, lParam);
   };
@@ -110,7 +110,7 @@ LRESULT CALLBACK handle_tray_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 
 LRESULT CALLBACK handle_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-  PROCESS_INFORMATION pi;
+  /* PROCESS_INFORMATION pi; */
 
   if (msg == WM_EXPLORERCRASH) {
     Shell_NotifyIcon(NIM_ADD, &ndata);
@@ -125,9 +125,9 @@ LRESULT CALLBACK handle_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
       init_menu();
       return 0;
     case WM_QUERYENDSESSION:
-      sprintf(format_buffer, SAVESTATE, vmname);
-      run_command(format_buffer, &pi);
-      WaitForSingleObject(pi.hProcess, INFINITE);
+      /* sprintf(format_buffer, SAVESTATE, vmname); */
+      /* run_command(format_buffer, &pi); */
+      /* WaitForSingleObject(pi.hProcess, INFINITE); */
       return TRUE;       
     case WM_ENDSESSION: 
       return 0;
@@ -141,13 +141,12 @@ int parse_options()
   if (__argc == 1)
     return 0;
 
-  vmname = *(__argv + 1);
+  // convert the vm name to wchar_t
+  const size_t size = strlen(*(__argv + 1)) + 1;
+  vmname = new wchar_t[size];
+  mbstowcs(vmname, *(__argv + 1), size);
   return 1;
 }
-
-void init_virtualbox();
-void destroy_virtualbox();
-void startvm(char *name);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LPSTR lpCmdLine, int nCmdShow)
@@ -157,7 +156,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   HWND hWnd;
 
   init_virtualbox();
-  startvm("dbox");
+  startvm(L"dbox");
   if (parse_options() == 0) {
     MessageBox(NULL, "Need to provide the VM name as first argument", "Invalid command line arguments", MB_OK);
     return 1;

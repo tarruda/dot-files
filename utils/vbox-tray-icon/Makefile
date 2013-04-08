@@ -2,7 +2,7 @@ SRC     = api.cpp main.cpp sdk/bindings/mscom/lib/VirtualBox_i.c
 RC      = resources/resources.rc
 ICO     = resources/vbox.ico
 RES     = resources.res
-EXE     = vbox-tray-icon.exe
+EXE     = VBoxTrayIcon.exe
 INC     = sdk/bindings/mscom/include
 SDK     = sdk
 SDK_URL = http://download.virtualbox.org/virtualbox/4.2.10/VirtualBoxSDK-4.2.10-84104.zip
@@ -10,8 +10,8 @@ SDK_URL = http://download.virtualbox.org/virtualbox/4.2.10/VirtualBoxSDK-4.2.10-
 all: $(EXE)
 
 $(EXE): $(SRC) $(RES)
-	i586-mingw32msvc-gcc $(SRC) $(RES) -o $(EXE) -mwindows -Wall -DMINGW32\
-	 	-lshell32 -lole32 -loleaut32 -lstdc++
+	i586-mingw32msvc-gcc $(SRC) $(RES) -o $(EXE) -I$(INC) -mwindows\
+	 	-Wall -DMINGW32 -lshell32 -lole32 -loleaut32 -lstdc++
 
 $(SRC): $(SDK)
 
