@@ -1,15 +1,15 @@
 # Menu for the XWin tray icon
 MENU dbox {
-  urxvt EXEC "tcp-command urxvt -title rxvt-unicode"	
-  gvim EXEC "tcp-command gvim"
-  emacs EXEC "tcp-command emacs"
-  lxtask EXEC "tcp-command lxtask"
-  tmux EXEC "tcp-command urxvt -title tmux -e sh -c tmux attach || tmux new"
+  urxvt EXEC "tcp-command 192.168.56.50 urxvt -title rxvt-unicode"	
+  gvim EXEC "tcp-command 192.168.56.50 gvim"
+  emacs EXEC "tcp-command 192.168.56.50 emacs"
+  lxtask EXEC "tcp-command 192.168.56.50 lxtask"
+  tmux EXEC "tcp-command 192.168.56.50 urxvt -title tmux -e sh -c 'tmux attach || tmux new'"
 }
 
 MENU cygwin {
-  urxvt EXEC "echo 'urxvt -title rxvt-unicode -sl 10000 -sb -sr -e /bin/zsh' | nc 127.0.0.1 55555"
-  gvim EXEC "echo gvim | nc 127.0.0.1 55555"
+  urxvt EXEC "tcp-command 127.0.0.1 urxvt -title rxvt-unicode -sl 10000 -sb -sr -e /bin/zsh"
+  gvim EXEC "tcp-command 127.0.0.1 gvim"
 }
 
 MENU root {

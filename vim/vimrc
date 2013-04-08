@@ -79,8 +79,9 @@ set nofoldenable " don't fold by default
 set foldlevel=0 " if fold everything if 'foldenable' is set
 set foldnestmax=10 " maximum fold depth
 set synmaxcol=500 " maximum length to apply syntax highlighting
-set notimeout " dont timeout on mappings(wait until a mapping is complete)
-set ttimeout ttimeoutlen=5 " terminals will insert key sequences codes fast
+set timeout " enable timeout of maps and code sequences
+set timeoutlen=3000 " 3 seconds is more than enought to finish any map
+set ttimeoutlen=5 " 5 milliseconds is enough for terminals to send the entire code sequence
 syntax on " enable syntax highlighting
 filetype plugin indent on " enable file-specific plugins/settings
 set backupskip=/tmp/*,/private/tmp/* " make it possible to use vim to edit crontab
@@ -119,6 +120,10 @@ elseif &term =~ 'rxvt-unicode' || &term =~ 'xterm'
   :set <a-j>=j
   :set <a-l>=l
   :set <a-h>=h
+
+  :set <a-d>=p
+  :set <a-y>=y
+  :set <a-d>=d
 endif
 " }}}
 " Custom commands {{{
@@ -198,7 +203,6 @@ if &term == 'tmux'
 endif
 " }}}
 " Mappings {{{
-" General {{{
 " clear last search highlight
 nnoremap <silent> <leader>c :noh<cr>
 " Move between bracket pairs using tab (in normal and visual mode)
@@ -250,10 +254,6 @@ else
   vnoremap <silent> <a-y> "+y
   vnoremap <silent> <a-d> "+d
 endif
-" }}}
-" CtrlP {{{
-nnoremap <silent> <leader>p :CtrlPTag<CR>
-" }}}
 " }}}
 " Filetype settings {{{
 augroup filetype_settings
@@ -354,6 +354,7 @@ if !exists('g:vimrc_done_basic_init')
     CtrlP
   endf
   command! Ctrlp call s:search()
+  nnoremap <silent> <leader>p :CtrlPTag<CR>
   " }}}
   " Clang(C/C++) {{{
   " Disable auto popup, use <Tab> to autocomplete
