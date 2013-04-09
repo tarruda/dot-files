@@ -27,6 +27,7 @@ ROOTMENU root
 ICONDIRECTORY T:\cygwin\home\tarruda\.dotfiles\cygwin-resources\icons
 
 ICONS {
+  gvim vim.ico
   tmux terminal.ico
   "Task Manager" system-monitor.ico
   rxvt-unicode rxvt.ico
