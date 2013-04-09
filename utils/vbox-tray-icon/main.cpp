@@ -19,7 +19,7 @@
 static UINT WM_EXPLORERCRASH = 0;
 
 static TCHAR wclass[] = _T("vboxtrayicon");
-static TCHAR title[] = _T("VirtualBox Tray Icon");
+static char title[100];
 
 static NOTIFYICONDATA ndata;
 
@@ -28,6 +28,8 @@ static HMENU running_menu;
 static HMENU stopped_menu;
 
 static wchar_t *vmname;
+static char *vmname_ascii;
+static char tooltip[64];
 
 void InitMenus()
 {
@@ -42,8 +44,23 @@ void InitMenus()
   AppendMenu(stopped_menu, MF_STRING, WM_TRAY_EXIT, "Exit");
 }
 
+void UpdateTray(MachineState state)
+{
+  switch (state) {
+    case MachineState_PoweredOff:
+      sprintf(tooltip, "%s: Powered off", vmname_ascii); break;
+    case MachineState_Running:
+      sprintf(tooltip, "%s: Running", vmname_ascii); break;
+    case MachineState_Saved:
+      sprintf(tooltip, "%s: Saved", vmname_ascii); break;
+    default:
+      sprintf(tooltip, "%s", vmname_ascii); break;
+  };
+  strcpy(ndata.szTip, TEXT(tooltip));
+  Shell_NotifyIcon(NIM_MODIFY, &ndata);
+}
 
-LRESULT CALLBACK HandleTrayMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK HandleTrayEvent(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
   HMENU menu;
   UINT clicked;
@@ -68,12 +85,15 @@ LRESULT CALLBACK HandleTrayMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
       {
         case WM_TRAY_STARTVM:
           VMStart();
+          UpdateTray(MachineState_Running);
           break;
         case WM_TRAY_SAVESTATE:
-          VMSaveState(1);
+          VMSaveState();
+          UpdateTray(MachineState_Saved);
           break;
         case WM_TRAY_ACPISHUTDOWN:
-          VMAcpiShutdown(1);
+          VMAcpiShutdown();
+          UpdateTray(MachineState_PoweredOff);
           break;
         case WM_TRAY_EXIT:
           if (Ask(L"Are you sure?")) {
@@ -86,7 +106,7 @@ LRESULT CALLBACK HandleTrayMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
   return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK HandleEvent(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
   if (msg == WM_EXPLORERCRASH) {
     Shell_NotifyIcon(NIM_ADD, &ndata);
@@ -95,18 +115,11 @@ LRESULT CALLBACK HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 
   switch (msg)
   {
-    case WM_TRAYEVENT:
-      return HandleTrayMessage(hWnd, msg, wParam, lParam);
-    case WM_CREATE:
-      InitMenus();
-      return 0;
-    case WM_QUERYENDSESSION:
-      return TRUE;       
-    case WM_ENDSESSION:
-      PostQuitMessage(0);
-      return 0;
-    default:
-      return DefWindowProc(hWnd, msg, wParam, lParam);
+    case WM_TRAYEVENT: return HandleTrayEvent(hWnd, msg, wParam, lParam);
+    case WM_CREATE: InitMenus(); return 0;
+    case WM_QUERYENDSESSION: return TRUE;
+    case WM_ENDSESSION: if (wParam) FreeVirtualbox(); return 0;
+    default: return DefWindowProc(hWnd, msg, wParam, lParam);
   };
 }
 
@@ -115,10 +128,11 @@ int ParseOptions()
   if (__argc == 1)
     return 0;
 
+  vmname_ascii = *(__argv + 1);
   // convert the vm name to wchar_t
-  const size_t size = strlen(*(__argv + 1)) + 1;
+  const size_t size = strlen(vmname_ascii) + 1;
   vmname = new wchar_t[size];
-  mbstowcs(vmname, *(__argv + 1), size);
+  mbstowcs(vmname, vmname_ascii, size);
   return 1;
 }
 
@@ -135,14 +149,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   }
 
   // initialize the virtualbox api
-  if (!InitVirtualbox(vmname, &ndata)) {
+  if (!InitVirtualbox(vmname))
     return 1;
-  }
+  
   // every application that wants to use a message loop needs to
   // initialize/register this structure
   wcex.cbSize = sizeof(WNDCLASSEX);
   wcex.style = CS_HREDRAW | CS_VREDRAW;
-  wcex.lpfnWndProc = HandleMessage;
+  wcex.lpfnWndProc = HandleEvent;
   wcex.cbClsExtra = 0;
   wcex.cbWndExtra = 0;
   wcex.hInstance = hInstance;
@@ -154,6 +168,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   wcex.hIconSm = LoadIcon(wcex.hInstance, IDI_APPLICATION);
   RegisterClassEx(&wcex);
 
+  sprintf(title, "VirtualBox Tray Icon: %s", vmname_ascii);
   // without creating a window no message queue will exist, so this is
   // needed even if the window will be hidden most(or all) of the time
   hWnd = CreateWindow(wclass, title, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
@@ -165,8 +180,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   ndata.uCallbackMessage = WM_TRAYEVENT; // custom message to identify tray events 
   ndata.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_VBOXICON));
   ndata.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-
   Shell_NotifyIcon(NIM_ADD, &ndata);
+  UpdateTray(VMGetState());
 
   // listen for the "explorer crash event" so we can add the icon
   // again

@@ -1,12 +1,12 @@
-rm -f $HOME/cygwin-session.log
-exec &> $HOME/cygwin-session.log
+#rm -f $HOME/cygwin-session.log
+#exec &> $HOME/cygwin-session.log
 
 { XWin -wgl -multiwindow -clipboard } &
 
 export DISPLAY=:0.0
 
-{ sleep 2 && xrdb $DOTDIR/.Xresources } &
-{ sleep 2 && xhost 192.168.56.50 } &
+{ sleep 4 && xrdb $DOTDIR/.Xresources } &
+{ sleep 4 && xhost 192.168.56.50 } &
 
 if which pulseaudio &> /dev/null; then
 	pulseaudio --start
