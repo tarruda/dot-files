@@ -1,11 +1,13 @@
 # Menu for the XWin tray icon
 MENU dbox {
-  urxvt EXEC "tcp-command 192.168.56.50 urxvt -title rxvt-unicode"	
+  urxvt EXEC "tcp-command 192.168.56.50 remote-urxvt"	
   gvim EXEC "tcp-command 192.168.56.50 gvim"
   emacs EXEC "tcp-command 192.168.56.50 emacs"
   lxtask EXEC "tcp-command 192.168.56.50 lxtask"
   lxappearance EXEC "tcp-command 192.168.56.50 lxappearance"
-  tmux EXEC "tcp-command 192.168.56.50 urxvt -title tmux -e sh -c \'tmux attach \|\| tmux new\'"
+  tmux EXEC "tcp-command 192.168.56.50 remote-tmux"
+  firefox EXEC "tcp-command 192.168.56.50 firefox"
+  chromium EXEC "tcp-command 192.168.56.50 chromium"
 }
 
 MENU cygwin {
