@@ -10,7 +10,8 @@ function() {
 	.gitconfig .gitconfig
 	.global.gitignore .global.gitignore
 	.XWinrc .XWinrc
-	.startxwinrc .startxwinrc
+	.asoundrc .asoundrc
+	vimperator .vimperator
 	tmux/.tmux.conf .tmux.conf
 	emacs.d .emacs.d
 	)
