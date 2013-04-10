@@ -1,3 +1,0 @@
-#include "resources.h"
-
-IDI_VBOXICON ICON "vbox.ico"
