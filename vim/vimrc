@@ -109,8 +109,8 @@ if &term == 'tmux'
   :set <right>=[C
   :set <left>=[D
 
-  :set <m-y>=y
-  :set <m-d>=d
+  :set <a-y>=y
+  :set <a-d>=d
 
   " Prefix used by tmux to send 'special commands' to vim. I use this so there's
   " no possibility of tmux accidentally hitting my own mappings
@@ -172,16 +172,13 @@ if &term == 'tmux'
       elseif a:direction == 'l'
         call system("tmux select-pane -R")
       endif
-    else
-      exe 'wincmd ' . a:direction
     end
   endfunction
   if has('clipboard') && executable('xclip') && $DISPLAY != ''
     " use the x11 clipboard as the main storage for shared yank data
     " tmux should also be configured to use it
     function! TmuxYank()
-      let @+ = @t " place data from the temp register into the clipboard
-      call system('xclip -o -selection clipboard | tmux load-buffer -')
+      call system('xclip -i -selection clipboard', @t)
     endfunction
     function! TmuxPaste()
       let @t = system('xclip -o -selection clipboard')
@@ -234,14 +231,14 @@ if &term == 'tmux'
   nnoremap <silent> <f37>move-right :silent call TmuxMove('l')<cr>
   nnoremap <silent> <f37>paste-tmux :call TmuxPaste()<cr>"tp
   vnoremap <silent> <f37>paste-tmux d:call TmuxPaste()<cr>h"tp
-  vnoremap <silent> <m-y> "ty:call TmuxYank()<cr>
-  vnoremap <silent> <m-d> "td:call TmuxYank()<cr>
+  vmap <silent> <a-y> "ty:call TmuxYank()<cr>
+  vmap <silent> <a-d> "td:call TmuxYank()<cr>
 else
   nnoremap <silent> <a-j> :wincmd j<cr>
   nnoremap <silent> <a-k> :wincmd k<cr>
   nnoremap <silent> <a-h> :wincmd h<cr>
   nnoremap <silent> <a-l> :wincmd l<cr>
-  nnoremap <silent> <a-down> :wincmd j<cr>
+  nnoremap <silent> <a-down> :wincMd j<cr>
   nnoremap <silent> <a-up> :wincmd k<cr>
   nnoremap <silent> <a-left> :wincmd h<cr>
   nnoremap <silent> <a-right> :wincmd l<cr>
