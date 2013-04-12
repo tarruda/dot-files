@@ -1,0 +1,19 @@
+include "%S/en_US.UTF-8/Compose"
+
+<dead_acute> <C> : "Ç"   Ccedilla # LATIN CAPITAL LETTER C WITH CEDILLA
+<Multi_key> <acute> <C> : "Ç"   Ccedilla # LATIN CAPITAL LETTER C WITH CEDILLA
+<Multi_key> <apostrophe> <C> : "Ç"   Ccedilla # LATIN CAPITAL LETTER C WITH CEDILLA
+<Multi_key> <C> <apostrophe> : "Ç"   Ccedilla # LATIN CAPITAL LETTER C WITH CEDILLA
+<dead_acute> <c> : "ç"   ccedilla # LATIN SMALL LETTER C WITH CEDILLA
+<Multi_key> <acute> <c> : "ç"   ccedilla # LATIN SMALL LETTER C WITH CEDILLA
+<Multi_key> <apostrophe> <c> : "ç"   ccedilla # LATIN SMALL LETTER C WITH CEDILLA
+<Multi_key> <c> <apostrophe> : "ç"   ccedilla # LATIN SMALL LETTER C WITH CEDILLA
+
+<dead_cedilla> <C> : "Ć"   U0106 # LATIN CAPITAL LETTER C WITH ACUTE
+<Multi_key> <comma> <C> : "Ć"   U0106 # LATIN CAPITAL LETTER C WITH ACUTE
+<Multi_key> <C> <comma> : "Ć"   U0106 # LATIN CAPITAL LETTER C WITH ACUTE
+<Multi_key> <cedilla> <C> : "Ć"   U0106 # LATIN CAPITAL LETTER C WITH ACUTE
+<dead_cedilla> <c> : "ć"   U0107 # LATIN SMALL LETTER C WITH ACUTE
+<Multi_key> <comma> <c> : "ć"   U0107 # LATIN SMALL LETTER C WITH ACUTE
+<Multi_key> <c> <comma> : "ć"   U0107 # LATIN SMALL LETTER C WITH ACUTE
+<Multi_key> <cedilla> <c> : "ć"   U0107 # LATIN SMALL LETTER C WITH ACUTE

@@ -2,7 +2,7 @@
 # Author: Thiago de Arruda (github.com/tarruda)
 # Description:
 #   This file is sourced by zsh when started as a login shell(-l) but after
-#   .zshrc is sourced.
+#   .zshrc is sourced(if interactive).
 
 # X Keyboard {{{
 

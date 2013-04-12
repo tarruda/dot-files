@@ -15,6 +15,7 @@ export WINEARCH=win32
 export WINEPREFIX=$HOME/.wine
 export EDITOR=vim
 export ACKRC=$DOTDIR/.ackrc
+export XCOMPOSEFILE=$DOTDIR/.XCompose
 if which vim &>/dev/null && [[ -n $SHELL ]]; then
 	VIM="`which vim`"
 	export PAGER="$SHELL -c \"unset PAGER;col -b -x | \
@@ -26,7 +27,10 @@ if which vim &>/dev/null && [[ -n $SHELL ]]; then
 	unset VIM
 fi
 export VBOX_USER_HOME=$HOME/.virtualbox
-
+# Thanks this article for the following two environment variables
+# http://my.opera.com/CrazyTerabyte/blog/2010/11/04/how-x11-xcompose-works
+export GTK_IM_MODULE=xim
+export QT_IM_MODULE=xim
 #
 
 # }}}
