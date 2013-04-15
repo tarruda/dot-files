@@ -1,22 +1,23 @@
 exec &> $HOME/.cygwin-session.log
+exec < /dev/null
 
-# For now VcXsrv seems to be the best windows x server
-cd /cygdrive/d/vcxsrv
-vcxsrv.exe -wgl -multiwindow -clipboard -ac &
-
-export DISPLAY=:0.0
+# Setup some basic environment
 export SHELL=/bin/zsh
 unset SHLVL
+
+# go to home directory
 cd
 
-sleep 4 && xrdb $DOTDIR/.Xresources &
+xrdb $DOTDIR/.Xresources
 
+urxvtd -q -o -f
+
+# play audio from the VM
 if which pulseaudio &> /dev/null; then
 	pulseaudio --start
 fi
 
-urxvtd -q -o -f
-
+# listen on port 55555 for commands to run in this session
 nc -k -d -l 127.0.0.1 55555 | while read cmd; do
 	# split/expand the arguments
 	cmdline=()

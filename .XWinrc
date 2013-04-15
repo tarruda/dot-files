@@ -24,7 +24,7 @@ MENU root {
   cygwin MENU cygwin
   SEPARATOR
   "Edit .XWinrc" EXEC "tcp-command 127.0.0.1 gvim ~/.dotfiles/.XWinrc"
-  "Edit .cygwin-session.zsh" EXEC "tcp-command 127.0.0.1 gvim ~/.dotfiles/cygwin-resources/zsh-session.zsh"
+  "Edit .cygwin-session.zsh" EXEC "tcp-command 127.0.0.1 gvim ~/.dotfiles/cygwin-resources/cygwin-session.zsh"
   "Reload .XWinrc" RELOAD
 }
 
