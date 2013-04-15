@@ -9,7 +9,6 @@ function() {
 	zsh/.zshenv .zshenv
 	.gitconfig .gitconfig
 	.global.gitignore .global.gitignore
-	.XWinrc .XWinrc
 	.asoundrc .asoundrc
 	vimperator .vimperator
 	tmux/.tmux.conf .tmux.conf

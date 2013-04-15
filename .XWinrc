@@ -1,27 +1,28 @@
 # Menu for the XWin tray icon
 MENU devbox {
-  urxvt EXEC "tcp-command 192.168.56.50 ~/.dotfiles/cygwin-resources/remote-urxvt"	
+  urxvt EXEC "tcp-command 192.168.56.50 urxvt -title rxvt-unicode -sl 10000 -sb -sr"	
   gvim EXEC "tcp-command 192.168.56.50 gvim"
   emacs EXEC "tcp-command 192.168.56.50 emacs"
   lxtask EXEC "tcp-command 192.168.56.50 lxtask"
   lxappearance EXEC "tcp-command 192.168.56.50 lxappearance"
-  tmux EXEC "tcp-command 192.168.56.50 ~/.dotfiles/cygwin-resources/remote-tmux"
+  tmux EXEC "tcp-command 192.168.56.50 urxvt -title tmux -e sh -c 'tmux attach || tmux new'"
   firefox EXEC "tcp-command 192.168.56.50 firefox"
   chromium EXEC "tcp-command 192.168.56.50 chromium"
 }
 
 MENU cygwin {
-  urxvt EXEC "tcp-command 127.0.0.1 ~/.dotfiles/cygwin-resources/remote-urxvt"
+  urxvt EXEC "tcp-command 127.0.0.1 urxvt -title rxvt-unicode -sl 10000 -sb -sr"
   gvim EXEC "tcp-command 127.0.0.1 gvim"
+  SEPARATOR
+  "Show session log" EXEC "tcp-command 127.0.0.1 urxvt -title 'Cygwin Session Log' -sl 10000 -sb -sr -e tail -n 10000 -f ~/.cygwin-session.log"
 }
 
 MENU root {
   devbox MENU devbox
-  cygwin MENU cygwin	
+  cygwin MENU cygwin
   SEPARATOR
-  "Edit .XWinrc" EXEC "tcp-command 127.0.0.1 gvim ~/.dotfiles/cygwin-resources/edit-xwinrc"
-  "Edit .cygwin-session.zsh" EXEC "tcp-command 127.0.0.1 ~/.dotfiles/cygwin-resources/edit-cygwin-session"  
-  "Show log" EXEC "notepad %logfile%"
+  "Edit .XWinrc" EXEC "tcp-command 127.0.0.1 gvim ~/.dotfiles/.XWinrc"
+  "Edit .cygwin-session.zsh" EXEC "tcp-command 127.0.0.1 gvim ~/.dotfiles/cygwin-resources/zsh-session.zsh"
   "Reload .XWinrc" RELOAD
 }
 
@@ -34,6 +35,7 @@ ICONS {
   tmux terminal.ico
   "Task Manager" system-monitor.ico
   rxvt-unicode rxvt.ico
+  lxappearance lxappearance.ico
 }
 
 STYLES {

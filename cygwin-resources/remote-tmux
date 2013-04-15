@@ -1,2 +1,0 @@
-#!/bin/sh
-exec urxvt -title tmux -e sh -c 'tmux attach || tmux new'
