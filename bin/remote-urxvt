@@ -1,2 +1,2 @@
 #!/bin/sh
-exec urxvt -title rxvt-unicode
+exec urxvt -title rxvt-unicode -sl 10000 -sb -sr
