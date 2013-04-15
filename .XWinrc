@@ -1,33 +1,33 @@
 # Menu for the XWin tray icon
-MENU dbox {
-  urxvt EXEC "tcp-command 192.168.56.50 remote-urxvt"	
+MENU devbox {
+  urxvt EXEC "tcp-command 192.168.56.50 ~/.dotfiles/cygwin-resources/remote-urxvt"	
   gvim EXEC "tcp-command 192.168.56.50 gvim"
   emacs EXEC "tcp-command 192.168.56.50 emacs"
   lxtask EXEC "tcp-command 192.168.56.50 lxtask"
   lxappearance EXEC "tcp-command 192.168.56.50 lxappearance"
-  tmux EXEC "tcp-command 192.168.56.50 remote-tmux"
+  tmux EXEC "tcp-command 192.168.56.50 ~/.dotfiles/cygwin-resources/remote-tmux"
   firefox EXEC "tcp-command 192.168.56.50 firefox"
   chromium EXEC "tcp-command 192.168.56.50 chromium"
 }
 
 MENU cygwin {
-  urxvt EXEC "tcp-command 127.0.0.1 urxvt -title rxvt-unicode -sl 10000 -sb -sr -e /bin/zsh"
+  urxvt EXEC "tcp-command 127.0.0.1 ~/.dotfiles/cygwin-resources/remote-urxvt"
   gvim EXEC "tcp-command 127.0.0.1 gvim"
 }
 
 MENU root {
-  dbox MENU dbox
+  devbox MENU devbox
   cygwin MENU cygwin	
   SEPARATOR
-  "Edit .XWinrc" EXEC "zsh -c 'cd; gvim .XWinrc'"
-  "Edit .cygwin-session.zsh" EXEC "zsh -c 'cd; gvim .dotfiles/cygwin-resources/cygwin-session.zsh'"  
+  "Edit .XWinrc" EXEC "tcp-command 127.0.0.1 gvim ~/.dotfiles/cygwin-resources/edit-xwinrc"
+  "Edit .cygwin-session.zsh" EXEC "tcp-command 127.0.0.1 ~/.dotfiles/cygwin-resources/edit-cygwin-session"  
   "Show log" EXEC "notepad %logfile%"
   "Reload .XWinrc" RELOAD
 }
 
 ROOTMENU root
 
-ICONDIRECTORY T:\cygwin\home\tarruda\.dotfiles\cygwin-resources\icons
+ICONDIRECTORY D:\cygwin\home\tarruda\.dotfiles\cygwin-resources\icons
 
 ICONS {
   gvim vim.ico
