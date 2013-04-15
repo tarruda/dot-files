@@ -8,9 +8,15 @@ unset SHLVL
 # go to home directory
 cd
 
+sleep 1
+
 xrdb $DOTDIR/.Xresources
 
+sleep 1
+
 urxvtd -q -o -f
+
+sleep 1
 
 # play audio from the VM
 if which pulseaudio &> /dev/null; then

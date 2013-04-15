@@ -7,7 +7,6 @@
 # X Keyboard {{{
 
 if [[ -z $X11_WINDOWS ]]; then
-	# echo 'Configuring X keyboard'
 	if which setxkbmap &> /dev/null; then
 		setxkbmap us_intl
 		# setxkbmap -model abnt2 -layout br -variant abnt2

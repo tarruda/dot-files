@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XLaunch WindowMode="MultiWindow" ClientMode="StartProgram" LocalClient="True" Display="-1" 
+  LocalProgram="D:\cygwin\bin\zsh.exe -l ~/.dotfiles/cygwin-resources/cygwin-session.zsh"
+  RemoteProgram="xterm" RemotePassword="" PrivateKey="" RemoteHost="" RemoteUser="" XDMCPHost=""
+  XDMCPBroadcast="False" XDMCPIndirect="False" Clipboard="True" ClipboardPrimary="True" ExtraParams=""
+  Wgl="True" DisableAC="True" XDMCPTerminate="False" />

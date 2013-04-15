@@ -102,7 +102,6 @@ fi
 # ensure ssh agent is running
 SSHPID=`ps ax | grep -c "[s]sh-agent" 2> /dev/null`
 if [[ $SSHPID -eq 0 ]]; then
-	echo 'Starting ssh agent'
 	ssh-agent > "$HOME/.ssh-env"
 fi
 . "$HOME/.ssh-env" > /dev/null
