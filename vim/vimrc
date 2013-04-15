@@ -215,6 +215,8 @@ vnoremap <f1> <esc>
 nnoremap <leader>z :let @z = expand("<cword>")<cr>q:i%s/\C\v<<esc>"zpa>//g<esc>hi
 " Quickly toggle spell on/off
 nnoremap <silent> <leader>s :set spell!<cr>
+" Clear search highlight with ,c
+nnoremap <silent> <leader>c :noh<cr>
 " Capitalize the first word of every sentence in a selection and format it.
 " Useful for quickly formatting comments. The capitalize part was taken from:
 " http://societyserver.org/mbaehr/vim-tips--capitalize-the-first-word-of-every-sentence
