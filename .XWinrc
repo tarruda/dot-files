@@ -1,20 +1,22 @@
 # Menu for the XWin tray icon
 MENU devbox {
-  urxvt EXEC "tcp-command 192.168.56.50 urxvt -title rxvt-unicode -sl 10000 -sb -sr"	
+  urxvt EXEC "tcp-command 192.168.56.50 urxvtc -title rxvt-unicode -sl 10000 -sb -sr"	
   gvim EXEC "tcp-command 192.168.56.50 gvim"
   emacs EXEC "tcp-command 192.168.56.50 emacs"
   lxtask EXEC "tcp-command 192.168.56.50 lxtask"
   lxappearance EXEC "tcp-command 192.168.56.50 lxappearance"
-  tmux EXEC "tcp-command 192.168.56.50 urxvt -title tmux -e sh -c 'tmux attach || tmux new'"
+  tmux EXEC "tcp-command 192.168.56.50 urxvtc -title tmux -e sh -c 'tmux attach || tmux new'"
   firefox EXEC "tcp-command 192.168.56.50 firefox"
   chromium EXEC "tcp-command 192.168.56.50 chromium"
+  SEPARATOR
+  "Show session log" EXEC "tcp-command 192.168.56.50 urxvtc -title 'debox session log' -sl 10000 -sb -sr -e tail -n 10000 -f ~/.devbox-session.log"
 }
 
 MENU cygwin {
-  urxvt EXEC "tcp-command 127.0.0.1 urxvt -title rxvt-unicode -sl 10000 -sb -sr"
+  urxvt EXEC "tcp-command 127.0.0.1 urxvtc -title rxvt-unicode -sl 10000 -sb -sr"
   gvim EXEC "tcp-command 127.0.0.1 gvim"
   SEPARATOR
-  "Show session log" EXEC "tcp-command 127.0.0.1 urxvt -title 'Cygwin Session Log' -sl 10000 -sb -sr -e tail -n 10000 -f ~/.cygwin-session.log"
+  "Show session log" EXEC "tcp-command 127.0.0.1 urxvtc -title 'cygwin session log' -sl 10000 -sb -sr -e tail -n 10000 -f ~/.cygwin-session.log"
 }
 
 MENU root {

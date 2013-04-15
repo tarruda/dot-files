@@ -15,6 +15,8 @@ if which pulseaudio &> /dev/null; then
 	pulseaudio --start
 fi
 
+urxvtd -q -o -f
+
 nc -k -d -l 127.0.0.1 55555 | while read cmd; do
 	# split/expand the arguments
 	cmdline=()
