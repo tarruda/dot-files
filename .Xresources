@@ -5,7 +5,6 @@ urxvt*background: #1C1C1C
 urxvt*foreground: #FFFFFF
 urxvt*font: xft:Ubuntu Mono:pixelsize=22
 urxvt*letterSpace: -1
-!urxvt*url-launcher: /usr/bin/chromium-browser
 urxvt*matcher.button: 1
 urxvt*underlineURLs: true
 urxvt*scrollBar: false

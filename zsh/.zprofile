@@ -4,36 +4,6 @@
 #   This file is sourced by zsh when started as a login shell(-l) but before
 #   .zshrc is sourced. Environment initialization code can be put here.
 
-# Environment {{{
-
-export LANG=en_US.UTF-8
-export VIMINIT="source $DOTDIR/vim/vimrc"
-export VIMPERATOR_INIT="source $DOTDIR/vimperator/vimperatorrc"
-export INPUTRC=$DOTDIR/.inputrc
-export PYTHONSTARTUP=$DOTDIR/.pythonrc
-export WINEARCH=win32
-export WINEPREFIX=$HOME/.wine
-export EDITOR=vim
-export ACKRC=$DOTDIR/.ackrc
-export XCOMPOSEFILE=$DOTDIR/.XCompose
-if which vim &>/dev/null && [[ -n $SHELL ]]; then
-	VIM="`which vim`"
-	export PAGER="$SHELL -c \"unset PAGER;col -b -x | \
-		$VIM -R -c 'set ft=man nomod nolist' -c 'map q :q<CR>' \
-		-c 'map <SPACE> <C-D>' -c 'map b <C-U>' \
-		-c 'set nonumber' \
-		-c 'set norelativenumber' \
-		-c 'nmap K :Man <C-R>=expand(\\\"<cword>\\\")<CR><CR>' -\""
-	unset VIM
-fi
-export VBOX_USER_HOME=$HOME/.virtualbox
-# Thanks this article for the following two environment variables
-# http://my.opera.com/CrazyTerabyte/blog/2010/11/04/how-x11-xcompose-works
-export GTK_IM_MODULE=xim
-export QT_IM_MODULE=xim
-#
-
-# }}}
 # Paths for programs/libraries/manpages {{{
 
 PATH=''
@@ -85,6 +55,35 @@ if [ -d $prefixes_dir ]; then
 fi
 unset dir paths prefixes_dir
 export PATH MANPATH
+
+# }}}
+# Environment {{{
+
+export LANG=en_US.UTF-8
+export VIMINIT="source $DOTDIR/vim/vimrc"
+export VIMPERATOR_INIT="source $DOTDIR/vimperator/vimperatorrc"
+export INPUTRC=$DOTDIR/.inputrc
+export PYTHONSTARTUP=$DOTDIR/.pythonrc
+export WINEARCH=win32
+export WINEPREFIX=$HOME/.wine
+export EDITOR=vim
+export ACKRC=$DOTDIR/.ackrc
+export XCOMPOSEFILE=$DOTDIR/.XCompose
+if which vim &> /dev/null; then
+	VIM="`which vim`"
+	export PAGER="/bin/sh -c \"unset PAGER;col -b -x | \
+		$VIM -R -c 'set ft=man nomod nolist' -c 'map q :q<CR>' \
+		-c 'map <SPACE> <C-D>' -c 'map b <C-U>' \
+		-c 'set nonumber' \
+		-c 'set norelativenumber' \
+		-c 'nmap K :Man <C-R>=expand(\\\"<cword>\\\")<CR><CR>' -\""
+	unset VIM
+fi
+export VBOX_USER_HOME=$HOME/.virtualbox
+# Thanks this article for the following two environment variables
+# http://my.opera.com/CrazyTerabyte/blog/2010/11/04/how-x11-xcompose-works
+export GTK_IM_MODULE=xim
+export QT_IM_MODULE=xim
 
 # }}}
 # SSH {{{
