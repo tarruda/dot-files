@@ -18,9 +18,12 @@ hilights = ( { text = "nick"; nick = "yes"; word = "yes"; } );
 aliases = { J = "join"; Q = "quit"; };
 
 channels = (
-  { name = "#irssi"; chatnet = "ircnet"; autojoin = "No"; },
+  { name = "#tmux"; chatnet = "freenode"; autojoin = "yes"; },
   { name = "#zsh"; chatnet = "freenode"; autojoin = "yes"; },
-  { name = "#tmux"; chatnet = "freenode"; autojoin = "yes"; }
+  { name = "#vim"; chatnet = "freenode"; autojoin = "yes"; },
+  { name = "#rxvt-unicode"; chatnet = "freenode"; autojoin = "yes"; },
+  { name = "#irssi"; chatnet = "freenode"; autojoin = "Yes"; },
+  { name = "#ubuntu"; chatnet = "freenode"; autojoin = "Yes"; }
 );
 
 chatnets = {
@@ -38,12 +41,7 @@ chatnets = {
 servers = (
   { address = "eu.irc6.net"; chatnet = "ircnet"; port = "6667"; },
   { address = "open.ircnet.net"; chatnet = "ircnet"; port = "6667"; },
-  {
-    address = "irc.freenode.net";
-    chatnet = "freenode";
-    port = "6667";
-    autoconnect = "yes";
-  }
+  { address = "irc.freenode.net"; chatnet = "freenode"; port = "6667"; autoconnect = "yes"; }
 );
 
 statusbar = {
