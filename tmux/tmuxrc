@@ -32,7 +32,8 @@ unbind l
 bind l select-pane -R
 
 # setting this to 0 seems to randomly mess up alt key combinations in urxvt
-set -g escape-time 5
+# 50 is good enough for ssh delay
+set -g escape-time 50
 
 # vi-style controls for copy mode
 setw -g mode-keys vi

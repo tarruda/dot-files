@@ -13,4 +13,5 @@
 .VimballRecord
 /emacs.d/el-get/
 /emacs.d/elpa/
+/bin/phantomjs
 .startxwinrc-local
