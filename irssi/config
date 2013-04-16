@@ -1,0 +1,40 @@
+settings = {
+  core = {
+    real_name = "Thiago de Arruda";
+    user_name = "tarruda";
+    nick = "tarruda";
+  };
+  "fe-text" = { actlist_sort = "refnum"; };
+};
+
+aliases = { J = "join"; };
+aliases = { Q = "quit"; };
+
+channels = (
+  { name = "#irssi"; chatnet = "ircnet"; autojoin = "No"; },
+  { name = "#zsh"; chatnet = "freenode"; autojoin = "yes"; },
+  { name = "#tmux"; chatnet = "freenode"; autojoin = "yes"; }
+);
+
+chatnets = {
+  ircnet = {
+    type = "IRC";
+    nick = "tarruda";
+    max_query_chans = "5";
+    max_kicks = "4";
+    max_msgs = "5";
+    max_whois = "4";
+  };
+  freenode = { type = "IRC"; nick = "tarruda"; };
+};
+
+servers = (
+  { address = "eu.irc6.net"; chatnet = "ircnet"; port = "6667"; },
+  { address = "open.ircnet.net"; chatnet = "ircnet"; port = "6667"; },
+  {
+    address = "irc.freenode.net";
+    chatnet = "freenode";
+    port = "6667";
+    autoconnect = "yes";
+  }
+);

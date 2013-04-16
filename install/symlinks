@@ -13,6 +13,7 @@ function() {
 	vimperator .vimperator
 	tmux/.tmux.conf .tmux.conf
 	emacs.d .emacs.d
+	irssi .irssi
 	)
 	case $action in
 		install)
