@@ -1,14 +1,21 @@
 settings = {
   core = {
-    real_name = "Thiago de Arruda";
+    real_name = "Thiago de Arruda Padilha";
     user_name = "tarruda";
     nick = "tarruda";
   };
-  "fe-text" = { actlist_sort = "refnum"; };
+  "fe-text" = { actlist_sort = "refnum"; autostick_split_windows = "no"; };
+  "fe-common/core" = {
+    autocreate_own_query = "no";
+    autocreate_query_level = "DCCMSGS";
+    use_status_window = "no";
+    use_msgs_window = "yes";
+  };
 };
 
-aliases = { J = "join"; };
-aliases = { Q = "quit"; };
+hilights = ( { text = "nick"; nick = "yes"; word = "yes"; } );
+
+aliases = { J = "join"; Q = "quit"; };
 
 channels = (
   { name = "#irssi"; chatnet = "ircnet"; autojoin = "No"; },
@@ -37,4 +44,35 @@ servers = (
     port = "6667";
     autoconnect = "yes";
   }
+);
+
+statusbar = {
+  default = {
+    window = {
+      items = {
+        barstart = { priority = "100"; };
+        time = { };
+        user = { };
+        window = { };
+        window_empty = { };
+        lag = { priority = "-1"; };
+        act = { priority = "10"; };
+        more = { priority = "-1"; alignment = "right"; };
+        barend = { priority = "100"; alignment = "right"; };
+        vim_mode = { };
+        vim_windows = { };
+      };
+    };
+
+    prompt = {
+      items = {
+        uberprompt = { priority = "-1"; };
+        input = { priority = "10"; };
+      };
+      position = "100";
+    };
+  };
+};
+keyboard = ( 
+  { key = "meta-[M"; id = "command"; data = "mouse_xterm "; }
 );

@@ -210,6 +210,18 @@ precmd_functions+=cnf_precmd
 			{ ssh-add -l &> /dev/null || ssh-add } && { command ssh "$@" }
 		}
 		# }}}
+		# irssi {{{
+		if [[ $TERM == tmux ]]; then
+			# It seems irssi breaks with my custom terminfo
+			irssi() {
+				TERM=screen-256color command irssi --home=$DOTDIR/irssi
+			}
+		else
+			irssi() {
+				command irssi --home=$DOTDIR/irssi
+			}
+		fi
+		# }}}
 		# Tmux {{{
 
 		if [[ -z $TMUX ]]; then

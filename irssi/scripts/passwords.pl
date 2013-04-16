@@ -42,10 +42,9 @@ sub process_server_msg {
   }
 }
 
-
 sub reload_passwords {
   %passwords = ();
-  open PASSWORDS_DB, "$ENV{'HOME'}/.irssi/passwords";
+  open PASSWORDS_DB, "$ENV{'HOME'}/.irssi-passwords";
   while (<PASSWORDS_DB>) {
     chomp;
     my ($chatnet, $password) = split(':');
