@@ -1,52 +1,32 @@
-# By default, HKEY_CLASSES_ROOT is not registered, so we have to do it now
-# new-psdrive -psprovider registry -root hkey_classes_root -name hkcr
+# Sources:
+# http://msdn.microsoft.com/en-us/library/windows/desktop/ee872121(v=vs.85).aspx
+# http://msdn.microsoft.com/en-us/library/cc144158(VS.85).aspx
+# http://msdn.microsoft.com/en-us/library/windows/desktop/cc144101(v=vs.85).aspx
+# http://stackoverflow.com/questions/1387769/create-registry-entry-to-associate-file-extension-with-application-in-c
 $ErrorActionPreference = "Stop"
-# cd hkcr:\applications
-$classes='hkcu:\software\classes'
+$classes="hkcu:\software\classes"
 $apps="$classes\applications"
-$names="$classes\local settings\software\microsoft\windows\shell\muicache"
 $cmd='D:\cygwin\home\tarruda\.dotfiles\cygwin-resources\edit-gvim.bat'
+$friendlyname='gVim (Cygwin)'
 $icon='D:\cygwin\home\tarruda\.dotfiles\cygwin-resources\icons\vim.ico'
 $filetypes=@(".txt", ".ps1", ".sh", ".py", ".cs", ".cpp", ".c", ".rb",
-".zsh", ".bash", ".vbox", ".xml", ".yml", ".yaml", ".bat")
+    ".zsh", ".bash", ".vbox", ".xml", ".yml", ".yaml", ".bat")
 
-function test-registryvalue($regkey, $name) {
-  get-itemproperty $regkey $name -ErrorAction SilentlyContinue |
-    out-null
-    $?
-}
-
-# register edit/open commands
-cd $apps
 if (test-path "$apps\cygwin-gvim.exe") {
-  rm -recurse "$apps\cygwin-gvim.exe"
+  # cleanup
+  remove-item -recurse "$apps\cygwin-gvim.exe"
 }
-mkdir cygwin-gvim.exe
-mkdir cygwin-gvim.exe\shell
-mkdir cygwin-gvim.exe\shell\edit
-mkdir cygwin-gvim.exe\shell\edit\command
-cd cygwin-gvim.exe\shell\edit\command
-set-itemproperty . '(Default)' "$cmd `"%1`""
-cd ../../
-mkdir open
-mkdir open\command
-cd open\command
-set-itemproperty . '(Default)' "$cmd `"%1`""
+# register open commands to know filetypes
+new-item -path "$apps\cygwin-gvim.exe\shell\open\command" -value "$cmd `"%1`"" -force
+# add a context menu item(edit with gVim) to every file in windows explorer
+new-item -path "$classes\*\shell\Edit with $friendlyname\command" -value "$cmd `"%1`"" -force
+# friendly name for the 'open with' dialog
+new-itemproperty -path "$apps\cygwin-gvim.exe\shell\open" -name 'FriendlyAppName' -value $friendlyname
 # register the icon
-cd $apps\cygwin-gvim.exe
-mkdir defaulticon
-cd defaulticon
-set-itemproperty . '(Default)' $icon
-# associate with filetypes
-cd $apps\cygwin-gvim.exe
-mkdir supportedtypes
-cd supportedtypes
+# FIXME this has no effect, need to find a way to associate icons with a bat file 
+new-item -path "$apps\cygwin-gvim.exe\DefaultIcon" -value $icon -type expandstring
+# register supported file extensions
+new-item -path "$apps\cygwin-gvim.exe\SupportedTypes"
 foreach ($ext in $filetypes) {
-  new-itemproperty -Path . -name $ext -PropertyType string -value ''
+  new-itemproperty -path "$apps\cygwin-gvim.exe\SupportedTypes" -name $ext -PropertyType string -value ''
 }
-# register a 'beautiful' application name
-cd $names
-if (test-registryvalue $names $cmd) {
-  remove-itemproperty -path . -name $cmd
-}
-new-itemproperty -Path . -name $cmd -PropertyType string -value 'Cygwin gVim'

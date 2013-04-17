@@ -6,6 +6,7 @@ MENU devbox {
   lxtask EXEC "tcp-command 192.168.56.50 lxtask"
   lxappearance EXEC "tcp-command 192.168.56.50 lxappearance"
   tmux EXEC "tcp-command 192.168.56.50 urxvtc -title tmux -e sh -c 'tmux attach || tmux new'"
+  tmux-ssh EXEC "tcp-command 192.168.56.50 urxvtc -title tmux -e tsh"
   firefox EXEC "tcp-command 192.168.56.50 firefox"
   chromium EXEC "tcp-command 192.168.56.50 chromium"
   SEPARATOR
