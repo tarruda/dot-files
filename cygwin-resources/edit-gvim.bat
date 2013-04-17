@@ -1,3 +1,3 @@
 @echo off
-set FILE=%~f1 && set DISPLAY=:0.0
-T:\cygwin\bin\run.exe /bin/zsh -l -c 'gvim $(cygpath -u ${FILE})'
+set FILE=%~f1
+D:\cygwin\bin\tcp-command.exe 127.0.0.1 gvim $(cygpath -u %FILE:\=\\\\%)

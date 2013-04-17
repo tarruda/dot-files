@@ -27,6 +27,7 @@ nc -k -d -l 127.0.0.1 55555 | while read cmd; do
 	for arg in ${(z)cmd}; do
 		cmdline+=${~${(Q)arg}}
 	done
-	(exec ${cmdline}) &
+	#(exec ${cmdline}) &
+	(eval "exec ${cmdline}") &
 	echo "exec ${cmdline}"
 done
