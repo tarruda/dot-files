@@ -3,25 +3,23 @@
 aliases_file=~/.ssh/host_aliases
 
 if (( $# == 0 )) && [[ -r $aliases_file ]]; then
+	# read aliases file and create an associative array
 	typeset -A hosts
 	while read line; do
 		hosts[${${(z)line}[1]}]=${${(z)line}[2]}
 	done < $aliases_file
-
-	# Taken from http://stackoverflow.com/questions/7052137/read-string-with-zsh-completions
-	# zmodload zsh/parameter
-	# autoload +X _complete
-	# functions[_original_complete]=$functions[_complete]
-	# _complete () {
-	# 	unset 'compstate[vared]'
-	# 	# _arguments "1:Host:($hosts)"
-	# 	_original_complete "$@"
-	# }
+	# initialize the host parameter with the first host found
 	host=''
 	if (( ${#${(k)hosts}} > 1 )); then
 		host=${${(k)hosts}[1]}
 	fi
+	# load the completion system 
+	autoload -Uz compinit
+	compinit
+	# add the available aliases as possible completions
+	compdef "compadd ${(k)hosts}" -value-,host,-default-
 	vared -hp "Enter hostname or alias>" host
+	# resolve hostname from alias
 	hostname=$hosts[$host]
 	while [[ -z $host ]]; do
 		echo "Error: Need to provide a hostname" >&2
@@ -45,4 +43,7 @@ ssh -tY $hostname "zsh -l -c \"tmux attach || tmux new\""
 if (( $? != 0 )); then
 	echo "[Press Enter]"
 	read
+	exit 1
 fi
+
+exit

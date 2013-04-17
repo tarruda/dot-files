@@ -41,7 +41,12 @@ chatnets = {
 servers = (
   { address = "eu.irc6.net"; chatnet = "ircnet"; port = "6667"; },
   { address = "open.ircnet.net"; chatnet = "ircnet"; port = "6667"; },
-  { address = "irc.freenode.net"; chatnet = "freenode"; port = "6667"; autoconnect = "yes"; }
+  {
+    address = "irc.freenode.net";
+    chatnet = "freenode";
+    port = "6667";
+    autoconnect = "yes";
+  }
 );
 
 statusbar = {
