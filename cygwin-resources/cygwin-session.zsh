@@ -8,16 +8,16 @@ unset SHLVL
 # go to home directory
 cd
 
-# give enough time for the server
-sleep 5
-
-xrdb $DOTDIR/.Xresources
+while ! xrdb $DOTDIR/.Xresources; do
+	# wait until the server is ready
+	sleep 1
+done
 
 urxvtd -q -o -f
 
 # play audio from the VM
 if which pulseaudio &> /dev/null; then
-	pulseaudio --start
+	pulseaudio --daemon
 fi
 
 # listen on port 55555 for commands to run in this session
