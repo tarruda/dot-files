@@ -231,9 +231,8 @@ precmd_functions+=cnf_precmd
 				alias vi=vim
 			fi
 		else
-			vi() {
-				zsh $DOTDIR/tmux/scripts/vim-tmux-open.zsh "$@"
-			}
+			vim () { command vim -X "$@" }
+			vi() { zsh $DOTDIR/tmux/scripts/vim-tmux-open.zsh "$@" }
 		fi
 
 		alias e=vi
