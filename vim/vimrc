@@ -50,7 +50,7 @@ endi
 set noerrorbells visualbell t_vb= " disable annoying terminal sounds
 set encoding=utf-8 " universal text encoding, compatible with ascii
 set list
-set listchars=tab:▸\ ,eol:¬,extends:❯,precedes:❮
+set listchars=tab:▸\ ,extends:❯,precedes:❮ " ,eol:¬
 set showbreak=↪
 set fillchars=diff:⣿,vert:│
 set showcmd " display incomplete commands
@@ -174,7 +174,7 @@ if &term == 'tmux'
       endif
     end
   endfunction
-  if has('clipboard') && executable('xclip') && $DISPLAY != ''
+  if executable('xclip') && $DISPLAY != ''
     " use the x11 clipboard as the main storage for shared yank data
     " tmux should also be configured to use it
     function! TmuxYank()
