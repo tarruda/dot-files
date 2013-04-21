@@ -233,8 +233,8 @@ if &term == 'tmux'
   nnoremap <silent> <f37>move-right :silent call TmuxMove('l')<cr>
   nnoremap <silent> <f37>paste-tmux :call TmuxPaste()<cr>"tp
   vnoremap <silent> <f37>paste-tmux d:call TmuxPaste()<cr>h"tp
-  vmap <silent> <a-y> "ty:call TmuxYank()<cr>
-  vmap <silent> <a-d> "td:call TmuxYank()<cr>
+  vnoremap <silent> <a-y> "ty:call TmuxYank()<cr>
+  vnoremap <silent> <a-d> "td:call TmuxYank()<cr>
 else
   nnoremap <silent> <a-j> :wincmd j<cr>
   nnoremap <silent> <a-k> :wincmd k<cr>
@@ -289,7 +289,7 @@ augroup filetype_settings
   au FileType python 
         \   setl softtabstop=4
         \ | setl shiftwidth=4 
-        \ | setl textwidth79=
+        \ | setl textwidth=79
   " }}}
 augroup END
 
@@ -372,6 +372,14 @@ if !exists('g:vimrc_done_basic_init')
   " superTab option for context aware completion
   let g:SuperTabDefaultCompletionType = "context"
   " }}}
+  " UltiSnips {{{
+  let g:UltiSnipsEditSplit = 'normal'
+  let g:UltiSnipsSnippetsDir = g:rc_dir . '/UltiSnips'
+
+  let g:UltiSnipsListSnippets = '<c-tab>'
+  let g:UltiSnipsNoPythonWarning = 1
+  call add(s:vim_addons, 'github:SirVer/ultisnips')
+  " }}}
   " Typescript-vim {{{
   call add(s:vim_addons, 'github:leafgarland/typescript-vim')
   setl textwidth=80
@@ -386,6 +394,7 @@ if !exists('g:vimrc_done_basic_init')
         \ }
   " }}}
   " Other {{{
+  call add(s:vim_addons, 'github:Raimondi/delimitMate') " autoclose brackets,quotes...
   call add(s:vim_addons, 'github:tpope/vim-tbone')
   call add(s:vim_addons, 'github:tpope/vim-repeat')
   call add(s:vim_addons, 'github:tpope/vim-surround')
@@ -404,14 +413,7 @@ if !exists('g:vimrc_done_basic_init')
   call add(s:vim_addons, 'github:godlygeek/csapprox')
   call add(s:vim_addons, 'github:godlygeek/tabular.git')
   call add(s:vim_addons, 'github:mileszs/ack.vim')
-  call add(s:vim_addons, 'github:Raimondi/delimitMate')
   call add(s:vim_addons, 'github:PProvost/vim-ps1.git')
-
-  if has('python')
-    call add(s:vim_addons, 'github:SirVer/ultisnips')
-  else
-    echo "ERROR: Need python support for some addons"
-  endif
   " }}}
   let &runtimepath = &runtimepath.','.g:rc_dir.'/after'
   "

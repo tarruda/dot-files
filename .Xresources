@@ -12,22 +12,23 @@ urxvt*saveLines: 0
 ! the following is the default but set it explicitily anyway
 urxvt*meta8: false
 /* make urxvt behave like xterm when control/alt keys */
-urxvt.keysym.M-Up:      \033[1;3A
-urxvt.keysym.M-Down:    \033[1;3B
-urxvt.keysym.M-Right:   \033[1;3C
-urxvt.keysym.M-Left:    \033[1;3D
-urxvt.keysym.M-Prior:   \033[5;3~
-urxvt.keysym.M-Next:    \033[6;3~
-urxvt.keysym.M-End:     \033[1;3F
-urxvt.keysym.M-Home:    \033[1;3H
-urxvt.keysym.C-Up:      \033[1;5A
-urxvt.keysym.C-Down:    \033[1;5B
-urxvt.keysym.C-Right:   \033[1;5C
-urxvt.keysym.C-Left:    \033[1;5D
-urxvt.keysym.C-Prior:   \033[5;5~
-urxvt.keysym.C-Next:    \033[6;5~
-urxvt.keysym.C-End:     \033[1;5F
-urxvt.keysym.C-Home:    \033[1;5H
+urxvt.keysym.M-Up:        \033[1;3A
+urxvt.keysym.M-Down:      \033[1;3B
+urxvt.keysym.M-Right:     \033[1;3C
+urxvt.keysym.M-Left:      \033[1;3D
+urxvt.keysym.M-Prior:     \033[5;3~
+urxvt.keysym.M-Next:      \033[6;3~
+urxvt.keysym.M-End:       \033[1;3F
+urxvt.keysym.M-Home:      \033[1;3H
+urxvt.keysym.C-Up:        \033[1;5A
+urxvt.keysym.C-Down:      \033[1;5B
+urxvt.keysym.C-Right:     \033[1;5C
+urxvt.keysym.C-Left:      \033[1;5D
+urxvt.keysym.C-Prior:     \033[5;5~
+urxvt.keysym.C-Next:      \033[6;5~
+urxvt.keysym.C-End:       \033[1;5F
+urxvt.keysym.C-Home:      \033[1;5H
+urxvt.keysym.C-Tab:       \033[27;5;9~
 ! tango color scheme (gnome terminal)
 ! black
 urxvt*color0 : #2E2E34343636
@@ -78,6 +79,8 @@ xterm*color13: #ad7fa8
 xterm*color14: #00f5e9
 xterm*color15: #eeeeec
 xterm*metaSendsEscape: true
+xterm*vt100.translations: #override \n\
+        Ctrl ~Shift <Key>Tab: string(0x1b) string("[27;5;9~") \n
 
 ! better font rendering
 Xft.dpi:        96
