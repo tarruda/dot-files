@@ -104,6 +104,7 @@ endif
 " }}}
 " Terminal keycode sequences {{{
 if ! has('gui_running')
+  " this is used to represent ctrl+tab in terminal vim
   :set <f20>=[34~
 endif
 if &term == 'tmux'
@@ -115,7 +116,8 @@ if &term == 'tmux'
   :set <a-y>=y
   :set <a-d>=d
   " Prefix used by tmux to send 'special commands' to vim. I use this so there's
-  " no possibility of tmux accidentally hitting my own mappings
+  " no possibility of tmux accidentally hitting my own mappings. Think of it as
+  " a namespace used for tmux-related commands
   :set <f37>=tmux
 elseif &term =~ 'rxvt-unicode' || &term =~ 'xterm'
   " with urxvt configured to use xterm control/alt sequences
@@ -233,6 +235,14 @@ if &term == 'tmux'
   nnoremap <silent> <f37>move-up :silent call TmuxMove('k')<cr>
   nnoremap <silent> <f37>move-left :silent call TmuxMove('h')<cr>
   nnoremap <silent> <f37>move-right :silent call TmuxMove('l')<cr>
+  inoremap <silent> <f37>move-down <esc>:silent call TmuxMove('j')<cr>
+  inoremap <silent> <f37>move-up <esc>:silent call TmuxMove('k')<cr>
+  inoremap <silent> <f37>move-left <esc>:silent call TmuxMove('h')<cr>
+  inoremap <silent> <f37>move-right <esc>:silent call TmuxMove('l')<cr>
+  vnoremap <silent> <f37>move-down <esc>:silent call TmuxMove('j')<cr>
+  vnoremap <silent> <f37>move-up <esc>:silent call TmuxMove('k')<cr>
+  vnoremap <silent> <f37>move-left <esc>:silent call TmuxMove('h')<cr>
+  vnoremap <silent> <f37>move-right <esc>:silent call TmuxMove('l')<cr>
   nnoremap <silent> <f37>paste-tmux :call TmuxPaste()<cr>"tp
   vnoremap <silent> <f37>paste-tmux d:call TmuxPaste()<cr>h"tp
   vnoremap <silent> <a-y> "ty:call TmuxYank()<cr>
@@ -242,10 +252,26 @@ else
   nnoremap <silent> <a-k> :wincmd k<cr>
   nnoremap <silent> <a-h> :wincmd h<cr>
   nnoremap <silent> <a-l> :wincmd l<cr>
-  nnoremap <silent> <a-down> :wincMd j<cr>
+  nnoremap <silent> <a-down> :wincmd j<cr>
   nnoremap <silent> <a-up> :wincmd k<cr>
   nnoremap <silent> <a-left> :wincmd h<cr>
   nnoremap <silent> <a-right> :wincmd l<cr>
+  inoremap <silent> <a-j> <esc>:wincmd j<cr>
+  inoremap <silent> <a-k> <esc>:wincmd k<cr>
+  inoremap <silent> <a-h> <esc>:wincmd h<cr>
+  inoremap <silent> <a-l> <esc>:wincmd l<cr>
+  inoremap <silent> <a-down> <esc>:wincmd j<cr>
+  inoremap <silent> <a-up> <esc>:wincmd k<cr>
+  inoremap <silent> <a-left> <esc>:wincmd h<cr>
+  inoremap <silent> <a-right> <esc>:wincmd l<cr>
+  vnoremap <silent> <a-j> <esc>:wincmd j<cr>
+  vnoremap <silent> <a-k> <esc>:wincmd k<cr>
+  vnoremap <silent> <a-h> <esc>:wincmd h<cr>
+  vnoremap <silent> <a-l> <esc>:wincmd l<cr>
+  vnoremap <silent> <a-down> <esc>:wincmd j<cr>
+  vnoremap <silent> <a-up> <esc>:wincmd k<cr>
+  vnoremap <silent> <a-left> <esc>:wincmd h<cr>
+  vnoremap <silent> <a-right> <esc>:wincmd l<cr>
   nnoremap <silent> <a-p> "+p
   vnoremap <silent> <a-p> "+p
   vnoremap <silent> <a-y> "+y
