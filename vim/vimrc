@@ -103,6 +103,9 @@ elseif isdirectory('/dev/shm')
 endif
 " }}}
 " Terminal keycode sequences {{{
+if ! has('gui_running')
+  :set <f20>=[34~
+endif
 if &term == 'tmux'
   :set <up>=[A
   :set <down>=[B
@@ -111,7 +114,6 @@ if &term == 'tmux'
 
   :set <a-y>=y
   :set <a-d>=d
-
   " Prefix used by tmux to send 'special commands' to vim. I use this so there's
   " no possibility of tmux accidentally hitting my own mappings
   :set <f37>=tmux
@@ -375,8 +377,13 @@ if !exists('g:vimrc_done_basic_init')
   " UltiSnips {{{
   let g:UltiSnipsEditSplit = 'normal'
   let g:UltiSnipsSnippetsDir = g:rc_dir . '/UltiSnips'
-
-  let g:UltiSnipsListSnippets = '<c-tab>'
+  if has('gui_running')
+    let g:UltiSnipsListSnippets = '<c-tab>'
+  else
+    " terminal emulators must be configured to send [34~ when ctrl+tab is
+    " pressed
+    let g:UltiSnipsListSnippets = '<f20>'
+  endif
   let g:UltiSnipsNoPythonWarning = 1
   call add(s:vim_addons, 'github:SirVer/ultisnips')
   " }}}
