@@ -28,6 +28,7 @@ if !exists('g:vimrc_done_basic_init')
   endif
   let g:vam_plugins_dir = g:rc_dir.'/addons'
   let &runtimepath = g:rc_dir.','.g:vam_plugins_dir.'/vim-addon-manager,'.$VIMRUNTIME
+  let g:has_python = has('python') || has('python3')
 endif
 
 " }}}
@@ -406,17 +407,24 @@ if !exists('g:vimrc_done_basic_init')
   let g:SuperTabDefaultCompletionType = "context"
   " }}}
   " UltiSnips {{{
-  let g:UltiSnipsEditSplit = 'normal'
-  let g:UltiSnipsSnippetsDir = g:rc_dir . '/UltiSnips'
-  if has('gui_running')
-    let g:UltiSnipsListSnippets = '<c-tab>'
-  else
-    " terminal emulators must be configured to send [34~ when ctrl+tab is
-    " pressed
-    let g:UltiSnipsListSnippets = '<f20>'
+  if g:has_python
+    let g:UltiSnipsEditSplit = 'normal'
+    let g:UltiSnipsSnippetsDir = g:rc_dir . '/UltiSnips'
+    if has('gui_running')
+      let g:UltiSnipsListSnippets = '<c-tab>'
+    else
+      " terminal emulators must be configured to send [34~ when ctrl+tab is
+      " pressed
+      let g:UltiSnipsListSnippets = '<f20>'
+    endif
+    call add(s:vim_addons, 'github:SirVer/ultisnips')
   endif
-  let g:UltiSnipsNoPythonWarning = 1
-  call add(s:vim_addons, 'github:SirVer/ultisnips')
+  " }}}
+  " Gundo {{{
+  if g:has_python
+    call add(s:vim_addons, 'github:sjl/gundo.vim.git')
+    nnoremap <leader>u :GundoToggle<cr>
+  endif
   " }}}
   " Typescript-vim {{{
   call add(s:vim_addons, 'github:leafgarland/typescript-vim')
@@ -453,8 +461,8 @@ if !exists('g:vimrc_done_basic_init')
   call add(s:vim_addons, 'github:mileszs/ack.vim')
   call add(s:vim_addons, 'github:PProvost/vim-ps1.git')
   " }}}
+  " load 'after' directory
   let &runtimepath = &runtimepath.','.g:rc_dir.'/after'
-  "
   " }}} 
   " Package management(vim-addon-manager setup) {{{
   let g:vim_addon_manager = {}
