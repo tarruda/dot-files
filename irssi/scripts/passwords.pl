@@ -8,9 +8,8 @@ $VERSION = '0.01';
   authors     => 'Thiago de Arruda',
   contact     => 'tpadilha84@gmail.com',
   name        => 'Passwords',
-  description => 'Loads passwords from a textfile ' .
-                 'and authenticates automatically ' .
-                 'when the server requests.',
+  description => 'Loads passwords from a gnupg encrypted file and '.
+                 'authenticates automatically when the server requests.',
   license     => 'WTFPL',
 );
 
@@ -44,7 +43,7 @@ sub process_server_msg {
 
 sub reload_passwords {
   %passwords = ();
-  open PASSWORDS_DB, "$ENV{'HOME'}/.irssi-passwords";
+  open PASSWORDS_DB, "gpg --batch -q --decrypt $ENV{'HOME'}/.irssi-passwords.gpg |";
   while (<PASSWORDS_DB>) {
     chomp;
     my ($chatnet, $password) = split(':');

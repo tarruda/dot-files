@@ -86,7 +86,7 @@ export GTK_IM_MODULE=xim
 export QT_IM_MODULE=xim
 
 # }}}
-# SSH {{{
+# SSH/GnuPG {{{
 
 # install some basic ssh configuration
 if [[ ! -e "$HOME/.ssh" ]]; then
@@ -98,12 +98,20 @@ if [ ! -e "$HOME/.ssh/config" ]; then
 	ServerAliveCountMax 2
 	EOF
 fi
-# ensure ssh agent is running
-SSHPID=`ps ax | grep -c "[s]sh-agent" 2> /dev/null`
-if [[ $SSHPID -eq 0 ]]; then
-	ssh-agent > "$HOME/.ssh-env"
+
+if which gpg-agent &> /dev/null; then
+	if ! ps -u $UID -C gpg-agent &> /dev/null;
+		gpg-agent --daemon --enable-ssh-support --write-env-file $HOME/.gpg-agent-env
+	fi
+	. $HOME/.gpg-agent-env > /dev/null
+	export GPG_AGENT_INFO SSH_AUTH_SOCK SSH_AGENT_PID
+elif which ssh-agent &> /dev/null; then
+	# ensure ssh agent is running
+	if ! ps -u $UID -C ssh-agent &> /dev/null;
+		ssh-agent > $HOME/.ssh-env
+	fi
+	. $HOME/.ssh-env > /dev/null
 fi
-. "$HOME/.ssh-env" > /dev/null
 
 # }}}
 # Site initialization {{{

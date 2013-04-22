@@ -70,22 +70,26 @@ if [[ -d $comp_dir ]]; then
 fi
 unset comp_dir
 # configuration created using compinstall
+zstyle ':completion:*' auto-description 'specify: %d'
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 zstyle ':completion:*' expand suffix
 zstyle ':completion:*' file-sort name
-zstyle ':completion:*' format '%d'
+zstyle ':completion:*' format 'Completing %d'
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*' insert-unambiguous true
 zstyle ':completion:*' list-colors ''
 zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
 zstyle ':completion:*' list-suffixes true
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'r:|[._-]=* r:|=* l:|=*'
-zstyle ':completion:*' menu select=0
+zstyle ':completion:*' menu select=2 eval "$(dircolors -b)"
 zstyle ':completion:*' original true
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
 zstyle ':completion:*' squeeze-slashes true
 # ignore extensions when completing edit commands
 zstyle ":completion:*:*:(vim|vi|e):*:*files" ignored-patterns '(*~|*.(o|swp|swo|tgz|tbz|tar.(gz|bz2|xz)))'
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
+zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
+
 # initialize the completion system
 autoload -Uz compinit
 compinit
@@ -204,11 +208,48 @@ precmd_functions+=cnf_precmd
 		# }}}
 		#
 		# }}}
-		# SSH {{{
-		# automatically add key to ssh-agent
-		ssh() {
-			{ ssh-add -l &> /dev/null || ssh-add } && { command ssh "$@" }
-		}
+		# SSH/GnuPG {{{
+		if ! which gpg-agent &> /dev/null; then
+			# Invoke ssh-add on demand, not needed if using gpg-agent
+			git() {
+				case $1 in
+					pull|push|fetch)
+						local remote=$2
+						if [ -z $remote ]; then
+							# remote wasn't specified so we have to find it by looking at
+							# which remote branch the current branch is tracking
+							local current_branch="`command git branch | grep '^*'`"
+							current_branch=${current_branch#\*\ }
+							local line=
+							command git for-each-ref \
+								--format='%(refname:short)<-%(upstream:short)' refs/heads | \
+								while read line; do
+									if [ "${line%%\<\-*}" = "$current_branch" ]; then
+										remote="${line#*<-}"
+										remote="${remote%%/*}"
+										break
+									fi
+								done
+							fi
+							# now find out the url
+							local grepLine='Fetch'
+							[ "$1" = "push" ] && grepLine='Push'
+							local url="`git remote show "$remote" -n | grep "$grepLine"`"
+							url="${url#*$grepLine*\:\ }"
+							case $url in
+								*@*|ssh://*)
+									# needs SSH key, so invoke ssh-add if needed
+									ssh-add -l &> /dev/null || ssh-add
+							esac
+							;;
+					esac
+
+					command git "$@"
+			}
+			ssh() {
+				{ ssh-add -l &> /dev/null || ssh-add } && { command ssh "$@" }
+			}
+		fi
 		# }}}
 		# irssi {{{
 		if [[ $TERM == tmux ]]; then

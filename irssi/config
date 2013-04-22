@@ -24,7 +24,8 @@ channels = (
   { name = "#rxvt-unicode"; chatnet = "freenode"; autojoin = "yes"; },
   { name = "#irssi"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#ubuntu"; chatnet = "freenode"; autojoin = "Yes"; },
-  { name = "#archlinux"; chatnet = "freenode"; autojoin = "Yes"; }
+  { name = "#archlinux"; chatnet = "freenode"; autojoin = "Yes"; },
+  { name = "#offlineimap"; chatnet = "freenode"; autojoin = "Yes"; }
 );
 
 chatnets = { freenode = { type = "IRC"; nick = "tarruda"; }; };

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+hardlink -n /media/mail
+notmuch new

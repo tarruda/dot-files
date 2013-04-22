@@ -13,6 +13,10 @@ function() {
 	vimperator .vimperator
 	tmux/.tmux.conf .tmux.conf
 	emacs.d .emacs.d
+	mail/offlineimap.py .offlineimap.py
+	mail/offlineimaprc .offlineimaprc
+	mail/muttrc .muttrc
+	mail/notmuch-config .notmuch-config
 	)
 	case $action in
 		install)
