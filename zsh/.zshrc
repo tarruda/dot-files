@@ -69,7 +69,6 @@ if [[ -d $comp_dir ]]; then
 	fpath=($comp_dir $fpath)
 fi
 unset comp_dir
-# configuration created using compinstall
 zstyle ':completion:*' auto-description 'specify: %d'
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 # don't need prefix when completing approximately
@@ -286,7 +285,7 @@ else
 		TERM=screen-256color command irssi --home=$DOTDIR/irssi "$@"
 	}
 	mutt() {
-		TERM=screen-256color command mutt "$@"
+		TERM=screen-256color command mutt -e "set editor='TERM=tmux vim -X'" "$@"
 	}
 fi
 

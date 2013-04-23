@@ -25,11 +25,14 @@ channels = (
   { name = "#irssi"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#ubuntu"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#archlinux"; chatnet = "freenode"; autojoin = "Yes"; },
-  { name = "#offlineimap"; chatnet = "freenode"; autojoin = "Yes"; }
+  { name = "#mutt"; chatnet = "freenode"; autojoin = "Yes"; },
+  { name = "#offlineimap"; chatnet = "freenode"; autojoin = "Yes"; },
+  { name = "#bitlbee"; chatnet = "oftc"; autojoin = "Yes"; }
 );
 
 chatnets = {
   freenode = { type = "IRC"; nick = "tarruda"; };
+  oftc = { type = "IRC"; nick = "tarruda"; };
   bitlbee = { type = "IRC"; };
 };
 
@@ -38,6 +41,13 @@ servers = (
     address = "irc.freenode.net";
     chatnet = "freenode";
     port = "7070";
+    use_ssl = "yes";
+    autoconnect = "yes";
+  },
+  {
+    address = "irc.oftc.net";
+    chatnet = "oftc";
+    port = "9999";
     use_ssl = "yes";
     autoconnect = "yes";
   },

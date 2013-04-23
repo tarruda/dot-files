@@ -13,7 +13,7 @@ set thorough_search # strip headers and eval mimes before searching
 set edit_headers = yes 
 set sort='reverse-threads'
 set sort_aux='last-date-received'
-set editor='TERM=tmux vim -X'
+set editor='vim -X'
 
 # Status Bar -----------------------------------------
 set status_chars  = " *%A"
@@ -56,7 +56,12 @@ mailboxes +tpadilha84-gmail.com/INBOX \
 set sidebar_delim = '│'
 set sidebar_visible = yes
 set sidebar_width = 30
-color sidebar_new color221 color233
+color sidebar_new green default
+color normal default default
+color index green default "~U"
+color index red default "~D"
+color indicator yellow black
+color status blue default
 
 # Index View Options ---------------------------------
 set date_format = "%m/%d"
@@ -115,7 +120,6 @@ bind pager R  group-reply
 bind attach <return> view-mailcap
 
 # Compose View Options -------------------------------
-set realname = "Thiago de Arruda" # who am i?
 set envelope_from # which from?
 set sig_dashes # dashes before sig
 set edit_headers # show headers when composing
@@ -130,10 +134,11 @@ set reply_to # reply to Reply to: field
 set reverse_name # reply as whomever it was to
 set include # include message in replies
 set forward_quote # include message in forwards
-set from  = "tpadilha84@gmail.com"
-set sendmail = "msmtp -C $DOTDIR/mail/msmtprc -a tpadilha84"
-set sendmail_wait = 0
 unset record
+set realname = "Thiago de Arruda"
+set from  = "tpadilha84@gmail.com"
+set smtp_url = "smtp://tpadilha84@gmail.com@smtp.gmail.com:587"
+set smtp_pass = "`gpg --batch -q --decrypt ~/.mail-passwords/tpadilha84.gpg`"
 
 # Compose bindings
 bind compose p postpone-message

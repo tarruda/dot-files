@@ -214,6 +214,9 @@ endif
 " Mappings {{{
 nnoremap <silent> <c-j> :m .+1<cr>==
 nnoremap <silent> <c-k> :m .-2<cr>==
+" Quickly open help in the current window
+"" :view $VIMRUNTIME/doc/help.txt<cr>
+nnoremap <silent> <leader>h :view +1 $VIMRUNTIME/doc/help.txt<cr>:setf help nomodifiable<cr>
 " Move selections
 vnoremap <silent> <c-j> :m '>+1<cr>gv=gv
 vnoremap <silent> <c-k> :m '<-2<cr>gv=gv

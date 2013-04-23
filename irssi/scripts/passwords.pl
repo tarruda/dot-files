@@ -39,16 +39,28 @@ sub event_notice {
   if (exists($passwords{$chatnet})) {
     if ($chatnet =~ /^freenode$/) {
 
-      return if ($text !~ /this nickname is registered./i) ||
+      return if ($text !~ /This nickname is registered/i) ||
         ($nick !~ /NickServ/);
 
       if ($address !~ 'NickServ@services.') {
         print("!!!'$nick($address)' trying to cause nickserv authentication, but " .
-          "the host is not recognized as the freenode nickserv host!!!", MSGLEVEL_CRAP);
+          "the request isn't coming freenode nickserv host!!!", MSGLEVEL_CRAP);
         return;
       }
 
-      $server->command("msg NickServ identify " . $passwords{$chatnet});
+      $server->command("msg -freenode NickServ identify " . $passwords{$chatnet});
+    } elsif ($chatnet =~/^oftc$/) {
+      
+      return if ($text !~ /This nickname is registered and protected/i) ||
+        ($nick !~ /^NickServ$/);
+
+      if ($address !~ 'services@services.oftc.net') {
+        print("!!!'$nick($address)' trying to cause nickserv authentication, but " .
+          "the request isn't coming from oftc nickserv host!!!", MSGLEVEL_CRAP);
+        return;
+      }
+
+      $server->command("msg -oftc NickServ identify " . $passwords{$chatnet});
     }
   }
 }
@@ -61,8 +73,6 @@ sub channel_joined {
 
   if ($chatnet =~ /^bitlbee$/ && $name =~ /^&bitlbee$/ && exists($passwords{'bitlbee'})) {
     $channel->command("msg &bitlbee identify " . $passwords{'bitlbee'});
-  } else {
-    print $name ;
   }
 }
 

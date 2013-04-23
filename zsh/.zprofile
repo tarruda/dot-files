@@ -100,7 +100,7 @@ if [ ! -e "$HOME/.ssh/config" ]; then
 fi
 
 if which gpg-agent &> /dev/null; then
-	if ! ps -u $UID -C gpg-agent &> /dev/null; then
+	if ! ps -C gpg-agent &> /dev/null; then
 		ttl=2592000 # 1 month
 		gpg-agent --daemon --enable-ssh-support \
 			--write-env-file $HOME/.gpg-agent-env \
@@ -115,7 +115,7 @@ if which gpg-agent &> /dev/null; then
 	fi
 elif which ssh-agent &> /dev/null; then
 	# ensure ssh agent is running
-	if ! ps -u $UID -C ssh-agent &> /dev/null; then
+	if ! ps -C ssh-agent &> /dev/null; then
 		ssh-agent > $HOME/.ssh-env
 	fi
 	if [[ -r $HOME/.ssh-env ]]; then
