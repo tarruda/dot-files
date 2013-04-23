@@ -150,8 +150,21 @@ cnoremap w!! w !sudo tee % >/dev/null
 " defined already.
 command! DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
       \ | wincmd p | diffthis
+
+command! -nargs=? -complete=help Help call OpenHelpInCurrentWindow(<q-args>)
+" Quickly open help in the current window
+"" :view $VIMRUNTIME/doc/help.txt<cr>
+nnoremap <silent> <leader>h :view +1 $VIMRUNTIME/doc/help.txt
 " }}}
 " Utility functions {{{
+function! OpenHelpInCurrentWindow(topic)
+  keepjumps view $VIMRUNTIME/doc/help.txt
+  setl filetype=help
+  setl buftype=help
+  setl nomodifiable
+  exe 'help ' . a:topic
+endfunction
+
 function! GetVisualSelection()
   let [lnum1, col1] = getpos("'<")[1:2]
   let [lnum2, col2] = getpos("'>")[1:2]
@@ -214,9 +227,6 @@ endif
 " Mappings {{{
 nnoremap <silent> <c-j> :m .+1<cr>==
 nnoremap <silent> <c-k> :m .-2<cr>==
-" Quickly open help in the current window
-"" :view $VIMRUNTIME/doc/help.txt<cr>
-nnoremap <silent> <leader>h :view +1 $VIMRUNTIME/doc/help.txt<cr>:setf help nomodifiable<cr>
 " Move selections
 vnoremap <silent> <c-j> :m '>+1<cr>gv=gv
 vnoremap <silent> <c-k> :m '<-2<cr>gv=gv

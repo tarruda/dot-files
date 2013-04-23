@@ -7,8 +7,7 @@ settings = {
   "fe-text" = { actlist_sort = "refnum"; autostick_split_windows = "no"; };
   "fe-common/core" = {
     autocreate_own_query = "no";
-    autocreate_query_level = "DCCMSGS";
-    use_status_window = "no";
+    use_status_window = "yes";
     use_msgs_window = "yes";
   };
 };
