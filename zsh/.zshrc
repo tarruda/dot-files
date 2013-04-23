@@ -5,7 +5,6 @@
 
 # Modules {{{
 
-zmodload zsh/net/socket
 zmodload zsh/pcre
 zmodload zsh/complist
 
@@ -23,6 +22,7 @@ HISTFILE=$ZDOTDIR/.zsh_history
 setopt auto_cd # change dir by typing the dir name
 setopt auto_pushd # change dir push to directory stack automatically
 setopt pushd_ignore_dups # dont push duplicates to directory stack
+setopt rm_star_wait # wait 10 seconds before really executing 'rm -rf *'
 
 # }}}
 # Prompt {{{
@@ -135,162 +135,165 @@ alias d='dirs -v | head -10'
 # Debian/Ubuntu {{{
 
 # Command-not-found(ubuntu/debian)
-if [ -x "/usr/lib/command-not-found" ]; then
+if [[ -x /usr/lib/command-not-found ]]; then
+
 	cnf_preexec() {
 		typeset -g cnf_command="${1%% *}"
 	}
 
 	cnf_precmd() {
-		(($? == 127)) && [ -n "$cnf_command" ] && [ -x /usr/lib/command-not-found ] && {
-		whence -- "$cnf_command" >& /dev/null ||
-			/usr/bin/python /usr/lib/command-not-found -- "$cnf_command"
-		unset cnf_command
-	}
-}
-typeset -ga preexec_functions
-typeset -ga precmd_functions
-preexec_functions+=cnf_preexec
-precmd_functions+=cnf_precmd
+		if (( $? == 127 )) && [[ -n $cnf_command && -x /usr/lib/command-not-found ]]; then
+			if ! whence -- $cnf_command >& /dev/null; then
+				/usr/bin/python /usr/lib/command-not-found -- $cnf_command
+			fi
+			unset cnf_command
 		fi
+	}
+	typeset -ga preexec_functions
+	typeset -ga precmd_functions
+	preexec_functions+=cnf_preexec
+	precmd_functions+=cnf_precmd
+fi
 
-		# }}}
-		# Encfs {{{
+# }}}
+# Encfs {{{
 
-		# mount many encfs volumes using a single key
-		decrypt() {
-			local p="$HOME/.encfs/mounts.txt"
-			if [ -r "$p" ]; then
-				echo "Enter the encryption key:"
-				read -s key
-				exec 3<"$p"
-				local line=
-				while read -u 3 line; do
-					line=(${(s: :)line})
-					if [ ${#line} -ne 2 ]; then
-						echo "invalid line '$line'" >&2
-						return 1
-					fi
-					local src=${~line[1]} 
-					if [ ! -r "${src}/.encfs6.xml" ]; then
-						echo "invalid source '$src'"
-						return 1
-					fi
-					local tgt=${~line[2]}
-					if [ ! -d "${tgt}" ]; then
-						echo "invalid target '$tgt'"
-						return 1
-					fi
-					echo "$key" | encfs -S "$src" "$tgt"
-					if [ $? -eq 0 ]; then
-						echo "mounted $src on $tgt"
-					else
-						return 1
+# mount many encfs volumes using a single key
+decrypt() {
+	local p="$HOME/.encfs/mounts.txt"
+	if [ -r "$p" ]; then
+		echo "Enter the encryption key:"
+		read -s key
+		exec 3<"$p"
+		local line=
+		while read -u 3 line; do
+			line=(${(s: :)line})
+			if [ ${#line} -ne 2 ]; then
+				echo "invalid line '$line'" >&2
+				return 1
+			fi
+			local src=${~line[1]} 
+			if [ ! -r "${src}/.encfs6.xml" ]; then
+				echo "invalid source '$src'"
+				return 1
+			fi
+			local tgt=${~line[2]}
+			if [ ! -d "${tgt}" ]; then
+				echo "invalid target '$tgt'"
+				return 1
+			fi
+			echo "$key" | encfs -S "$src" "$tgt"
+			if [ $? -eq 0 ]; then
+				echo "mounted $src on $tgt"
+			else
+				return 1
+			fi
+		done
+		exec 3>&-
+		echo "done"
+	fi
+}
+
+# }}}
+# Programs {{{
+
+# BURL (Better CURL) {{{
+
+alias GET='burl GET'
+alias HEAD='burl -I'
+alias POST='burl POST'
+alias PUT='burl PUT'
+alias PATCH='burl PATCH'
+alias DELETE='burl DELETE'
+alias OPTIONS='burl OPTIONS'
+
+# }}}
+
+# }}}
+# SSH/GnuPG {{{
+
+if ! which gpg-agent &> /dev/null; then
+	# Invoke ssh-add on demand, not needed if using gpg-agent
+	git() {
+		case $1 in
+			pull|push|fetch)
+				local remote=$2
+				if [[ -z $remote ]]; then
+					# remote wasn't specified so we have to find it by looking at
+					# which remote branch the current branch is tracking
+					local current_branch="`command git branch | grep '^*'`"
+					current_branch=${current_branch#\*\ }
+					local line=
+					command git for-each-ref --format='%(refname:short)<-%(upstream:short)' refs/heads | while read line; do
+					if [[ ${line%%\<\-*} == $current_branch ]]; then
+						remote=${line#*<-}
+						remote=${remote%%/*}
+						break
 					fi
 				done
-				exec 3>&-
-				echo "done"
 			fi
-		}
+			# now find out the url
+			local grepLine='Fetch'
+			[[ $1 == push ]] && grepLine='Push'
+			local url="`git remote show "$remote" -n | grep "$grepLine"`"
+			url="${url#*$grepLine*\:\ }"
+			case $url in
+				*@*|ssh://*)
+					# needs SSH key, so invoke ssh-add if needed
+					ssh-add -l &> /dev/null || ssh-add
+			esac
+			;;
+	esac
 
-		# }}}
-		# Programs {{{
+	command git "$@"
+}
+ssh() {
+	if ssh-add -l &> /dev/null || ssh-add; then
+		command ssh "$@"
+	fi
+}
+fi
 
-		# BURL (Better CURL) {{{
+# }}}
+# Tmux {{{
 
-		alias GET='burl GET'
-		alias HEAD='burl -I'
-		alias POST='burl POST'
-		alias PUT='burl PUT'
-		alias PATCH='burl PATCH'
-		alias DELETE='burl DELETE'
-		alias OPTIONS='burl OPTIONS'
+if [[ -z $TMUX || $TERM != tmux ]]; then
+	if which tmux &>/dev/null && tmux has -t auto-attach &> /dev/null; then
+		exec tmux a -t auto-attach
+	else
+		alias vi=vim
+	fi
+	irssi() {
+		command irssi --home=$DOTDIR/irssi
+	}
+else
+	vim () { command vim -X "$@" }
+	vi() { zsh $DOTDIR/tmux/scripts/vim-tmux-open.zsh "$@" }
 
-		# }}}
-		#
-		# }}}
-		# SSH/GnuPG {{{
-		if ! which gpg-agent &> /dev/null; then
-			# Invoke ssh-add on demand, not needed if using gpg-agent
-			git() {
-				case $1 in
-					pull|push|fetch)
-						local remote=$2
-						if [ -z $remote ]; then
-							# remote wasn't specified so we have to find it by looking at
-							# which remote branch the current branch is tracking
-							local current_branch="`command git branch | grep '^*'`"
-							current_branch=${current_branch#\*\ }
-							local line=
-							command git for-each-ref \
-								--format='%(refname:short)<-%(upstream:short)' refs/heads | \
-								while read line; do
-									if [ "${line%%\<\-*}" = "$current_branch" ]; then
-										remote="${line#*<-}"
-										remote="${remote%%/*}"
-										break
-									fi
-								done
-							fi
-							# now find out the url
-							local grepLine='Fetch'
-							[ "$1" = "push" ] && grepLine='Push'
-							local url="`git remote show "$remote" -n | grep "$grepLine"`"
-							url="${url#*$grepLine*\:\ }"
-							case $url in
-								*@*|ssh://*)
-									# needs SSH key, so invoke ssh-add if needed
-									ssh-add -l &> /dev/null || ssh-add
-							esac
-							;;
-					esac
+	# It seems irssi/mutt breaks with my custom terminfo
+	irssi() {
+		TERM=screen-256color command irssi --home=$DOTDIR/irssi "$@"
+	}
+	mutt() {
+		TERM=screen-256color command mutt "$@"
+	}
+fi
 
-					command git "$@"
-			}
-			ssh() {
-				{ ssh-add -l &> /dev/null || ssh-add } && { command ssh "$@" }
-			}
-		fi
-		# }}}
-		# irssi {{{
-		if [[ $TERM == tmux ]]; then
-			# It seems irssi breaks with my custom terminfo
-			irssi() {
-				TERM=screen-256color command irssi --home=$DOTDIR/irssi
-			}
-		else
-			irssi() {
-				command irssi --home=$DOTDIR/irssi
-			}
-		fi
-		# }}}
-		# Tmux {{{
+alias e=vi
 
-		if [[ -z $TMUX ]]; then
-			if which tmux &>/dev/null && tmux has -t auto-attach &> /dev/null; then
-				exec tmux a -t auto-attach
-			else
-				alias vi=vim
-			fi
-		else
-			vim () { command vim -X "$@" }
-			vi() { zsh $DOTDIR/tmux/scripts/vim-tmux-open.zsh "$@" }
-		fi
+# }}}
+# {{{ zshrc.d
+#
+if [[ -d $ZDOTDIR/zshrc.d ]]; then
+	for script in $ZDOTDIR/zshrc.d/*.zsh(.N); do
+		source $script
+	done
+	unset script
+fi
 
-		alias e=vi
-
-		# }}}
-		# {{{ zshrc.d
-		#
-		if [[ -d $ZDOTDIR/zshrc.d ]]; then
-			for script in $ZDOTDIR/zshrc.d/*.zsh(.N); do
-				source $script
-			done
-			unset script
-		fi
-
-		# }}}
-		# Site initialization {{{
-		if [[ -r $ZDOTDIR/.site-zshrc ]]; then
-			source $ZDOTDIR/.site-zshrc
-		fi
-		# }}}
+# }}}
+# Site initialization {{{
+if [[ -r $ZDOTDIR/.site-zshrc ]]; then
+	source $ZDOTDIR/.site-zshrc
+fi
+# }}}
