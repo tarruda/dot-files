@@ -1,5 +1,13 @@
 # based on http://stevelosh.com/blog/2012/10/the-homely-mutt/
 set folder = /media/mail # mailbox
+set spoolfile = "+tpadilha84-gmail.com/INBOX"
+set mbox = "+tpadilha84-gmail.com/archive"
+set postponed = "+tpadilha84-gmail.com/drafts"
+set realname = "Thiago de Arruda"
+set from  = "tpadilha84@gmail.com"
+set smtp_url = "smtp://tpadilha84@gmail.com@smtp.gmail.com:587"
+set smtp_pass = "`gpg --batch -q --decrypt ~/.mail-passwords/tpadilha84.gpg`"
+unset record
 
 # Basic Options --------------------------------------
 set wait_key = no # dont press key after external command
@@ -18,15 +26,6 @@ set editor='vim -X'
 # Status Bar -----------------------------------------
 set status_chars  = " *%A"
 set status_format = "───[ Folder: %f ]───[%r%m messages%?n? (%n new)?%?d? (%d to delete)?%?t? (%t tagged)? ]───%>─%?p?( %p postponed )?───"
-
-# Account Settings -----------------------------------
-
-# Default inbox.
-set spoolfile = "+tpadilha84-gmail.com/INBOX"
-
-# Other special folders.
-set mbox = "+tpadilha84-gmail.com/archive"
-set postponed = "+tpadilha84-gmail.com/drafts"
 
 # Mailboxes to show in the sidebar.
 mailboxes +tpadilha84-gmail.com/INBOX \
@@ -134,11 +133,6 @@ set reply_to # reply to Reply to: field
 set reverse_name # reply as whomever it was to
 set include # include message in replies
 set forward_quote # include message in forwards
-unset record
-set realname = "Thiago de Arruda"
-set from  = "tpadilha84@gmail.com"
-set smtp_url = "smtp://tpadilha84@gmail.com@smtp.gmail.com:587"
-set smtp_pass = "`gpg --batch -q --decrypt ~/.mail-passwords/tpadilha84.gpg`"
 
 # Compose bindings
 bind compose p postpone-message
