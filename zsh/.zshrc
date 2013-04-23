@@ -72,9 +72,20 @@ unset comp_dir
 # configuration created using compinstall
 zstyle ':completion:*' auto-description 'specify: %d'
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
+# don't need prefix when completing approximately
+zstyle ':completion::approximate*:*' prefix-needed false
+# more errors allowed for large words and fewer for small words
+zstyle ':completion:*:approximate:*' max-errors 'reply=(  $((  ($#PREFIX+$#SUFFIX)/3  ))  )'
+# Errors format
+zstyle ':completion:*:corrections' format '%B%d (errors %e)%b'
+# Don't complete stuff already on the line
+zstyle ':completion::*:(rm|vi):*' ignore-line true
+# Don't complete directory we are already in (../here)
+zstyle ':completion:*' ignore-parents parent pwd
+#
 zstyle ':completion:*' expand suffix
 zstyle ':completion:*' file-sort name
-zstyle ':completion:*' format 'Completing %d'
+zstyle ':completion:*' format '%d'
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*' insert-unambiguous true
 zstyle ':completion:*' list-colors ''
@@ -280,6 +291,12 @@ else
 fi
 
 alias e=vi
+
+# }}}
+# Misc {{{
+
+autoload -U zcalc zsh-mime-setup
+zsh-mime-setup
 
 # }}}
 # {{{ zshrc.d

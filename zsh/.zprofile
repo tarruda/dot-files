@@ -100,23 +100,27 @@ if [ ! -e "$HOME/.ssh/config" ]; then
 fi
 
 if which gpg-agent &> /dev/null; then
-	if ! ps -u $UID -C gpg-agent &> /dev/null;
-		ttl=86400 # 1 day
+	if ! ps -u $UID -C gpg-agent &> /dev/null; then
+		ttl=2592000 # 1 month
 		gpg-agent --daemon --enable-ssh-support \
-		 	--write-env-file $HOME/.gpg-agent-env \
+			--write-env-file $HOME/.gpg-agent-env \
 			--default-cache-ttl $ttl \
 			--default-cache-ttl-ssh $ttl \
 			--max-cache-ttl $ttl \
 			--max-cache-ttl-ssh $ttl
 	fi
-	. $HOME/.gpg-agent-env > /dev/null
-	export GPG_AGENT_INFO SSH_AUTH_SOCK SSH_AGENT_PID
+	if [[ -r $HOME/.gpg-agent-env ]]; then
+		. $HOME/.gpg-agent-env > /dev/null
+		export GPG_AGENT_INFO SSH_AUTH_SOCK SSH_AGENT_PID
+	fi
 elif which ssh-agent &> /dev/null; then
 	# ensure ssh agent is running
-	if ! ps -u $UID -C ssh-agent &> /dev/null;
+	if ! ps -u $UID -C ssh-agent &> /dev/null; then
 		ssh-agent > $HOME/.ssh-env
 	fi
-	. $HOME/.ssh-env > /dev/null
+	if [[ -r $HOME/.ssh-env ]]; then
+		. $HOME/.ssh-env > /dev/null
+	fi
 fi
 
 # }}}
