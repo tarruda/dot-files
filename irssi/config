@@ -28,7 +28,10 @@ channels = (
   { name = "#offlineimap"; chatnet = "freenode"; autojoin = "Yes"; }
 );
 
-chatnets = { freenode = { type = "IRC"; nick = "tarruda"; }; };
+chatnets = {
+  freenode = { type = "IRC"; nick = "tarruda"; };
+  bitlbee = { type = "IRC"; };
+};
 
 servers = (
   {
@@ -36,6 +39,13 @@ servers = (
     chatnet = "freenode";
     port = "7070";
     use_ssl = "yes";
+    autoconnect = "yes";
+  },
+  {
+    address = "localhost";
+    chatnet = "bitlbee";
+    port = "6667";
+    use_ssl = "no";
     autoconnect = "yes";
   }
 );

@@ -439,6 +439,10 @@ if !exists('g:vimrc_done_basic_init')
         \ 'hash_fun': 'LVRHashOfFile'
         \ }
   " }}}
+  " gnupg {{{
+  let g:GPGPreferSymmetric = 1
+  call add(s:vim_addons, 'github:jamessan/vim-gnupg.git')
+  " }}}
   " Other {{{
   call add(s:vim_addons, 'github:Raimondi/delimitMate') " autoclose brackets,quotes...
   call add(s:vim_addons, 'github:tpope/vim-tbone')
@@ -460,7 +464,6 @@ if !exists('g:vimrc_done_basic_init')
   call add(s:vim_addons, 'github:godlygeek/tabular.git')
   call add(s:vim_addons, 'github:mileszs/ack.vim')
   call add(s:vim_addons, 'github:PProvost/vim-ps1.git')
-  call add(s:vim_addons, 'github:jamessan/vim-gnupg.git')
   " }}}
   " load 'after' directory
   let &runtimepath = &runtimepath.','.g:rc_dir.'/after'

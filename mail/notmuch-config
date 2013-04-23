@@ -1,10 +1,9 @@
 [database]
-path=/media/mail
+path=/media/mail/tpadilha84-gmail.com
 
 [user]
 name=Thiago de Arruda
 primary_email=tpadilha84@gmail.com
-other_email=tap@cin.ufpe.br;
 
 [new]
 tags=unread;inbox;

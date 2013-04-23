@@ -2,6 +2,7 @@ use strict;
 
 use vars qw($VERSION %IRSSI);
 use Irssi qw(command_bind signal_add);
+use Data::Dumper;
 
 $VERSION = '0.01';
 %IRSSI = (
@@ -14,32 +15,6 @@ $VERSION = '0.01';
 );
 
 my %passwords;
-my $register_request = 'This nickname is registered.';
-my $nickserv_nick = 'NickServ';
-my $ns_hosts = 'NickServ@services.';
-
-sub process_server_msg {
-  my ($server, $data, $nickname, $hostname) = @_;
-
-  my ($target, $text) = $data =~ /^(\S*)\s:(.*)/;
-
-  return if ($target !~ /$server->{nick}/);
-
-  return if ($text !~ /$register_request/i) || ($nickname !~ /$nickserv_nick/);
-
-  if ($hostname !~ $ns_hosts) {
-    print("!!!'$nickname($hostname)' trying to cause nickserv authentication, but " .
-      "the host is not recognized as a valid nickserv host!!!", MSGLEVEL_CRAP);
-    return;
-  }
-
-  my $chatnet = $server->{'chatnet'};
-
-  if (exists($passwords{$chatnet})) {
-    print("Authenticating '$server->{nick}' on '$chatnet'");
-    $server->command("msg $nickserv_nick identify " . $passwords{$chatnet});
-  }
-}
 
 sub reload_passwords {
   %passwords = ();
@@ -52,6 +27,46 @@ sub reload_passwords {
   close PASSWORDS_DB
 }
 
+sub event_notice {
+  # $data = "nick/#channel :text"
+  my ($server, $data, $nick, $address) = @_;
+  my ($target, $text) = split(/ :/, $data, 2);
+
+  return if ($target !~ /$server->{nick}/);
+
+  my $chatnet = $server->{'chatnet'};
+
+  if (exists($passwords{$chatnet})) {
+    if ($chatnet =~ /^freenode$/) {
+
+      return if ($text !~ /this nickname is registered./i) ||
+        ($nick !~ /NickServ/);
+
+      if ($address !~ 'NickServ@services.') {
+        print("!!!'$nick($address)' trying to cause nickserv authentication, but " .
+          "the host is not recognized as the freenode nickserv host!!!", MSGLEVEL_CRAP);
+        return;
+      }
+
+      $server->command("msg NickServ identify " . $passwords{$chatnet});
+    }
+  }
+}
+
+sub channel_joined {
+  my ($channel,) = @_;
+
+  my $name = $channel->{'name'};
+  my $chatnet = $channel->{'server'}->{'chatnet'};
+
+  if ($chatnet =~ /^bitlbee$/ && $name =~ /^&bitlbee$/ && exists($passwords{'bitlbee'})) {
+    $channel->command("msg &bitlbee identify " . $passwords{'bitlbee'});
+  } else {
+    print $name ;
+  }
+}
+
 reload_passwords;
 
-signal_add 'event notice', 'process_server_msg';
+signal_add 'event notice', 'event_notice';
+signal_add 'channel joined', 'channel_joined';

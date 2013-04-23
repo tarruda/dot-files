@@ -17,6 +17,7 @@ function() {
 	mail/offlineimaprc .offlineimaprc
 	mail/muttrc .muttrc
 	mail/notmuch-config .notmuch-config
+	mail/msmtprc .msmtprc
 	)
 	case $action in
 		install)

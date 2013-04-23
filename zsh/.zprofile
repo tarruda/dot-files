@@ -101,7 +101,13 @@ fi
 
 if which gpg-agent &> /dev/null; then
 	if ! ps -u $UID -C gpg-agent &> /dev/null;
-		gpg-agent --daemon --enable-ssh-support --write-env-file $HOME/.gpg-agent-env
+		ttl=86400 # 1 day
+		gpg-agent --daemon --enable-ssh-support \
+		 	--write-env-file $HOME/.gpg-agent-env \
+			--default-cache-ttl $ttl \
+			--default-cache-ttl-ssh $ttl \
+			--max-cache-ttl $ttl \
+			--max-cache-ttl-ssh $ttl
 	fi
 	. $HOME/.gpg-agent-env > /dev/null
 	export GPG_AGENT_INFO SSH_AUTH_SOCK SSH_AGENT_PID

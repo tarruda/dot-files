@@ -16,7 +16,6 @@ postsynchook = offlineimap-post-sync
 type = Maildir
 localfolders = /media/mail/tpadilha84-gmail.com
 # change default '.' separator so nested labels are stored in nested directories
-sep = /
 nametrans = lambda folder: {'drafts':  '[Gmail]/Drafts',
                             'sent':    '[Gmail]/Sent Mail',
                             'starred': '[Gmail]/Starred',
