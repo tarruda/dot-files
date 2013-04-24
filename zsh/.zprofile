@@ -84,7 +84,7 @@ export VBOX_USER_HOME=$HOME/.virtualbox
 # http://my.opera.com/CrazyTerabyte/blog/2010/11/04/how-x11-xcompose-works
 export GTK_IM_MODULE=xim
 export QT_IM_MODULE=xim
-export MUTT_ACCRC=$DOTDIR/mail/tpadilha84.muttrc
+export EMAIL='tpadilha84@gmail.com'
 
 # }}}
 # SSH/GnuPG {{{

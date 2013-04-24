@@ -110,11 +110,16 @@ set mbox = '+[Gmail]/All Mail'
 set postponed = '+[Gmail]/Drafts'
 set record = '+[Gmail]/Sent Mail'
 set ssl_force_tls = yes
-# Allow Mutt to open new imap connection automatically.
-unset imap_passive
-# Keep IMAP connection alive by polling intermittently (time in seconds).
-set imap_keepalive = 360
-# How often to check for new mail (time in seconds).
+# Don't open new imap connections automatically.
+set imap_passive
+# Check for new mail every 3 minutes
 set mail_check = 180
-# Source account credentials
-source "`echo $MUTT_ACCRC`" 
+# Setup account credentials
+set my_password = "`gpg --batch -q --decrypt ~/.mail-passwords/$EMAIL.gpg`" 
+set from = $EMAIL
+set imap_user = $EMAIL
+set smtp_url = "smtp://$EMAIL@smtp.gmail.com:587"
+set smtp_pass = $my_password
+set imap_pass = $my_password
+set header_cache = "/media/mail/cache/mutt/headers"
+set message_cachedir = "/media/mail/cache/mutt/bodies"
