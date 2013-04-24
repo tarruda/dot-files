@@ -158,11 +158,11 @@ nnoremap <silent> <leader>h :view +1 $VIMRUNTIME/doc/help.txt
 " }}}
 " Utility functions {{{
 function! OpenHelpInCurrentWindow(topic)
-  keepjumps view $VIMRUNTIME/doc/help.txt
+  view $VIMRUNTIME/doc/help.txt
   setl filetype=help
   setl buftype=help
   setl nomodifiable
-  exe 'help ' . a:topic
+  exe 'keepjumps help ' . a:topic
 endfunction
 
 function! GetVisualSelection()
@@ -227,6 +227,8 @@ endif
 " Mappings {{{
 nnoremap <silent> <c-j> :m .+1<cr>==
 nnoremap <silent> <c-k> :m .-2<cr>==
+" Quickly open help in current window
+nnoremap <leader>h :Help 
 " Move selections
 vnoremap <silent> <c-j> :m '>+1<cr>gv=gv
 vnoremap <silent> <c-k> :m '<-2<cr>gv=gv

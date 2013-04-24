@@ -41,6 +41,7 @@ bind index G last-entry
 bind index R group-reply
 bind index <tab> sync-mailbox
 bind index <space> collapse-thread
+bind index p recall-message
 # Ctrl-R to mark all as read
 macro index \Cr "T~U<enter><tag-prefix><clear-flag>N<untag-pattern>.<enter>" "mark all messages as read"
 # Saner copy/move dialogs
@@ -81,7 +82,25 @@ set reverse_name # reply as whomever it was to
 set include # include message in replies
 set forward_quote # include message in forwards
 bind compose p postpone-message
-bind index p recall-message
+bind compose P pgp-menu
+
+# GnuPG integration
+set pgp_decode_command="gpg --status-fd=2 %?p?--passphrase-fd 0? --no-verbose --quiet --batch --output - %f"
+set pgp_verify_command="gpg --status-fd=2 --no-verbose --quiet --batch --output - --verify %s %f"
+set pgp_decrypt_command="gpg --status-fd=2 %?p?--passphrase-fd 0? --no-verbose --quiet --batch --output - %f"
+set pgp_sign_command="gpg --no-verbose --batch --quiet --output - %?p?--passphrase-fd 0? --armor --detach-sign --textmode %?a?-u %a? %f"
+set pgp_clearsign_command="gpg --no-verbose --batch --quiet --output - %?p?--passphrase-fd 0? --armor --textmode --clearsign %?a?-u %a? %f"
+set pgp_encrypt_only_command="/usr/lib/mutt/pgpewrap gpg --batch --quiet --no-verbose --output - --encrypt --textmode --armor --always-trust -- -r %r -- %f"
+set pgp_encrypt_sign_command="/usr/lib/mutt/pgpewrap gpg %?p?--passphrase-fd 0? --batch --quiet --no-verbose --textmode --output - --encrypt --sign %?a?-u %a? --armor --always-trust -- -r %r -- %f"
+set pgp_import_command="gpg --no-verbose --import %f"
+set pgp_export_command="gpg --no-verbose --export --armor %r"
+set pgp_verify_key_command="gpg --verbose --batch --fingerprint --check-sigs %r"
+set pgp_list_pubring_command="gpg --no-verbose --batch --quiet --with-colons --list-keys %r" 
+set pgp_list_secring_command="gpg --no-verbose --batch --quiet --with-colons --list-secret-keys %r" 
+set pgp_good_sign="^\\[GNUPG:\\] GOODSIG"
+set pgp_use_gpg_agent = yes
+# automatically sign all outgoing messages
+set crypt_autosign
 
 # Credentials/mailbox options
 set realname = 'Thiago de Arruda'
