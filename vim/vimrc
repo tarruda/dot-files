@@ -154,7 +154,7 @@ command! DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
 command! -nargs=? -complete=help Help call OpenHelpInCurrentWindow(<q-args>)
 " Quickly open help in the current window
 "" :view $VIMRUNTIME/doc/help.txt<cr>
-nnoremap <silent> <leader>h :view +1 $VIMRUNTIME/doc/help.txt
+nnoremap <silent> <leader>h :Help 
 " }}}
 " Utility functions {{{
 function! OpenHelpInCurrentWindow(topic)

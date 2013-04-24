@@ -114,7 +114,7 @@ set imap_check_subscribed = yes
 set imap_passive = yes
 set imap_idle = yes
 # Dont constantly check for mail
-set mail_check = 3600
+set mail_check = 180
 # let the server close the connection
 set imap_keepalive = 3600
 # Setup account credentials

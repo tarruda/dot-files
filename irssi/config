@@ -17,6 +17,7 @@ hilights = ( { text = "nick"; nick = "yes"; word = "yes"; } );
 aliases = { J = "join"; Q = "quit"; };
 
 channels = (
+  { name = "&gtalk"; chatnet = "bitlbee"; autojoin = "yes"; },
   { name = "#tmux"; chatnet = "freenode"; autojoin = "yes"; },
   { name = "#zsh"; chatnet = "freenode"; autojoin = "yes"; },
   { name = "#vim"; chatnet = "freenode"; autojoin = "yes"; },
@@ -25,9 +26,7 @@ channels = (
   { name = "#ubuntu"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#archlinux"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#mutt"; chatnet = "freenode"; autojoin = "Yes"; },
-  { name = "#offlineimap"; chatnet = "freenode"; autojoin = "Yes"; },
-  { name = "#bitlbee"; chatnet = "oftc"; autojoin = "Yes"; },
-  { name = "&gtalk"; chatnet = "bitlbee"; autojoin = "Yes"; }
+  { name = "#bitlbee"; chatnet = "oftc"; autojoin = "Yes"; }
 );
 
 chatnets = {

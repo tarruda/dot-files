@@ -73,6 +73,8 @@ sub channel_joined {
 
   if ($chatnet =~ /^bitlbee$/ && $name =~ /^&bitlbee$/ && exists($passwords{'bitlbee'})) {
     $channel->command("msg &bitlbee identify " . $passwords{'bitlbee'});
+    # nothing left to do in &bitlbee
+    $channel->command("part &bitlbee");
   }
 }
 
