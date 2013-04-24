@@ -1,0 +1,9 @@
+set my_login = 'tpadilha84@gmail.com'
+set my_password = "`gpg --batch -q --decrypt ~/.mail-passwords/tpadilha84.gpg`" 
+set from = $my_login
+set imap_user = $my_login
+set smtp_url = 'smtp://tpadilha84@gmail.com@smtp.gmail.com:587'
+set smtp_pass = $my_password
+set imap_pass = $my_password
+set header_cache = '/media/mail/cache/mutt/tpadilha84/headers'
+set message_cachedir = '/media/mail/cache/mutt/tpadilha84/bodies'

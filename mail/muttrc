@@ -1,66 +1,32 @@
 # based on http://stevelosh.com/blog/2012/10/the-homely-mutt/
-set folder = /media/mail # mailbox
-set spoolfile = "+tpadilha84-gmail.com/INBOX"
-set mbox = "+tpadilha84-gmail.com/archive"
-set postponed = "+tpadilha84-gmail.com/drafts"
-set realname = "Thiago de Arruda"
-set from  = "tpadilha84@gmail.com"
-set smtp_url = "smtp://tpadilha84@gmail.com@smtp.gmail.com:587"
-set smtp_pass = "`gpg --batch -q --decrypt ~/.mail-passwords/tpadilha84.gpg`"
-unset record
+# http://empt1e.blogspot.com.br/2009/10/using-mutt-with-gmail-imap-complete.html
 
 # Basic Options --------------------------------------
 set wait_key = no # dont press key after external command
-set mbox_type = Maildir # mailbox type
-set mail_check = 0 # disable checking for mail automatically
 unset move # gmail already does that
+set delete
 set quit # don't ask, just do!!
-unset mark_old # messages will be read or new only
-set pipe_decode # strip headers and eval mimes when piping
-set thorough_search # strip headers and eval mimes before searching
-set edit_headers = yes 
-set sort='reverse-threads'
-set sort_aux='last-date-received'
-set editor='vim -X'
+set editor = 'vim -X'
+set imap_check_subscribed = yes
 
 # Status Bar -----------------------------------------
 set status_chars  = " *%A"
 set status_format = "───[ Folder: %f ]───[%r%m messages%?n? (%n new)?%?d? (%d to delete)?%?t? (%t tagged)? ]───%>─%?p?( %p postponed )?───"
 
-# Mailboxes to show in the sidebar.
-mailboxes +tpadilha84-gmail.com/INBOX \
-          +tpadilha84-gmail.com/archive \
-          +tpadilha84-gmail.com/sent \
-          +tpadilha84-gmail.com/drafts \
-          +tpadilha84-gmail.com/starred \
-          +tpadilha84-gmail.com/Lists.Vim \
-          +tpadilha84-gmail.com/Lists.Tmux \
-          +tpadilha84-gmail.com/Lists.Hyde \
-          +tpadilha84-gmail.com/Lists.LXC \
-          +tpadilha84-gmail.com/Lists.Cygwin \
-          +tpadilha84-gmail.com/Lists.Cygwin-X \
-          +tpadilha84-gmail.com/Games.Blizzard \
-          +tpadilha84-gmail.com/Games.DDO \
-          +tpadilha84-gmail.com/Games.Origin \
-          +tpadilha84-gmail.com/Games.Steam \
-          +tpadilha84-gmail.com/Business.Dell \
-          +tpadilha84-gmail.com/Business.Empresa \
-          +tpadilha84-gmail.com/Business.Google-checkout \
-          +tpadilha84-gmail.com/Business.oDesk \
-          +tpadilha84-gmail.com/Business.Payoneer \
-          +tpadilha84-gmail.com/Business.Registro.br \
-          +tpadilha84-gmail.com/Projects.bootstrap-datetimepicker \
-
-# Sidebar Patch --------------------------------------
+# Sidebar
 set sidebar_delim = '│'
 set sidebar_visible = yes
 set sidebar_width = 30
+set sidebar_sort = no
 color sidebar_new green default
 color normal default default
 color index green default "~U"
 color index red default "~D"
 color indicator yellow black
 color status blue default
+bind index,pager <down> sidebar-next
+bind index,pager <up> sidebar-prev
+bind index,pager <right> sidebar-open
 
 # Index View Options ---------------------------------
 set date_format = "%m/%d"
@@ -70,31 +36,16 @@ set sort_aux = reverse-last-date-received # like gmail
 set uncollapse_jump # don't collapse on an unread message
 set sort_re # thread based on regex
 set reply_regexp = "^(([Rr][Ee]?(\[[0-9]+\])?: *)?(\[[^]]+\] *)?)*"
-
-
-# Index Key Bindings ---------------------------------
-bind index gg       first-entry
-bind index G        last-entry
-
-bind index R        group-reply
-bind index <tab>    sync-mailbox
-bind index <space>  collapse-thread
-
+bind index gg first-entry
+bind index G last-entry
+bind index R group-reply
+bind index <tab> sync-mailbox
+bind index <space> collapse-thread
 # Ctrl-R to mark all as read
 macro index \Cr "T~U<enter><tag-prefix><clear-flag>N<untag-pattern>.<enter>" "mark all messages as read"
-
-# Sync email
-macro index O "<shell-escape>offlineimap<enter>" "run offlineimap to sync all mail"
-macro index o "<shell-escape>offlineimap -qf INBOX<enter>" "run offlineimap to sync inbox"
-
 # Saner copy/move dialogs
 macro index C "<copy-message>?<toggle-mailboxes>" "copy a message to a mailbox"
 macro index M "<save-message>?<toggle-mailboxes>" "move a message to a mailbox"
-
-# Sidebar Navigation ---------------------------------
-bind index,pager <down> sidebar-next
-bind index,pager <up> sidebar-prev
-bind index,pager <right> sidebar-open
 
 # Pager View Options ---------------------------------
 set pager_index_lines = 10 # number of index lines to show
@@ -103,16 +54,12 @@ set pager_stop # don't go to next message automatically
 set menu_scroll # scroll in menus
 set tilde # show tildes like in vim
 unset markers # no ugly plus signs
-
 set quote_regexp = "^( {0,4}[>|:#%]| {0,4}[a-z0-9]+[>|]+)+"
 alternative_order text/plain text/enriched text/html
-
-# Pager Key Bindings ---------------------------------
 bind pager k  previous-line
 bind pager j  next-line
 bind pager gg top
 bind pager G  bottom
-
 bind pager R  group-reply
 
 # View attachments properly.
@@ -133,7 +80,22 @@ set reply_to # reply to Reply to: field
 set reverse_name # reply as whomever it was to
 set include # include message in replies
 set forward_quote # include message in forwards
-
-# Compose bindings
 bind compose p postpone-message
 bind index p recall-message
+
+# Credentials/mailbox options
+set realname = 'Thiago de Arruda'
+set folder = 'imaps://imap.gmail.com:993' 
+set spoolfile = '+INBOX'
+set mbox = '+[Gmail]/All Mail'
+set postponed = '+[Gmail]/Drafts'
+set record = '+[Gmail]/Sent Mail'
+set ssl_force_tls = yes
+# Allow Mutt to open new imap connection automatically.
+unset imap_passive
+# Keep IMAP connection alive by polling intermittently (time in seconds).
+set imap_keepalive = 360
+# How often to check for new mail (time in seconds).
+set mail_check = 180
+# Source account credentials
+source "`echo $MUTT_ACCRC`" 
