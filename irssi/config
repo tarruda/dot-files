@@ -26,7 +26,9 @@ channels = (
   { name = "#archlinux"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#mutt"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#offlineimap"; chatnet = "freenode"; autojoin = "Yes"; },
-  { name = "#bitlbee"; chatnet = "oftc"; autojoin = "Yes"; }
+  { name = "#bitlbee"; chatnet = "oftc"; autojoin = "Yes"; },
+  { name = "&tpadilha84"; chatnet = "bitlbee"; autojoin = "Yes"; }
+  { name = "&tap"; chatnet = "bitlbee"; autojoin = "Yes"; }
 );
 
 chatnets = {
@@ -86,6 +88,15 @@ statusbar = {
     };
   };
 };
+
 keyboard = ( 
   { key = "meta-[M"; id = "command"; data = "mouse_xterm "; }
+);
+
+ignores = (
+  {
+    level = "MODES JOINS PARTS QUITS";
+    channels = ( "&tpadilha84", "&tap" );
+    network = "bitlbee";
+  }
 );
