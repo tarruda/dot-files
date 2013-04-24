@@ -72,10 +72,11 @@ export XCOMPOSEFILE=$DOTDIR/.XCompose
 if which vim &> /dev/null; then
 	VIM="`which vim`"
 	export PAGER="/bin/sh -c \"unset PAGER;col -b -x | \
-		$VIM -R -c 'set ft=man nomod nolist' -c 'map q :q<CR>' \
+		$VIM -R -c 'set ft=man nolist' -c 'map q :q<CR>' \
 		-c 'map <SPACE> <C-D>' -c 'map b <C-U>' \
 		-c 'set nonumber' \
 		-c 'set norelativenumber' \
+		-c 'set nomodifiable' \
 		-c 'nmap K :Man <C-R>=expand(\\\"<cword>\\\")<CR><CR>' -\""
 	unset VIM
 fi

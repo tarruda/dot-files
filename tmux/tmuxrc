@@ -18,6 +18,11 @@ set -g mouse-select-window on
 set -g mouse-utf8 on
 setw -g mode-mouse on
 
+# open tree instead of session list
+bind s choose-tree
+bind-key -t vi-choice h tree-collapse
+bind-key -t vi-choice l tree-expand
+
 # Easily reload configuration
 bind r source-file ~/.tmux.conf \; display "Reloaded!"
 

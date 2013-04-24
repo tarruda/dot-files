@@ -27,8 +27,7 @@ channels = (
   { name = "#mutt"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#offlineimap"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#bitlbee"; chatnet = "oftc"; autojoin = "Yes"; },
-  { name = "&tpadilha84"; chatnet = "bitlbee"; autojoin = "Yes"; }
-  { name = "&tap"; chatnet = "bitlbee"; autojoin = "Yes"; }
+  { name = "&gtalk"; chatnet = "bitlbee"; autojoin = "Yes"; }
 );
 
 chatnets = {
@@ -96,7 +95,7 @@ keyboard = (
 ignores = (
   {
     level = "MODES JOINS PARTS QUITS";
-    channels = ( "&tpadilha84", "&tap" );
+    channels = ( "&gtalk" );
     network = "bitlbee";
   }
 );
