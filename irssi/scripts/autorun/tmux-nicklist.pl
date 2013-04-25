@@ -1,0 +1,1 @@
+../tmux-nicklist.pl

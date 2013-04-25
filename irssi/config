@@ -10,6 +10,7 @@ settings = {
     use_status_window = "yes";
     use_msgs_window = "yes";
   };
+  "perl/core/scripts" = { nicklist_height = "44"; nicklist_width = "18"; };
 };
 
 hilights = ( { text = "nick"; nick = "yes"; word = "yes"; } );
@@ -58,7 +59,6 @@ servers = (
     autoconnect = "yes";
   }
 );
-
 statusbar = {
   default = {
     window = {
@@ -76,7 +76,6 @@ statusbar = {
         vim_windows = { };
       };
     };
-
     prompt = {
       items = {
         uberprompt = { priority = "-1"; };
