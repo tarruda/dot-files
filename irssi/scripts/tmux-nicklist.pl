@@ -22,7 +22,7 @@ my $enabled = 0;
 my $script_path = __FILE__;
 my $tmpdir;
 my $fifo_path; 
-my $channel_pattern = /^&gtalk$/;
+my $channel_pattern = '&gtalk';
 
 sub enable_nicklist {
   return if ($enabled);
@@ -55,7 +55,7 @@ sub reset_nicklist {
       (ref($channel) ne 'Irssi::Irc::Channel' && ref($channel) ne
         'Irssi::Silc::Channel') || $channel->{'type'} ne 'CHANNEL' ||
       ($channel->{chat_type} ne 'SILC' && !$channel->{'names_got'})) ||
-    ($channel->{'name'} !~ $channel_pattern )) {
+    ($channel->{'name'} !~ /^$channel_pattern$/ )) {
     disable_nicklist;
   } else {
     enable_nicklist;
