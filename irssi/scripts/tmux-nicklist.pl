@@ -1,4 +1,24 @@
 # based on the nicklist.pl script
+################################################################################
+#                               tmux_nicklist.pl                               
+# This script integrates tmux and irssi to display a list of nicks in a       
+# vertical right pane with 20% width. Right now theres no configuration
+# or setup, simply initialize the script with irssi and by default you
+# will get the nicklist for every channel(customize by altering 
+# the regex in '$channel_pattern'.
+#
+# It supports mouse scrolling and the following keys:
+# k/up arrow: up one line
+# j/down arrow: down one line
+# pageup: up 20 lines
+# pagedown: down 20 lines
+# gg: go to top
+# G: go to bottom
+#
+# For better integration, unrecognized sequences will be sent to irssi and
+# its pane will be focused.
+################################################################################
+
 use strict;
 use IO::Handle;
 use IO::Select;
@@ -22,7 +42,7 @@ my $enabled = 0;
 my $script_path = __FILE__;
 my $tmpdir;
 my $fifo_path; 
-# my $channel_pattern = '^&gtalk$';
+# my $channel_pattern = '^&bitlbee$';
 my $channel_pattern = '^.+$';
 
 sub enable_nicklist {
@@ -79,8 +99,13 @@ sub reset_nicklist {
   }
 }
 
-Irssi::signal_add_last('window item changed', \&reset_nicklist);
-Irssi::signal_add_last('window changed', \&reset_nicklist);
+sub switch_channel {
+  print(FIFO "SWITCH_CHANNEL\n");
+  reset_nicklist;
+}
+
+Irssi::signal_add_last('window item changed', \&switch_channel);
+Irssi::signal_add_last('window changed', \&switch_channel);
 Irssi::signal_add_last('channel wholist', \&reset_nicklist);
 # first, to be before ignores
 Irssi::signal_add_first('message join', \&reset_nicklist);
@@ -97,7 +122,6 @@ require 'sys/ioctl.ph';
 # open STDERR, '>', "$ENV{'HOME'}/.nickbar-errors.log";
 my $fifo_path = $ARGV[0];
 my $irssi_pane = $ARGV[1];
-print(STDERR "PANE: $irssi_pane");
 # array to store the current channel nicknames
 my @nicknames = ();
 
@@ -109,16 +133,16 @@ sub save_cursor { print "\e[s"; }
 sub restore_cursor { print "\e[u"; }
 sub enable_mouse { print "\e[?1000h"; }
 # recognized sequences
-my $MOUSE_SCROLL_DOWN="27;91;77;97;";
-my $MOUSE_SCROLL_UP="27;91;77;96;";
-my $ARROW_DOWN="27;91;66;";
-my $ARROW_UP="27;91;65;";
-my $UP="107;";
-my $DOWN="106;";
-my $PAGE_DOWN="27;91;54;";
-my $PAGE_UP="27;91;53;";
-my $GO_TOP="103;103;";
-my $GO_BOTTOM="71;";
+my $MOUSE_SCROLL_DOWN="\e[Ma";
+my $MOUSE_SCROLL_UP="\e[M`";
+my $ARROW_DOWN="\e[B";
+my $ARROW_UP="\e[A";
+my $UP="k";
+my $DOWN="j";
+my $PAGE_DOWN="\e[6~";
+my $PAGE_UP="\e[5~";
+my $GO_TOP="gg";
+my $GO_BOTTOM="G";
 
 my $current_line = 0;
 my $sequence = '';
@@ -184,6 +208,8 @@ sub move_up {
   }
 }
 
+$SIG{INT} = 'IGNORE';
+
 # setup terminal so we can listen for individual key presses without echo
 my ($term, $oterm, $echo, $noecho, $fd_stdin);
 $fd_stdin = fileno(STDIN);
@@ -217,6 +243,8 @@ MAIN: {
           my $line = $_;
           if ($line =~ /^BEGIN/) {
             @nicknames = ();
+          } elsif ($line =~ /^SWITCH_CHANNEL/) {
+            $current_line = 0;
           } elsif ($line =~ /^NICK(.+)$/) {
             push @nicknames, $1;
           } elsif ($line =~ /^END$/) {
@@ -229,32 +257,41 @@ MAIN: {
       } else {
         my $key = '';
         sysread(STDIN, $key, 1);
-        $key = ord($key);
-        $sequence .= "$key;";
-        if ($MOUSE_SCROLL_DOWN =~ /^$sequence/) {
-          move_down 3 if ($MOUSE_SCROLL_DOWN eq $sequence);
-        } elsif ($MOUSE_SCROLL_UP =~ /^$sequence/) {
-          move_up 3 if ($MOUSE_SCROLL_UP eq $sequence);
-        } elsif ($ARROW_DOWN =~ /^$sequence/) {
+        $sequence .= $key;
+        if ($MOUSE_SCROLL_DOWN =~ /^\Q$sequence\E/) {
+          if ($MOUSE_SCROLL_DOWN eq $sequence) {
+            move_down 3; 
+            # mouse scroll has two more bytes that I dont use here
+            # so consume them now to avoid sending unwanted bytes to
+            # irssi
+            sysread(STDIN, $key, 2);
+          }
+        } elsif ($MOUSE_SCROLL_UP =~ /^\Q$sequence\E/) {
+          if ($MOUSE_SCROLL_UP eq $sequence) {
+            move_up 3; 
+            sysread(STDIN, $key, 2);
+          }
+        } elsif ($ARROW_DOWN =~ /^\Q$sequence\E/) {
           move_down 1 if ($ARROW_DOWN eq $sequence);
-        } elsif ($ARROW_UP =~ /^$sequence/) {
+        } elsif ($ARROW_UP =~ /^\Q$sequence\E/) {
           move_up 1 if ($ARROW_UP eq $sequence);
-        } elsif ($DOWN =~ /^$sequence/) {
+        } elsif ($DOWN =~ /^\Q$sequence\E/) {
           move_down 1 if ($DOWN eq $sequence);
-        } elsif ($UP =~ /^$sequence/) {
+        } elsif ($UP =~ /^\Q$sequence\E/) {
           move_up 1 if ($UP eq $sequence);
-        } elsif ($PAGE_DOWN =~ /^$sequence/) {
+        } elsif ($PAGE_DOWN =~ /^\Q$sequence\E/) {
           move_down 20 if ($PAGE_DOWN eq $sequence);
-        } elsif ($PAGE_UP =~ /^$sequence/) {
+        } elsif ($PAGE_UP =~ /^\Q$sequence\E/) {
           move_up 20 if ($PAGE_UP eq $sequence);
-        } elsif ($GO_BOTTOM =~ /^$sequence/) {
+        } elsif ($GO_BOTTOM =~ /^\Q$sequence\E/) {
           move_down -1 if ($GO_BOTTOM eq $sequence);
-        } elsif ($GO_TOP =~ /^$sequence/) {
+        } elsif ($GO_TOP =~ /^\Q$sequence\E/) {
           move_up -1 if ($GO_TOP eq $sequence);
         } else {
-          # Unrecognized sequence, send to irssi
-          # system('tmux', 'send-keys', '-l', '-t', $irssi_pane, $sequence);
-          # system('tmux', 'select-pane', '-t', $irssi_pane);
+          # Unrecognized sequences will be send to irssi and its pane
+          # will be focused
+          system('tmux', 'send-keys', '-l', '-t', $irssi_pane, $sequence);
+          system('tmux', 'select-pane', '-t', $irssi_pane);
           $sequence = '';
         }
       }
