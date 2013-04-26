@@ -268,11 +268,7 @@ fi
 # Tmux {{{
 
 if [[ -z $TMUX || $TERM != tmux ]]; then
-	if which tmux &>/dev/null && tmux has -t auto-attach &> /dev/null; then
-		exec tmux a -t auto-attach
-	else
-		alias vi=vim
-	fi
+	alias vi=vim
 	irssi() {
 		command irssi --home=$DOTDIR/irssi
 	}
