@@ -77,7 +77,6 @@ set forward_format = "Fwd: %s" # format of subject when forwarding
 set forward_decode # decode when forwarding
 set attribution = "On %d, %n wrote:" # format of quoting header
 set reply_to # reply to Reply to: field
-set reverse_name # reply as whomever it was to
 set include # include message in replies
 set forward_quote # include message in forwards
 bind compose p postpone-message
@@ -102,12 +101,16 @@ set pgp_use_gpg_agent = yes
 set crypt_autosign
 
 # Credentials/mailbox options
+# set realname = 'Thiago de Arruda'
+set from = $EMAIL
 set realname = 'Thiago de Arruda'
+set reverse_name = yes
+set reverse_realname = no
 set folder = 'imaps://imap.gmail.com:993' 
 set spoolfile = '+INBOX'
 set mbox = '+[Gmail]/All Mail'
 set postponed = '+[Gmail]/Drafts'
-set record = '+[Gmail]/Sent Mail'
+unset record # Gmail already does that
 set ssl_force_tls = yes
 set imap_check_subscribed = yes
 # Don't open new imap connections automatically.
@@ -119,7 +122,6 @@ set mail_check = 180
 set imap_keepalive = 3600
 # Setup account credentials
 set my_password = "`gpg --batch -q --decrypt ~/.mail-passwords/$EMAIL.gpg`" 
-set from = $EMAIL
 set imap_user = $EMAIL
 set smtp_url = "smtp://$EMAIL@smtp.gmail.com:587"
 set smtp_pass = $my_password
