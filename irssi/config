@@ -29,7 +29,7 @@ channels = (
   { name = "#archlinux"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#mutt"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#bitlbee"; chatnet = "oftc"; autojoin = "Yes"; },
-  { name = "#python"; chatnet = "freenode"; autojoin = "Yes"; },
+  { name = "#perl"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#node.js"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#ruby-lang"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#postgresql"; chatnet = "freenode"; autojoin = "Yes"; }
