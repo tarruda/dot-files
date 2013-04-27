@@ -119,7 +119,7 @@ set imap_idle = yes
 # Dont constantly check for mail
 set mail_check = 180
 # let the server close the connection
-set imap_keepalive = 32767
+set imap_keepalive = 3600
 # Setup account credentials
 set my_password = "`gpg --batch -q --decrypt ~/.mail-passwords/$EMAIL.gpg`" 
 set imap_user = $EMAIL

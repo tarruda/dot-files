@@ -380,6 +380,7 @@ if !exists('g:vimrc_done_basic_init')
     nnoremap <silent> <f6> :SlimuxREPLSendLine<cr>
     inoremap <silent> <f6> <esc>:SlimuxREPLSendLine<cr>i
     vnoremap <silent> <f6> :SlimuxREPLSendSelection<cr>
+    nnoremap <silent> <f7> ggvG$:SlimuxREPLSendSelection<cr>
   endif
   " }}}
   " CtrlP(fuzzy finder) {{{
