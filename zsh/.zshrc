@@ -283,6 +283,9 @@ else
 	mutt() {
 		TERM=screen-256color command mutt -e "set editor='TERM=tmux vim -X'" "$@"
 	}
+	psql() {
+		EDITOR='vim -X' command psql
+	}
 fi
 
 alias e=vi

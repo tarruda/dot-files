@@ -10,13 +10,13 @@ fi
 if which xclip &> /dev/null && [[ -n $DISPLAY ]]; then
 	tmux bind -t vi-copy M-y copy-pipe 'xclip -i -selection clipboard'
 	tmux bind -n M-p if\
-	 	'cmd=$(tmux display -p "#{pane_current_command}"); [ $cmd = vim ] || [ $cmd = mutt ]'\
+	 	'cmd=$(tmux display -p "#{pane_current_command}"); [ $cmd = vim ] || [ $cmd = mutt ] || [ $cmd = psql ]'\
 		"send-keys M-t 'mux' paste-tmux"\
 		'run "xclip -o -selection clipboard | tmux load-buffer -; tmux paste-buffer"'
 else
 	tmux bind -t vi-copy M-y copy-selection
 	tmux bind -n M-p if\
-	 	'cmd=$(tmux display -p "#{pane_current_command}"); [ $cmd = vim ] || [ $cmd = mutt ]'\
+	 	'cmd=$(tmux display -p "#{pane_current_command}"); [ $cmd = vim ] || [ $cmd = mutt ] || [ $cmd = psql ]'\
 		"send-keys M-t 'mux' paste-tmux"\
 		"paste-buffer"
 fi
