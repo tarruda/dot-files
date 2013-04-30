@@ -86,6 +86,7 @@ export VBOX_USER_HOME=$HOME/.virtualbox
 export GTK_IM_MODULE=xim
 export QT_IM_MODULE=xim
 export EMAIL='tpadilha84@gmail.com'
+export PGHOST=localhost PGUSER=postgres PSQL_EDITOR='vim -X'
 
 # }}}
 # SSH/GnuPG {{{
