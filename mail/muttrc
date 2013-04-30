@@ -131,8 +131,9 @@ set editor = 'vim -X'
 unset envelope_from
 set sig_dashes # dashes before sig
 set edit_headers # edit headers manually
+unset autoedit # ask for to/subject when composing
+set askcc # ask for CC:
 set fast_reply # skip to compose when replying
-unset askcc # don't ask for CC(edit in vim):
 set fcc_attach # save attachments with the body
 unset mime_forward # forward attachments as part of body
 set forward_format = "Fwd: %s" # format of subject when forwarding

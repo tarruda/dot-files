@@ -158,6 +158,39 @@ command! -nargs=? -complete=help Help call OpenHelpInCurrentWindow(<q-args>)
 nnoremap <silent> <leader>h :Help 
 " }}}
 " Utility functions {{{
+
+" Autocomplete google contact when composing emails. Based from:
+" http://www.recursivedream.com/blog/2012/auto-completing-google-contacts-in-vim
+function! CompleteGoogleContact(findstart, base)
+  if a:findstart == 1
+    let line = getline('.')
+    let idx = col('.')
+    while idx > 0
+      let idx -= 1
+      let c = line[idx]
+      " break on header and previous email
+      if c == ':' || c == '>'
+        return idx + 2
+      else
+        continue
+      endif
+    endwhile
+    return idx
+  elseif a:base != ''
+    let trim = "sed '/^$/d' | cut -f1,2"
+    let fmt = 'awk ''BEGIN{FS=OFS="\t"}{printf "%s <%s>\n", $2, $1}'''
+    let goobookrc = $HOME.'/.mail-accounts/'.$EMAIL.'/goobookrc'
+    if filereadable(goobookrc)
+      let goobook = "goobook -c ".goobookrc
+    else
+      let goobook = "goobook"
+    endif
+    return split(system(goobook.' query '.a:base.'|'.trim.'|'.fmt), '\n')
+  else
+    return []
+  endif
+endfunc
+
 function! OpenHelpInCurrentWindow(topic)
   view $VIMRUNTIME/doc/help.txt
   setl filetype=help
@@ -346,6 +379,12 @@ augroup filetype_settings
         \   setl foldmethod=marker
         \ | setl foldenable
   " }}}
+  " Mail {{{
+  au FileType mail 
+        \   setl foldmethod=marker
+        \ | setl foldenable
+        \ | setl omnifunc=CompleteGoogleContact
+  " }}}
 augroup END
 
 " }}}
@@ -424,9 +463,9 @@ if !exists('g:vimrc_done_basic_init')
   nnoremap <silent> <F2> :NERDTreeToggle<CR>
   " }}}
   " SuperTab {{{
-  call add(s:vim_addons, 'github:ervandew/supertab')
   " superTab option for context aware completion
   let g:SuperTabDefaultCompletionType = "context"
+  call add(s:vim_addons, 'github:ervandew/supertab')
   " }}}
   " UltiSnips {{{
   if g:has_python
