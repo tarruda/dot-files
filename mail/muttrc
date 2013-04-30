@@ -1,88 +1,68 @@
-# based on http://stevelosh.com/blog/2012/10/the-homely-mutt/
-# http://empt1e.blogspot.com.br/2009/10/using-mutt-with-gmail-imap-complete.html
+# General {{{
 
-# Basic Options --------------------------------------
 set wait_key = no # dont press key after external command
 unset move # gmail already does that
 set delete
 set quit # don't ask, just do!!
-set editor = 'vim -X'
-
-# Status Bar -----------------------------------------
+set sleep_time = 0
 set status_chars  = " *%A"
 set status_format = "───[ Folder: %f ]───[%r%m messages%?n? (%n new)?%?d? (%d to delete)?%?t? (%t tagged)? ]───%>─%?p?( %p postponed )?───"
 
-# Sidebar
-set sidebar_delim = '│'
-set sidebar_visible = yes
-set sidebar_width = 30
-set sidebar_sort = no
-color sidebar_new green default
-color normal default default
-color index green default "~U"
-color index red default "~D"
-color indicator yellow black
-color status blue default
-bind index,pager <down> sidebar-next
-bind index,pager <up> sidebar-prev
-bind index,pager <right> sidebar-open
+# }}}
+# Account {{{
 
-# Index View Options ---------------------------------
-set date_format = "%m/%d"
-set index_format = "[%Z]  %D  %-20.20F  %s"
-set sort = threads # like gmail
-set sort_aux = reverse-last-date-received # like gmail
-set uncollapse_jump # don't collapse on an unread message
-set sort_re # thread based on regex
-set reply_regexp = "^(([Rr][Ee]?(\[[0-9]+\])?: *)?(\[[^]]+\] *)?)*"
-bind index gg first-entry
-bind index G last-entry
-bind index R group-reply
-bind index <tab> sync-mailbox
-bind index <space> collapse-thread
-bind index p recall-message
-# Ctrl-R to mark all as read
-macro index \Cr "T~U<enter><tag-prefix><clear-flag>N<untag-pattern>.<enter>" "mark all messages as read"
-# Saner copy/move dialogs
-macro index C "<copy-message>?<toggle-mailboxes>" "copy a message to a mailbox"
-macro index M "<save-message>?<toggle-mailboxes>" "move a message to a mailbox"
+# Most of the account settings are set using the $EMAIL environment variable so
+# I can open one instance of mutt per email account by modifying this
+# environment variable before startup.
 
-# Pager View Options ---------------------------------
-set pager_index_lines = 10 # number of index lines to show
-set pager_context = 3 # number of context lines to show
-set pager_stop # don't go to next message automatically
-set menu_scroll # scroll in menus
-set tilde # show tildes like in vim
-unset markers # no ugly plus signs
-set quote_regexp = "^( {0,4}[>|:#%]| {0,4}[a-z0-9]+[>|]+)+"
-alternative_order text/plain text/enriched text/html
-bind pager k  previous-line
-bind pager j  next-line
-bind pager gg top
-bind pager G  bottom
-bind pager R  group-reply
+set from = $EMAIL
+set realname = 'Thiago de Arruda'
+set reverse_name = yes
+set reverse_realname = no
+set header_cache = "/media/mail/cache/mutt/headers"
+set message_cachedir = "/media/mail/cache/mutt/bodies"
 
-# View attachments properly.
-bind attach <return> view-mailcap
+# Get the password from a gnupg encrypted file with the same name as $EMAIL and
+# store it in the 'my_password' variable for reuse in SMTP/IMAP.
+set my_password = "`gpg --batch -q --decrypt ~/.mail-accounts/$EMAIL/password.gpg`" 
 
-# Compose View Options -------------------------------
-set envelope_from # which from?
-set sig_dashes # dashes before sig
-set edit_headers # show headers when composing
-set fast_reply # skip to compose when replying
-set askcc # ask for CC:
-set fcc_attach # save attachments with the body
-unset mime_forward # forward attachments as part of body
-set forward_format = "Fwd: %s" # format of subject when forwarding
-set forward_decode # decode when forwarding
-set attribution = "On %d, %n wrote:" # format of quoting header
-set reply_to # reply to Reply to: field
-set include # include message in replies
-set forward_quote # include message in forwards
-bind compose p postpone-message
-bind compose P pgp-menu
+# IMAP {{{
 
-# GnuPG integration
+set folder = "imaps://imap.gmail.com:993"
+set imap_user = $EMAIL
+set imap_pass = $my_password
+set spoolfile = '+INBOX'
+set mbox = '+[Gmail]/All Mail'
+set postponed = '+[Gmail]/Drafts'
+
+# Gmail already takes care of sent messages, so unset this option to avoid
+# duplicates.
+unset record
+unset imap_passive
+set imap_idle
+
+# Check for new mail every 180 seconds
+set mail_check = 180
+set ssl_force_tls = yes
+set imap_check_subscribed = yes
+
+# }}}
+# SMTP {{{
+
+set smtp_url = "smtp://$EMAIL@smtp.gmail.com:587"
+set smtp_pass = $my_password
+
+# }}}
+# Google contacts {{{
+
+set query_command = "goobook -c ~/.mail-accounts/$EMAIL/goobookrc query '%s'"
+macro index,pager a "<pipe-message>goobook -c ~/.mail-accounts/$EMAIL/goobookrc add<return>" "add sender to google contacts"
+bind editor <Tab> complete-query
+
+# }}}
+# }}}
+# PGP/GnuPG {{{
+
 set pgp_decode_command="gpg --status-fd=2 %?p?--passphrase-fd 0? --no-verbose --quiet --batch --output - %f"
 set pgp_verify_command="gpg --status-fd=2 --no-verbose --quiet --batch --output - --verify %s %f"
 set pgp_decrypt_command="gpg --status-fd=2 %?p?--passphrase-fd 0? --no-verbose --quiet --batch --output - %f"
@@ -97,34 +77,80 @@ set pgp_list_pubring_command="gpg --no-verbose --batch --quiet --with-colons --l
 set pgp_list_secring_command="gpg --no-verbose --batch --quiet --with-colons --list-secret-keys %r" 
 set pgp_good_sign="^\\[GNUPG:\\] GOODSIG"
 set pgp_use_gpg_agent = yes
-# automatically sign all outgoing messages
+
+# Automatically sign all outgoing messages
 set crypt_autosign
 
-# Credentials/mailbox options
-# set realname = 'Thiago de Arruda'
-set from = $EMAIL
-set realname = 'Thiago de Arruda'
-set reverse_name = yes
-set reverse_realname = no
-set folder = 'imaps://imap.gmail.com:993' 
-set spoolfile = '+INBOX'
-set mbox = '+[Gmail]/All Mail'
-set postponed = '+[Gmail]/Drafts'
-unset record # Gmail already does that
-set ssl_force_tls = yes
-set imap_check_subscribed = yes
-# Don't open new imap connections automatically.
-set imap_passive = yes
-set imap_idle = yes
-# Dont constantly check for mail
-set mail_check = 180
-# let the server close the connection
-set imap_keepalive = 3600
-# Setup account credentials
-set my_password = "`gpg --batch -q --decrypt ~/.mail-passwords/$EMAIL.gpg`" 
-set imap_user = $EMAIL
-set smtp_url = "smtp://$EMAIL@smtp.gmail.com:587"
-set smtp_pass = $my_password
-set imap_pass = $my_password
-set header_cache = "/media/mail/cache/mutt/headers"
-set message_cachedir = "/media/mail/cache/mutt/bodies"
+# }}}
+# Index View {{{
+
+set date_format = "%y-%m-%d"
+set index_format = "[%Z]  %D  %-20.20F  %s"
+set sort = threads # like gmail
+set sort_aux = reverse-last-date-received # like gmail
+set uncollapse_jump # don't collapse on an unread message
+set sort_re # thread based on regex
+set reply_regexp = "^(([Rr][Ee]?(\[[0-9]+\])?: *)?(\[[^]]+\] *)?)*"
+bind index gg first-entry
+bind index G last-entry
+bind index R group-reply
+bind index <tab> sync-mailbox
+bind index <space> collapse-thread
+bind index p recall-message
+
+# Ctrl-R to mark all as read
+macro index \Cr "T~U<enter><tag-prefix><clear-flag>N<untag-pattern>.<enter>" "mark all messages as read"
+
+# Saner copy/move dialogs
+macro index C "<copy-message>?<toggle-mailboxes>" "copy a message to a mailbox"
+macro index M "<save-message>?<toggle-mailboxes>" "move a message to a mailbox"
+macro index gi  "<change-folder> =INBOX<enter>"  "go to inbox"
+
+# }}}
+# Pager View {{{
+
+bind attach <return> view-mailcap
+set pager_index_lines = 10
+set pager_context = 3
+set pager_stop
+set menu_scroll
+set tilde
+unset markers
+set quote_regexp = "^( {0,4}[>|:#%]| {0,4}[a-z0-9]+[>|]+)+"
+alternative_order text/plain text/enriched text/html
+bind pager k  previous-line
+bind pager j  next-line
+bind pager gg top
+bind pager G  bottom
+bind pager R  group-reply
+
+# }}}
+# Composing emails {{{
+
+set editor = 'vim -X'
+unset envelope_from
+set sig_dashes # dashes before sig
+set edit_headers # edit headers manually
+set fast_reply # skip to compose when replying
+unset askcc # don't ask for CC(edit in vim):
+set fcc_attach # save attachments with the body
+unset mime_forward # forward attachments as part of body
+set forward_format = "Fwd: %s" # format of subject when forwarding
+set forward_decode # decode when forwarding
+set attribution = "On %d, %n wrote:" # format of quoting header
+set reply_to # reply to Reply to: field
+set include # include message in replies
+set forward_quote # include message in forwards
+bind compose p postpone-message
+bind compose P pgp-menu
+
+# }}}
+# Colors {{{
+
+color normal default default
+color index green default "~U"
+color index red default "~D"
+color indicator yellow black
+color status blue default
+
+# }}}

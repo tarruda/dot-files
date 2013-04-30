@@ -1,0 +1,8 @@
+#!/usr/bin/env zsh
+
+cat > ~/.mail-accounts/$EMAIL/goobookrc << EOF
+[DEFAULT]
+email: $EMAIL
+passwordeval: gpg --batch --decrypt ~/.mail-accounts/$EMAIL/password.gpg
+cache_filename: ~/.mail-accounts/$EMAIL/goobook_cache
+EOF

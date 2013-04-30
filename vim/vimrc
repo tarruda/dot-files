@@ -26,6 +26,7 @@ if !exists('g:vimrc_done_basic_init')
     " Set .vim as the rc_dir
     let g:rc_dir = g:rc_dir.'/.vim'
   endif
+  let $RCDIR = g:rc_dir
   let g:vam_plugins_dir = g:rc_dir.'/addons'
   let &runtimepath = g:rc_dir.','.g:vam_plugins_dir.'/vim-addon-manager,'.$VIMRUNTIME
   let g:has_python = has('python') || has('python3')
@@ -339,6 +340,11 @@ augroup filetype_settings
         \   setl softtabstop=4
         \ | setl shiftwidth=4 
         \ | setl textwidth=79
+  " }}}
+  " Muttrc {{{
+  au FileType muttrc 
+        \   setl foldmethod=marker
+        \ | setl foldenable
   " }}}
 augroup END
 
