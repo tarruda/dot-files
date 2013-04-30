@@ -7,7 +7,7 @@
 
 zmodload zsh/pcre
 zmodload zsh/complist
-zmodload zsh/util
+zmodload zsh/zutil
 
 # }}}
 # History {{{
@@ -114,6 +114,21 @@ for file in $ZDOTDIR/functions/*/*(.N:t); do
 	autoload -U $file
 done
 unset file
+
+# wrapper for psql/pg_top that sets some default options
+psql() {
+	o_user=(-U postgres)
+	o_host=(-h localhost)
+	zparseopts -D -K U:=o_user -username:=o_user h=:o_host -hostname:=o_host
+	command psql -U $o_user[2] -h $o_host[2] "$@"
+}
+
+pg_top() {
+	o_user=(-U postgres)
+	o_host=(-h localhost)
+	zparseopts -D -K U:=o_user -username:=o_user h=:o_host -hostname:=o_host
+	command pg_top -U $o_user[2] -h $o_host[2] "$@"
+}
 
 # }}}
 # Aliases {{{
@@ -271,7 +286,7 @@ fi
 if [[ -z $TMUX || $TERM != tmux ]]; then
 	alias vi=vim
 	irssi() {
-		command irssi --home=$DOTDIR/irssi
+		command irssi --home=$DOTDIR/irssi "$@"
 	}
 else
 	vim () { command vim -X "$@" }
