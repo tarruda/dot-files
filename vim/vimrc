@@ -386,6 +386,12 @@ augroup filetype_settings
         \ | setl foldenable
         \ | setl omnifunc=CompleteGoogleContact
   " }}}
+  " Mail {{{
+  au FileType man 
+        \   setl foldmethod=indent
+        \ | setl foldenable
+        \ | setl foldnestmax=2
+  " }}}
 augroup END
 
 " }}}

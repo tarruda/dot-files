@@ -45,27 +45,30 @@ chatnets = {
 
 servers = (
   {
-    address = "irc.freenode.net";
+    address = "127.0.0.1";
     chatnet = "freenode";
-    port = "7070";
-    use_ssl = "yes";
+    port = "65535";
+    password = "tarruda_freenode:123";
+    use_ssl = "no";
     autoconnect = "yes";
   },
   {
-    address = "irc.oftc.net";
+    address = "127.0.0.1";
     chatnet = "oftc";
-    port = "9999";
-    use_ssl = "yes";
+    port = "65534";
+    password = "tarruda_oftc:123";
+    use_ssl = "no";
     autoconnect = "yes";
   },
   {
-    address = "localhost";
+    address = "127.0.0.1";
     chatnet = "bitlbee";
     port = "6667";
     use_ssl = "no";
     autoconnect = "yes";
   }
 );
+
 statusbar = {
   default = {
     window = {

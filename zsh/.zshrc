@@ -150,6 +150,14 @@ man() {
 	PAGER=$pager command man "$@"
 }
 
+# wrapper for default datadir with znc
+
+znc() {
+	o_data=(-d $DOTDIR/znc)
+	zparseopts -D -K d:=o_data -datadir:=o_data
+	command znc -d $o_data[2] "$@"
+}
+
 # }}}
 # Aliases {{{
 
@@ -306,14 +314,17 @@ fi
 if [[ -z $TMUX || $TERM != tmux ]]; then
 	alias vi=vim
 	irssi() {
+		# sleep hack taken from:
+		# http://www.g-loaded.eu/2006/11/24/auto-closing-ssh-tunnels/
+		ssh -f -L 65535:127.0.0.1:65535 -L 65534:127.0.0.1:65534 irc-proxy sleep 5;
 		command irssi --home=$DOTDIR/irssi "$@"
 	}
 else
 	vim () { command vim -X "$@" }
 	vi() { zsh $DOTDIR/tmux/scripts/vim-tmux-open.zsh "$@" }
 
-	# It seems irssi/mutt breaks with my custom terminfo
 	irssi() {
+		ssh -f -L 65535:127.0.0.1:65535 -L 65534:127.0.0.1:65534 irc-proxy sleep 5;
 		TERM=screen-256color command irssi --home=$DOTDIR/irssi "$@"
 	}
 	mutt() {
