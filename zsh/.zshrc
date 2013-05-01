@@ -8,6 +8,7 @@
 zmodload zsh/pcre
 zmodload zsh/complist
 zmodload zsh/zutil
+zmodload zsh/zpty
 
 # }}}
 # History {{{

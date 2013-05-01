@@ -41,3 +41,12 @@
   user = tpadilha84@gmail.com
   port = 993 
   sslverify = true 
+
+[diff]
+	tool = vimdiff
+
+[difftool]
+	prompt = false
+
+[alias]
+	d = difftool
