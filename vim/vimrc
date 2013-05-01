@@ -418,7 +418,7 @@ else
 endif
 " }}}
 " Addons {{{
-if !exists('g:vimrc_done_basic_init')
+function! LoadAddons() 
   let s:vim_addons = []
   " Slimux {{{
   if $TMUX != ''
@@ -554,5 +554,8 @@ if !exists('g:vimrc_done_basic_init')
   endif
   call vam#ActivateAddons(s:vim_addons)
   let g:vimrc_done_basic_init = 1
+endfunction
+if !exists('g:vimrc_done_basic_init') && !exists('g:disable_addons')
+  call LoadAddons()
 endif
 " }}}

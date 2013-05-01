@@ -75,15 +75,18 @@ export VBOX_USER_HOME=$HOME/.virtualbox
 export GTK_IM_MODULE=xim
 export QT_IM_MODULE=xim
 export EMAIL='tpadilha84@gmail.com'
-read PAGER <<- EOF
-zsh -c \"col -b -x | vim -X -R \
-	-c 'set nomod nolist nomodifiable' \
-	-c 'set nonumber norelativenumber' \
-	-c 'map q :q<cr>' \
-	-c 'map <space> <c-d>' \
-	-c 'map b <c-u>' -\"
-EOF
-export PAGER
+if which vim &> /dev/null; then
+	read PAGER <<- EOF
+	zsh -c \"col -b -x | vim -X -R \
+		--cmd 'let g:disable_addons = 1' \
+		-c 'set nomod nolist nomodifiable' \
+		-c 'set nonumber norelativenumber' \
+		-c 'map q :q<cr>' \
+		-c 'map <space> <c-d>' \
+		-c 'map b <c-u>' -\"
+	EOF
+	export PAGER
+fi
 
 # }}}
 # SSH/GnuPG {{{

@@ -139,6 +139,7 @@ man() {
 	if which vim &> /dev/null; then
 		read pager <<- EOF
 		zsh -c \"col -b -x | vim -X -R \
+			--cmd 'let g:disable_addons = 1' \
 			-c 'set ft=man nomod nolist nomodifiable' \
 			-c 'set nonumber norelativenumber' \
 			-c 'map q :q<cr>' \
