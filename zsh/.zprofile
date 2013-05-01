@@ -69,24 +69,21 @@ export WINEPREFIX=$HOME/.wine
 export EDITOR=vim
 export ACKRC=$DOTDIR/.ackrc
 export XCOMPOSEFILE=$DOTDIR/.XCompose
-if which vim &> /dev/null; then
-	VIM="`which vim`"
-	export PAGER="/bin/sh -c \"unset PAGER;col -b -x | \
-		$VIM -R -c 'set ft=man nolist' -c 'map q :q<CR>' \
-		-c 'map <SPACE> <C-D>' -c 'map b <C-U>' \
-		-c 'set nonumber' \
-		-c 'set norelativenumber' \
-		-c 'set nomodifiable' \
-		-c 'nmap K :Man <C-R>=expand(\\\"<cword>\\\")<CR><CR>' -\""
-	unset VIM
-fi
 export VBOX_USER_HOME=$HOME/.virtualbox
 # Thanks this article for the following two environment variables
 # http://my.opera.com/CrazyTerabyte/blog/2010/11/04/how-x11-xcompose-works
 export GTK_IM_MODULE=xim
 export QT_IM_MODULE=xim
 export EMAIL='tpadilha84@gmail.com'
-export PSQL_EDITOR='vim -X +"setf sql"'
+read PAGER <<- EOF
+zsh -c \"col -b -x | vim -X -R \
+	-c 'set nomod nolist nomodifiable' \
+	-c 'set nonumber norelativenumber' \
+	-c 'map q :q<cr>' \
+	-c 'map <space> <c-d>' \
+	-c 'map b <c-u>' -\"
+EOF
+export PAGER
 
 # }}}
 # SSH/GnuPG {{{

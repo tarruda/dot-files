@@ -7,8 +7,11 @@ compdef _git gst=git-status
 alias gp='git push'
 compdef _git gp=git-push
 alias gd='git diff'
-gdv() { git diff -w "$@" | view - }
-compdef _git gdv=git-diff
+compdef _git gd=git-diff
+alias gdt='git difftool'
+compdef _git gdt=git-difftool
+alias gmt='git mergetool'
+compdef _git gmt=git-mergetool
 alias gc='git commit -v'
 compdef _git gc=git-commit
 alias gca='git commit -v -a'

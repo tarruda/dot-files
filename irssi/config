@@ -120,6 +120,6 @@ windows = {
 };
 
 mainwindows = {
-  1 = { first_line = "8"; lines = "35"; };
-  3 = { first_line = "1"; lines = "7"; };
+  1 = { first_line = "12"; lines = "31"; };
+  3 = { first_line = "1"; lines = "11"; };
 };

@@ -35,6 +35,7 @@ endif
 " }}}
 " Global settings {{{
 "
+let $PAGER='' " use vim to read man pages
 set nocompatible
 let mapleader = ","
 set backspace=indent,eol,start " backspace over everything in insert mode

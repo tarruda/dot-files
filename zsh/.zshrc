@@ -121,7 +121,8 @@ psql() {
 	o_user=(-U postgres)
 	o_host=(-h localhost)
 	zparseopts -D -K U:=o_user -username:=o_user h=:o_host -hostname:=o_host
-	command psql -U $o_user[2] -h $o_host[2] "$@"
+	PSQL_EDITOR='vim -X +"setf sql"' command psql -U $o_user[2] -h $o_host[2]\
+		"$@"
 }
 
 pg_top() {
@@ -129,6 +130,23 @@ pg_top() {
 	o_host=(-h localhost)
 	zparseopts -D -K U:=o_user -username:=o_user h=:o_host -hostname:=o_host
 	command pg_top -U $o_user[2] -h $o_host[2] "$@"
+}
+
+# wrapper for reading man pages
+
+man() {
+	local pager=$PAGER
+	if which vim &> /dev/null; then
+		read pager <<- EOF
+		zsh -c \"col -b -x | vim -X -R \
+			-c 'set ft=man nomod nolist nomodifiable' \
+			-c 'set nonumber norelativenumber' \
+			-c 'map q :q<cr>' \
+			-c 'map <space> <c-d>' \
+			-c 'map b <c-u>' -\"
+		EOF
+	fi
+	PAGER=$pager command man "$@"
 }
 
 # }}}
