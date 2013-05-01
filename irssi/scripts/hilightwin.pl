@@ -23,7 +23,12 @@ $VERSION = "0.03";
     changed     => "Sun May 25 18:59:57 BST 2008"
 );
 
-my $logfile = "$ENV{'HOME'}/.irssi-hilightwin.log";
+Irssi::settings_add_bool('hilightwin', 'hilightwin_showprivmsg', 1);
+Irssi::settings_add_int('hilightwin', 'hilightwin_log_tail_count', 50);
+Irssi::settings_add_str('hilightwin', 'hilightwin_log_file', "$ENV{'HOME'}/.irssi-hilightwin.log");
+Irssi::settings_add_str('hilightwin', 'hilightwin_timestamp_format', "%Y-%m-%d %H:%M ");
+
+my $logfile = Irssi::settings_get_str('hilightwin_log_file');
 
 sub sig_printtext {
     my ($dest, $text, $stripped) = @_;
@@ -43,14 +48,11 @@ sub sig_printtext {
         if ($dest->{level} & MSGLEVEL_PUBLIC) {
             $text = $dest->{target}.": ".$text;
         }
-        $text = strftime("%Y-%m-%d %H:%M ", localtime).$text;
+        $text = strftime(Irssi::settings_get_str('hilightwin_timestamp_format'), localtime).$text;
         $window->print($text, MSGLEVEL_NEVER) if ($window);
         print(LOGFILE "\0$text");
     }
 }
-
-Irssi::settings_add_bool('hilightwin', 'hilightwin_showprivmsg', 1);
-Irssi::settings_add_int('hilightwin', 'hilightwin_previous_entries', 50);
 
 my $win = Irssi::window_find_name('hilight');
 
@@ -58,7 +60,7 @@ if (-r $logfile && $win) {
   # read the last n entries in the logfile and print it to the window, where n
   # is 'hilightwin_previous_entries'
   my @entries = ();
-  my $max_entries = Irssi::settings_get_int('hilightwin_previous_entries');
+  my $max_entries = Irssi::settings_get_int('hilightwin_log_tail_count');
   my $block_size = 4096;
   my $buffer = '';
   my (@entry_buffer, $read_buffer, $pos, $last_read_pos, $partial_entry);
