@@ -26,6 +26,7 @@ channels = (
   { name = "#gnupg"; chatnet = "freenode"; autojoin = "yes"; },
   { name = "#rxvt-unicode"; chatnet = "freenode"; autojoin = "yes"; },
   { name = "#irssi"; chatnet = "freenode"; autojoin = "Yes"; },
+  { name = "#znc"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#ubuntu"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#archlinux"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#mutt"; chatnet = "freenode"; autojoin = "Yes"; },
@@ -126,3 +127,4 @@ mainwindows = {
   1 = { first_line = "12"; lines = "31"; };
   3 = { first_line = "1"; lines = "11"; };
 };
+logs = { };

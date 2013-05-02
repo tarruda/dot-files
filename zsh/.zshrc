@@ -158,6 +158,22 @@ znc() {
 	command znc -d $o_data[2] "$@"
 }
 
+irssi() {
+	local ssh_args="-f -L 65535:127.0.0.1:65535 -L 65534:127.0.0.1:65534 irc-proxy"
+	local tmpdir
+	if which autossh &> /dev/null; then
+		tmpdir=$(mktmpdir)
+		trap "[[ -d $tmpdir ]] && kill \$(<$tmpdir/pid) && rm -rf $tmpdir" INT HUP TERM EXIT
+		AUTOSSH_PIDFILE=$tmpdir/pid autossh -M 65000 -N ${(z)ssh_args}
+		sleep 5
+	else
+		# sleep hack taken from:
+		# http://www.g-loaded.eu/2006/11/24/auto-closing-ssh-tunnels/
+		ssh ${(z)ssh_args} sleep 5
+	fi
+	command irssi --home=$DOTDIR/irssi "$@"
+}
+
 # }}}
 # Aliases {{{
 
@@ -313,23 +329,15 @@ fi
 
 if [[ -z $TMUX || $TERM != tmux ]]; then
 	alias vi=vim
-	irssi() {
-		# sleep hack taken from:
-		# http://www.g-loaded.eu/2006/11/24/auto-closing-ssh-tunnels/
-		ssh -f -L 65535:127.0.0.1:65535 -L 65534:127.0.0.1:65534 irc-proxy sleep 5;
-		command irssi --home=$DOTDIR/irssi "$@"
-	}
 else
 	vim () { command vim -X "$@" }
 	vi() { zsh $DOTDIR/tmux/scripts/vim-tmux-open.zsh "$@" }
 
-	irssi() {
-		ssh -f -L 65535:127.0.0.1:65535 -L 65534:127.0.0.1:65534 irc-proxy sleep 5;
-		TERM=screen-256color command irssi --home=$DOTDIR/irssi "$@"
-	}
 	mutt() {
 		TERM=screen-256color command mutt -e "set editor='TERM=tmux vim -X'" "$@"
 	}
+
+	alias irssi='TERM=screen-256color irssi "$@"'
 fi
 
 alias e=vi

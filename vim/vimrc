@@ -390,7 +390,7 @@ augroup filetype_settings
   au FileType man 
         \   setl foldmethod=indent
         \ | setl foldenable
-        \ | setl foldnestmax=2
+        \ | setl foldnestmax=1
   " }}}
 augroup END
 
