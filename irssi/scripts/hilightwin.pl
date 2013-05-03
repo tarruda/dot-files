@@ -24,10 +24,12 @@ $VERSION = "0.03";
 );
 
 Irssi::settings_add_bool('hilightwin', 'hilightwin_showprivmsg', 1);
+Irssi::settings_add_bool('hilightwin', 'hilightwin_enable_log', 1);
 Irssi::settings_add_int('hilightwin', 'hilightwin_log_tail_count', 50);
 Irssi::settings_add_str('hilightwin', 'hilightwin_log_file', "$ENV{'HOME'}/.irssi-hilightwin.log");
 Irssi::settings_add_str('hilightwin', 'hilightwin_timestamp_format', "%Y-%m-%d %H:%M ");
 
+my $enable_log = Irssi::settings_get_bool('hilightwin_enable_log');
 my $logfile = Irssi::settings_get_str('hilightwin_log_file');
 
 sub sig_printtext {
@@ -50,13 +52,13 @@ sub sig_printtext {
         }
         $text = strftime(Irssi::settings_get_str('hilightwin_timestamp_format'), localtime).$text;
         $window->print($text, MSGLEVEL_NEVER) if ($window);
-        print(LOGFILE "\0$text");
+        print(LOGFILE "\0$text") if $enable_log;
     }
 }
 
 my $win = Irssi::window_find_name('hilight');
 
-if (-r $logfile && $win) {
+if (-r $logfile && $win && $enable_log) {
   # read the last n entries in the logfile and print it to the window, where n
   # is 'hilightwin_previous_entries'
   my @entries = ();
@@ -127,7 +129,9 @@ if (-r $logfile && $win) {
   }
 }
 
-open (LOGFILE, ">> $logfile");
-LOGFILE->autoflush(1);
+if ($enable_log) {
+  open (LOGFILE, ">> $logfile");
+  LOGFILE->autoflush(1);
+}
 
 Irssi::signal_add('print text', 'sig_printtext');

@@ -33,7 +33,6 @@ for dir in $paths; do
 done
 # path to user programs
 paths=(
-$HOME/.git-extras/bin
 $DOTDIR/bin
 )
 for dir in $paths; do
@@ -44,7 +43,7 @@ done
 prefixes_dir="$HOME/.user-prefixes"
 # paths/manpaths for programs installed in home dir
 if [ -d $prefixes_dir ]; then
-	for dir in $prefixes_dir/*(/N); do
+	for dir in $prefixes_dir/*(/ND); do
 		if [ -d "$dir/bin" ]; then
 			PATH="$dir/bin:$PATH"
 		fi

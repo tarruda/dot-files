@@ -12,6 +12,7 @@ settings = {
     show_names_on_join = "no";
   };
 
+  "perl/core/scripts" = { hilightwin_enable_log = "no"; };
 };
 
 hilights = ( { text = "tarruda"; nick = "yes"; word = "yes"; } );
