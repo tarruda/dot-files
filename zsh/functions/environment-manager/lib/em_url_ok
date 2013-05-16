@@ -1,5 +1,0 @@
-#
-# Check if the HEAD response of <url> is 200.
-#
-
-curl -Is $1 | head -n 1 | grep 200 > /dev/null

@@ -300,6 +300,7 @@ if &term == 'tmux'
   vnoremap <silent> <f37>move-left <esc>:silent call TmuxMove('h')<cr>
   vnoremap <silent> <f37>move-right <esc>:silent call TmuxMove('l')<cr>
   nnoremap <silent> <f37>paste-tmux :call TmuxPaste()<cr>"tp
+  inoremap <silent> <f37>paste-tmux <esc>:call TmuxPaste()<cr>"tp
   vnoremap <silent> <f37>paste-tmux d:call TmuxPaste()<cr>h"tp
   vnoremap <silent> <a-y> "ty:call TmuxYank()<cr>
   vnoremap <silent> <a-d> "td:call TmuxYank()<cr>
@@ -329,6 +330,7 @@ else
   vnoremap <silent> <a-left> <esc>:wincmd h<cr>
   vnoremap <silent> <a-right> <esc>:wincmd l<cr>
   nnoremap <silent> <a-p> "+p
+  inoremap <silent> <a-p> <esc>"+p
   vnoremap <silent> <a-p> "+p
   vnoremap <silent> <a-y> "+y
   vnoremap <silent> <a-d> "+d
@@ -435,7 +437,7 @@ function! LoadAddons()
     nnoremap <silent> <f7> ggvG$:SlimuxREPLSendSelection<cr>
   endif
   " }}}
-  " CtrlP(fuzzy finder) {{{
+  " CtrlP {{{
   call add(s:vim_addons, 'github:kien/ctrlp.vim')
   set wildignore+=*.o,*.so,*.dll,*.exe,*.bak,*.swp,*.class,*.pyc,*.pyd,*.pyo,*~
   set wildignore+=*.zip,*.tgz,*.gz,*.bz2,*.lz,*.rar,*.7z,*.jar
@@ -451,7 +453,7 @@ function! LoadAddons()
   command! Ctrlp call s:search()
   nnoremap <silent> <leader>p :CtrlPTag<CR>
   " }}}
-  " Clang(C/C++) {{{
+  " Clang {{{
   " Disable auto popup, use <Tab> to autocomplete
   let g:clang_complete_auto = 0
   " Show clang errors in the quickfix window

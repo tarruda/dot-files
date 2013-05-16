@@ -43,6 +43,7 @@ chatnets = {
   freenode = { type = "IRC"; nick = "tarruda"; };
   oftc = { type = "IRC"; nick = "tarruda"; };
   bitlbee = { type = "IRC"; };
+  schmorp = { type = "IRC"; };
 };
 
 servers = (
@@ -59,6 +60,13 @@ servers = (
     chatnet = "oftc";
     port = "65534";
     password = "tarruda_oftc:123";
+    use_ssl = "no";
+    autoconnect = "yes";
+  },
+  {
+    address = "irc.schmorp.de";
+    chatnet = "schmorp";
+    port = "6667";
     use_ssl = "no";
     autoconnect = "yes";
   },

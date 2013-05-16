@@ -1,2 +1,0 @@
-local dir=$1
-echo "$dir/share/man"

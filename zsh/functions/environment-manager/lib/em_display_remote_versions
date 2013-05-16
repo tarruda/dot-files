@@ -1,6 +1,0 @@
-#
-# Display the versions of [PROGRAM] available.
-#
-
-local active=`em_get_current_environment`
-em_display_remote_versions_impl $active

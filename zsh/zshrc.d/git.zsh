@@ -52,6 +52,7 @@ compdef _git ga=git-add
 alias gwc='git whatchanged -p --abbrev-commit --pretty=medium'
 alias gf='git ls-files | grep'
 alias gpoat='git push origin --all && git push origin --tags'
+alias gclean='git clean -x -f -d'
 
 # Will cd into the top of the current repository
 # or submodule.

@@ -1,5 +1,0 @@
-local dir=$1
-cat << EOF
-export NPM_CONFIG_PREFIX="$dir"
-export NODE_PATH="$dir/lib/node_modules"
-EOF

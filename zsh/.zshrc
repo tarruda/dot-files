@@ -343,6 +343,43 @@ fi
 alias e=vi
 
 # }}}
+# Ruby {{{
+
+install-rvm() {
+	if [[ -d $HOME/.rvm ]]; then
+		print "Already installed" >&2
+		return 1
+	fi
+	command curl -L https://get.rvm.io | bash -s -- --ignore-dotfiles
+}
+[[ -r $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
+
+# }}}
+# Python {{{
+install-pythonbrew() {
+	command curl -kL http://xrl.us/pythonbrewinstall | bash
+}
+[[ -s $HOME/.pythonbrew/etc/bashrc ]] && source $HOME/.pythonbrew/etc/bashrc
+# }}}
+# Perl {{{
+export PERLBREW_ROOT=$HOME/.perlbrew
+install-perlbrew() {
+	command curl -kL http://install.perlbrew.pl | bash
+}
+[[ -r $PERLBREW_ROOT/etc/bashrc ]] && source $PERLBREW_ROOT/etc/bashrc
+if which perlbrew &> /dev/null; then
+	perlbrew use default &> /dev/null
+fi
+# }}}
+# Node.js {{{
+install-nvm() {
+	command curl https://raw.github.com/creationix/nvm/master/install.sh | sh
+}
+[[ -r $HOME/.nvm/nvm.sh ]] && source $HOME/.nvm/nvm.sh
+if which nvm &>/dev/null && [[ -n $(nvm alias default) ]]; then
+	nvm use default &> /dev/null
+fi
+# }}}
 # Misc {{{
 
 autoload -U zcalc zsh-mime-setup

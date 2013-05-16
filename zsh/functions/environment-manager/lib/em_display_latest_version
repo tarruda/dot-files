@@ -1,5 +1,0 @@
-#
-# Display the latest version of [PROGRAM] available.
-#
-
-em_display_latest_version_impl

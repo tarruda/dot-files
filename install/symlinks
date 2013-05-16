@@ -10,6 +10,7 @@ function() {
 	.gitconfig .gitconfig
 	.global.gitignore .global.gitignore
 	.asoundrc .asoundrc
+	.irbrc .irbrc
 	vimperator .vimperator
 	tmux/.tmux.conf .tmux.conf
 	emacs.d .emacs.d

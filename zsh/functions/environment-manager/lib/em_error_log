@@ -1,5 +1,0 @@
-#
-# em_error_log <msg ...>
-#
-
-printf "\n  \033[31mError: $@\033[0m\n\n"
