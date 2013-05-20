@@ -12,10 +12,10 @@ vim_ensure_is_open() {
 	if [[ -z $vim_pane ]] || ! tmux display-message -pt $vim_pane &> /dev/null; then
 		# vim is not running in any pane, so start a new instance 
 		channel="`uuidgen`"
-		tmux split-window -d -p 70 "vim -X \
-			-c \"cd $dir\" \
-			-c ':silent !tmux set -q \"@vim-edit:$dir\" \"\$TMUX_PANE\"'\
-			-c ':silent !tmux wait -S \"$channel\"'"
+		tmux split-window -d -p 70 "zsh -i -c \"vim -X \
+			-c \\\"cd $dir\\\" \
+			-c ':silent !tmux set -q \\\"@vim-edit:$dir\\\" \\\"\\\$TMUX_PANE\\\"'\
+			-c ':silent !tmux wait -S \\\"$channel\\\"' \""
 		tmux wait $channel
 		vim_pane=`tmux show -v "@vim-edit:$dir" 2> /dev/null`
 	fi
