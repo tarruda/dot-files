@@ -260,6 +260,7 @@ if &term == 'tmux'
 endif
 " }}}
 " Mappings {{{
+nmap T @t
 nnoremap <silent> <c-j> :m .+1<cr>==
 nnoremap <silent> <c-k> :m .-2<cr>==
 " Quickly open help in current window
@@ -453,16 +454,14 @@ function! LoadAddons()
   command! Ctrlp call s:search()
   nnoremap <silent> <leader>p :CtrlPTag<CR>
   " }}}
-  " Clang {{{
-  " Disable auto popup, use <Tab> to autocomplete
-  let g:clang_complete_auto = 0
-  " Show clang errors in the quickfix window
-  let g:clang_complete_copen = 1
-  " Use clang library instead of the executable
-  " This requires both libclang and its headers to be installed
-  let g:clang_use_library = 1
-  " clang integration
-  call add(s:vim_addons, 'github:Rip-Rip/clang_complete')
+  " Syntastic {{{
+  let g:syntastic_coffee_checkers=['coffee']
+  call add(s:vim_addons, 'github:scrooloose/syntastic')
+  " }}}
+  " YouCompleteMe {{{
+  if g:has_python
+    call add(s:vim_addons, 'github:Valloric/YouCompleteMe')
+  endif
   " }}}
   " NERDTree {{{
   call add(s:vim_addons, 'github:scrooloose/nerdtree')
@@ -471,22 +470,13 @@ function! LoadAddons()
   " toggle NERDTree
   nnoremap <silent> <F2> :NERDTreeToggle<CR>
   " }}}
-  " SuperTab {{{
-  " superTab option for context aware completion
-  let g:SuperTabDefaultCompletionType = "context"
-  call add(s:vim_addons, 'github:ervandew/supertab')
-  " }}}
   " UltiSnips {{{
   if g:has_python
     let g:UltiSnipsEditSplit = 'normal'
     let g:UltiSnipsSnippetsDir = g:rc_dir . '/UltiSnips'
-    if has('gui_running')
-      let g:UltiSnipsListSnippets = '<c-tab>'
-    else
-      " terminal emulators must be configured to send [34~ when ctrl+tab is
-      " pressed
-      let g:UltiSnipsListSnippets = '<f20>'
-    endif
+    let g:UltiSnipsExpandTrigger="<c-j>"
+    let g:UltiSnipsJumpForwardTrigger="<c-j>"
+    let g:UltiSnipsJumpBackwardTrigger="<c-k>"
     call add(s:vim_addons, 'github:SirVer/ultisnips')
   endif
   " }}}
@@ -528,12 +518,12 @@ function! LoadAddons()
   call add(s:vim_addons, 'github:danro/rename.vim')
   call add(s:vim_addons, 'github:mattn/webapi-vim')
   call add(s:vim_addons, 'github:mattn/gist-vim')
-  call add(s:vim_addons, 'github:walm/jshint.vim')
   call add(s:vim_addons, 'github:vim-scripts/scratch.vim')
   call add(s:vim_addons, 'github:godlygeek/csapprox')
   call add(s:vim_addons, 'github:godlygeek/tabular.git')
   call add(s:vim_addons, 'github:mileszs/ack.vim')
   call add(s:vim_addons, 'github:PProvost/vim-ps1.git')
+  call add(s:vim_addons, 'github:alunny/pegjs-vim.git')
   " }}}
   " load 'after' directory
   let &runtimepath = &runtimepath.','.g:rc_dir.'/after'

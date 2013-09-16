@@ -20,23 +20,8 @@ hilights = ( { text = "tarruda"; nick = "yes"; word = "yes"; } );
 aliases = { J = "join"; Q = "quit"; };
 
 channels = (
-  { name = "&gtalk"; chatnet = "bitlbee"; autojoin = "yes"; },
-  { name = "#tmux"; chatnet = "freenode"; autojoin = "yes"; },
-  { name = "#zsh"; chatnet = "freenode"; autojoin = "yes"; },
-  { name = "#vim"; chatnet = "freenode"; autojoin = "yes"; },
-  { name = "#gnupg"; chatnet = "freenode"; autojoin = "yes"; },
-  { name = "#rxvt-unicode"; chatnet = "freenode"; autojoin = "yes"; },
-  { name = "#irssi"; chatnet = "freenode"; autojoin = "Yes"; },
-  { name = "#znc"; chatnet = "freenode"; autojoin = "Yes"; },
-  { name = "#ubuntu"; chatnet = "freenode"; autojoin = "Yes"; },
-  { name = "#archlinux"; chatnet = "freenode"; autojoin = "Yes"; },
-  { name = "#mutt"; chatnet = "freenode"; autojoin = "Yes"; },
-  { name = "#notmuch"; chatnet = "freenode"; autojoin = "Yes"; },
-  { name = "#bitlbee"; chatnet = "oftc"; autojoin = "Yes"; },
-  { name = "#perl"; chatnet = "freenode"; autojoin = "Yes"; },
   { name = "#node.js"; chatnet = "freenode"; autojoin = "Yes"; },
-  { name = "#ruby-lang"; chatnet = "freenode"; autojoin = "Yes"; },
-  { name = "#postgresql"; chatnet = "freenode"; autojoin = "Yes"; }
+  { name = "##leveldb"; chatnet = "freenode"; autojoin = "Yes"; }
 );
 
 chatnets = {
@@ -46,38 +31,24 @@ chatnets = {
   schmorp = { type = "IRC"; };
 };
 
+
 servers = (
   {
-    address = "127.0.0.1";
+    address = "irc.freenode.net";
     chatnet = "freenode";
-    port = "65535";
-    password = "tarruda_freenode:123";
-    use_ssl = "no";
+    port = "7070";
+    use_ssl = "yes";
     autoconnect = "yes";
   },
   {
-    address = "127.0.0.1";
+    address = "irc.oftc.net";
     chatnet = "oftc";
-    port = "65534";
-    password = "tarruda_oftc:123";
-    use_ssl = "no";
-    autoconnect = "yes";
-  },
-  {
-    address = "irc.schmorp.de";
-    chatnet = "schmorp";
-    port = "6667";
-    use_ssl = "no";
-    autoconnect = "yes";
-  },
-  {
-    address = "127.0.0.1";
-    chatnet = "bitlbee";
-    port = "6667";
-    use_ssl = "no";
+    port = "9999";
+    use_ssl = "yes";
     autoconnect = "yes";
   }
 );
+
 
 statusbar = {
   default = {
