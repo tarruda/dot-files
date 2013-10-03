@@ -28,13 +28,18 @@ sub reload_passwords {
 }
 
 sub event_notice {
+
   # $data = "nick/#channel :text"
   my ($server, $data, $nick, $address) = @_;
   my ($target, $text) = split(/ :/, $data, 2);
 
-  return if ($target !~ /$server->{nick}/);
-
   my $chatnet = $server->{'chatnet'};
+
+  if ($chatnet =~ /^freenode$/) {
+    if ($text == '*** You need to authenticate to your account. Please use /quote PASS <username>:<password>' && $nick == '*.bnc4free.com') {
+      $server->command("quote PASS tarruda:$passwords{'bnc-freenode'}");
+    }
+  }
 
   if (exists($passwords{$chatnet})) {
     if ($chatnet =~ /^freenode$/) {

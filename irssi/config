@@ -1,3 +1,4 @@
+# IRSSI config
 settings = {
   core = {
     real_name = "Thiago de Arruda Padilha";
@@ -20,30 +21,37 @@ hilights = ( { text = "tarruda"; nick = "yes"; word = "yes"; } );
 aliases = { J = "join"; Q = "quit"; };
 
 channels = (
-  { name = "#node.js"; chatnet = "freenode"; autojoin = "Yes"; },
-  { name = "##leveldb"; chatnet = "freenode"; autojoin = "Yes"; }
+  { name = "#node.js"; chatnet = "bnc-freenode"; autojoin = "Yes"; },
+  { name = "##leveldb"; chatnet = "bnc-freenode"; autojoin = "Yes"; }
 );
 
 chatnets = {
   freenode = { type = "IRC"; nick = "tarruda"; };
-  oftc = { type = "IRC"; nick = "tarruda"; };
-  bitlbee = { type = "IRC"; };
-  schmorp = { type = "IRC"; };
+  #  oftc = { type = "IRC"; nick = "tarruda"; };
+  #  bitlbee = { type = "IRC"; };
+  #  schmorp = { type = "IRC"; };
 };
 
 
 servers = (
+  #  {
+  #    address = "irc.freenode.net";
+  #    chatnet = "freenode";
+  #    port = "7070";
+  #    use_ssl = "yes";
+  #    autoconnect = "yes";
+  #  },
+  #  {
+  #    address = "irc.oftc.net";
+  #    chatnet = "oftc";
+  #    port = "9999";
+  #    use_ssl = "yes";
+  #    autoconnect = "yes";
+  #  },
   {
-    address = "irc.freenode.net";
+    address = "apple.bnc4free.com";
     chatnet = "freenode";
-    port = "7070";
-    use_ssl = "yes";
-    autoconnect = "yes";
-  },
-  {
-    address = "irc.oftc.net";
-    chatnet = "oftc";
-    port = "9999";
+    port = "1339";
     use_ssl = "yes";
     autoconnect = "yes";
   }
