@@ -27,34 +27,27 @@ channels = (
 
 chatnets = {
   freenode = { type = "IRC"; nick = "tarruda"; };
-  #  oftc = { type = "IRC"; nick = "tarruda"; };
-  #  bitlbee = { type = "IRC"; };
-  #  schmorp = { type = "IRC"; };
+  # oftc = { type = "IRC"; nick = "tarruda"; };
+  # bitlbee = { type = "IRC"; };
+  # schmorp = { type = "IRC"; };
 };
 
 
 servers = (
-  #  {
-  #    address = "irc.freenode.net";
-  #    chatnet = "freenode";
-  #    port = "7070";
-  #    use_ssl = "yes";
-  #    autoconnect = "yes";
-  #  },
-  #  {
-  #    address = "irc.oftc.net";
-  #    chatnet = "oftc";
-  #    port = "9999";
-  #    use_ssl = "yes";
-  #    autoconnect = "yes";
-  #  },
   {
-    address = "apple.bnc4free.com";
+    address = "irc.freenode.net";
     chatnet = "freenode";
-    port = "1339";
+    port = "7070";
     use_ssl = "yes";
     autoconnect = "yes";
-  }
+  },
+  # {
+  #   address = "irc.oftc.net";
+  #   chatnet = "oftc";
+  #   port = "9999";
+  #   use_ssl = "yes";
+  #   autoconnect = "yes";
+  # }
 );
 
 

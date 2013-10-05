@@ -4,3 +4,19 @@ for (var ${4:i} = 0, ${5:l} = ${1:arr}.length; $4 < $5; $4++) {
   $3
 }
 endsnippet
+
+snippet while "While loop" !
+while (${1:true}) {
+  $2
+}
+endsnippet
+
+snippet type "Check the type of object" i!
+typeof $1 === '$2'
+endsnippet
+
+snippet exists "Check if an object is null or undefined" !
+if (typeof ${1:obj} !== 'undefined' && $1 !== null) {
+  $2
+}
+endsnippet
