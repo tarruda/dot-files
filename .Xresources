@@ -11,7 +11,7 @@ urxvt*scrollBar: false
 urxvt*saveLines: 0
 ! the following is the default but set it explicitily anyway
 urxvt*meta8: false
-/* make urxvt behave like xterm when control/alt keys */
+! make urxvt behave like xterm when control/alt keys
 urxvt.keysym.M-Up:        \033[1;3A
 urxvt.keysym.M-Down:      \033[1;3B
 urxvt.keysym.M-Right:     \033[1;3C
@@ -28,7 +28,7 @@ urxvt.keysym.C-Prior:     \033[5;5~
 urxvt.keysym.C-Next:      \033[6;5~
 urxvt.keysym.C-End:       \033[1;5F
 urxvt.keysym.C-Home:      \033[1;5H
-/* urxvt.keysym.C-Tab:       \033[27;5;9~ */
+! urxvt.keysym.C-Tab:       \033[27;5;9~
 urxvt.keysym.C-Tab:       \033[34~
 ! tango color scheme (gnome terminal)
 ! black
