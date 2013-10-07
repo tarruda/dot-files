@@ -13,25 +13,15 @@ MENU devbox {
   "Show session log" EXEC "tcp-command 192.168.56.50 urxvtc -title \\'devbox session log\\' -sl 10000 -sb -sr -e tail -n 10000 -f ~/.devbox-session.log"
 }
 
-MENU cygwin {
-  urxvt EXEC "tcp-command 127.0.0.1 urxvtc -fn xft:Consolas:pixelsize=21 -title rxvt-unicode -sl 10000 -sb -sr"
-  gvim EXEC "tcp-command 127.0.0.1 gvim"
-  SEPARATOR
-  "Show session log" EXEC "tcp-command 127.0.0.1 urxvtc -fn xft:Consolas:pixelsize=21 -title \\'cygwin session log\\' -sl 10000 -sb -sr -e tail -n 10000 -f ~/.cygwin-session.log"
-}
-
 MENU root {
   devbox MENU devbox
-  cygwin MENU cygwin
   SEPARATOR
-  "Edit .XWinrc" EXEC "tcp-command 127.0.0.1 gvim ~/.dotfiles/.XWinrc"
-  "Edit .cygwin-session.zsh" EXEC "tcp-command 127.0.0.1 gvim ~/.dotfiles/cygwin-resources/cygwin-session.zsh"
   "Reload .XWinrc" RELOAD
 }
 
 ROOTMENU root
 
-ICONDIRECTORY D:\cygwin\home\tarruda\.dotfiles\cygwin-resources\icons
+ICONDIRECTORY C:\Users\Thiago\Documents\GitHub\dot-files\cygwin-resources\icons
 
 ICONS {
   gvim vim.ico
