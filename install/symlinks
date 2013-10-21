@@ -15,6 +15,7 @@ function() {
 	tmux/.tmux.conf .tmux.conf
 	emacs.d .emacs.d
 	mail/muttrc .muttrc
+	weechat .weechat
 	)
 	case $action in
 		install)

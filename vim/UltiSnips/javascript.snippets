@@ -20,3 +20,35 @@ if (typeof ${1:obj} !== 'undefined' && $1 !== null) {
   $2
 }
 endsnippet
+
+snippet req "Require commonjs module" !b
+var ${1:module} = require('$1');
+endsnippet
+
+snippet class "Class boilerplate" !b
+var ${1:ClassName} = classic({
+  constructor: function $1(${2:property}) {
+    this.$2 = $2;
+  },
+
+  ${3:method}: function() {
+  }
+});
+endsnippet
+
+snippet foro "Enumerate all object own properties" !b
+for (var k in ${1:obj}) {
+  if (!has($1, k)) continue;
+  $2
+}
+endsnippet
+
+snippet each "Iterate using lodash 'each' method" !
+_.each(${1:obj}, function(${2:el}) {
+  $3
+});
+endsnippet
+
+snippet jshint "Creates a jshint comment" !b
+/* jshint ${1:loopfunc}: true */
+endsnippet

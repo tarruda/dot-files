@@ -10,6 +10,9 @@
 /zsh/.zsh_history
 /zsh/.zcompdump
 /zsh/.zcalc_history
+/weechat/sec.conf
+/weechat/logs/
+*.weechatlog
 /tmux/site-tmuxrc
 .VimballRecord
 /emacs.d/el-get/

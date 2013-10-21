@@ -152,27 +152,21 @@ man() {
 
 # wrapper for default datadir with znc
 
-znc() {
-	o_data=(-d $DOTDIR/znc)
-	zparseopts -D -K d:=o_data -datadir:=o_data
-	command znc -d $o_data[2] "$@"
-}
-
-irssi() {
-	# local ssh_args="-f -L 65535:127.0.0.1:65535 -L 65534:127.0.0.1:65534 irc-proxy"
-	# local tmpdir
-	# if which autossh &> /dev/null; then
-	# 	tmpdir=$(mktmpdir)
-	# 	trap "[[ -d $tmpdir ]] && kill \$(<$tmpdir/pid) && rm -rf $tmpdir" INT HUP TERM EXIT
-	# 	AUTOSSH_PIDFILE=$tmpdir/pid autossh -M 65000 -N ${(z)ssh_args}
-	# 	sleep 5
-	# else
-	# 	# sleep hack taken from:
-	# 	# http://www.g-loaded.eu/2006/11/24/auto-closing-ssh-tunnels/
-	# 	ssh ${(z)ssh_args} sleep 5
-	# fi
-	command irssi --home=$DOTDIR/irssi "$@"
-}
+# irssi() {
+# 	local ssh_args="-f -L 65535:127.0.0.1:65535 -L 65534:127.0.0.1:65534 irc-proxy"
+# 	local tmpdir
+# 	if which autossh &> /dev/null; then
+# 		tmpdir=$(mktmpdir)
+# 		trap "[[ -d $tmpdir ]] && kill \$(<$tmpdir/pid) && rm -rf $tmpdir" INT HUP TERM EXIT
+# 		AUTOSSH_PIDFILE=$tmpdir/pid autossh -M 65000 -N ${(z)ssh_args}
+# 		sleep 5
+# 	else
+# 		# sleep hack taken from:
+# 		# http://www.g-loaded.eu/2006/11/24/auto-closing-ssh-tunnels/
+# 		ssh ${(z)ssh_args} sleep 5
+# 	fi
+# 	command irssi --home=$DOTDIR/irssi "$@"
+# }
 
 # }}}
 # Aliases {{{
@@ -337,7 +331,9 @@ else
 		TERM=screen-256color command mutt -e "set editor='TERM=tmux vim -X'" "$@"
 	}
 
-	alias irssi='TERM=screen-256color irssi "$@"'
+	weechat() {
+		TERM=screen-256color command weechat-curses "$@"
+	}
 fi
 
 alias e=vi
