@@ -1,0 +1,16 @@
+#
+# sec.conf -- weechat v0.4.2
+#
+
+[crypt]
+cipher = aes256
+hash_algo = sha256
+passphrase_file = ""
+salt = on
+
+[data]
+__passphrase__ = off
+freenode_username = ""
+freenode_password = ""
+oftc_username = ""
+oftc_password = ""
