@@ -295,6 +295,7 @@ sub highmon_buffer_open
 			weechat::buffer_set($highmon_buffer, "localvar_set_no_log", "1");
 		}
 	}
+	weechat::hook_signal_send("logger_backlog", weechat::WEECHAT_HOOK_SIGNAL_POINTER, $highmon_buffer);
 	return weechat::WEECHAT_RC_OK;
 }
 # Buffer input has no action
