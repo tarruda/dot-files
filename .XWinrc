@@ -33,7 +33,7 @@ ICONS {
 
 STYLES {
   # Firefox MAXIMIZE
-  tmux MAXIMIZE
+  # tmux MAXIMIZE
   # Chromium MAXIMIZE
-  emacs MAXIMIZE
+  # emacs MAXIMIZE
 }
