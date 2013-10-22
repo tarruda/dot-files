@@ -5,7 +5,9 @@
 /vimperator/info
 /vimperator/plugin/local.vimp
 /zsh/.site-zprofile
+/zsh/site-zprofile.d/
 /zsh/.site-zshrc
+/zsh/site-zshrc.d/
 /zsh/.site-zlogin
 /zsh/.zsh_history
 /zsh/.zcompdump

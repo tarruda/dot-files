@@ -16,6 +16,7 @@ function() {
 	emacs.d .emacs.d
 	mail/muttrc .muttrc
 	weechat .weechat
+	.Xresources .Xdefaults
 	)
 	case $action in
 		install)

@@ -339,42 +339,106 @@ fi
 alias e=vi
 
 # }}}
-# Ruby {{{
+# Github {{{
+install-github-tree() {
+	(
+	zmodload zsh/regex
+	o_dir=(-d)
+	o_tree=(-t master)
 
-install-rvm() {
-	if [[ -d $HOME/.rvm ]]; then
-		print "Already installed" >&2
+	zparseopts -D -K -- d:=o_dir t:=o_tree
+
+	dir=$o_dir[2]
+	tree=$o_tree[2]
+	repo=$1
+
+	if [[ ! $repo -regex-match "[^/]+/.+$" ]]; then
+		echo "Repository must be in the form 'user/repo'" >&2
 		return 1
 	fi
-	command curl -L https://get.rvm.io | bash -s -- --ignore-dotfiles
+
+	strip=0
+	if [[ -n $dir ]]; then
+		if [[ -e $dir ]]; then
+			echo "'$dir' already exists" >&2
+			return 1
+		fi
+		strip=1
+		mkdir $dir
+		cd $dir
+	fi
+	command curl -L "https://github.com/${repo}/archive/${tree}.tar.gz" | tar --strip-components=$strip -xvzf -
+	)
 }
-[[ -r $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
+# }}}
+# Ruby {{{
+install-rbenv() {
+	install-github-tree -d "$HOME/.rbenv" -t 'v0.4.0' 'sstephenson/rbenv'
+	mkdir -p "$HOME/.rbenv/plugins"
+	install-github-tree -d "$HOME/.rbenv/plugins/ruby-build" -t 'v20131008' 'sstephenson/ruby-build'
+	mkdir -p "$ZDOTDIR/site-zshrc.d"
+	echo 'export RBENV_ROOT="$HOME/.rbenv"' > "$ZDOTDIR/site-zshrc.d/rbenv.zsh"
+	echo 'export PATH="$RBENV_ROOT/bin:$PATH"' >> "$ZDOTDIR/site-zshrc.d/rbenv.zsh"
+	echo 'eval "$(rbenv init -)"' >> "$ZDOTDIR/site-zshrc.d/rbenv.zsh"
+}
+
+install-ruby() {
+	local version='1.9.3-p448'
+	RUBY_CONFIGURE_OPTS='--enable-shared' rbenv install $version
+	echo $version > "$HOME/.ruby-version"
+}
 
 # }}}
 # Python {{{
-install-pythonbrew() {
-	command curl -kL http://xrl.us/pythonbrewinstall | bash
+install-pyenv() {
+	install-github-tree -d "$HOME/.pyenv" -t 'v0.4.0-20130726' 'yyuu/pyenv'
+	mkdir -p "$ZDOTDIR/site-zshrc.d"
+	echo 'export PYENV_ROOT="$HOME/.pyenv"' > "$ZDOTDIR/site-zshrc.d/pyenv.zsh"
+	echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> "$ZDOTDIR/site-zshrc.d/pyenv.zsh"
+	echo 'eval "$(pyenv init -)"' >> "$ZDOTDIR/site-zshrc.d/pyenv.zsh"
 }
-[[ -s $HOME/.pythonbrew/etc/bashrc ]] && source $HOME/.pythonbrew/etc/bashrc
-# }}}
+
+install-python() {
+	local version='2.7.5'
+	PYTHON_CONFIGURE_OPTS='--enable-shared' pyenv install $version
+	echo $version "$HOME/.python-version"
+	# 	if [[ -n $pybrew_version ]]; then
+	# 		export PKG_CONFIG_PATH="$PYTHONPATH/pkgconfig:$PKG_CONFIG_PATH"
+	# 	fi
+}
 # Perl {{{
-export PERLBREW_ROOT=$HOME/.perlbrew
-install-perlbrew() {
-	command curl -kL http://install.perlbrew.pl | bash
+install-plenv() {
+	install-github-tree -d "$HOME/.plenv" -t '2.1.1' 'tokuhirom/plenv'
+	mkdir -p "$HOME/.plenv/plugins"
+	install-github-tree -d "$HOME/.plenv/plugins/perl-build" -t '1.05' 'tokuhirom/perl-build'
+	mkdir -p "$ZDOTDIR/site-zshrc.d"
+	echo 'export PLENV_ROOT="$HOME/.plenv"' > "$ZDOTDIR/site-zshrc.d/plenv.zsh"
+	echo 'export PATH="$PLENV_ROOT/bin:$PATH"' >> "$ZDOTDIR/site-zshrc.d/plenv.zsh"
+	echo 'eval "$(plenv init -)"' >> "$ZDOTDIR/site-zshrc.d/plenv.zsh"
 }
-[[ -r $PERLBREW_ROOT/etc/bashrc ]] && source $PERLBREW_ROOT/etc/bashrc
-if which perlbrew &> /dev/null; then
-	perlbrew use default &> /dev/null
-fi
+
+install-perl() {
+	local version='5.19.5'
+	PERL_CONFIGURE_OPTS='-Duseshrplib' plenv install $version
+	echo $version > ~/.perl-version
+}
 # }}}
 # Node.js {{{
-install-nvm() {
-	command curl https://raw.github.com/creationix/nvm/master/install.sh | sh
+install-nodenv() {
+	install-github-tree -d "$HOME/.nodenv" -t 'master' 'oinutter/nodenv'
+	mkdir -p "$HOME/.nodenv/plugins"
+	install-github-tree -d "$HOME/.nodenv/plugins/node-build" -t 'master' 'oinutter/node-build'
+	mkdir -p "$ZDOTDIR/site-zshrc.d"
+	echo 'export NODENV_ROOT="$HOME/.nodenv"' > "$ZDOTDIR/site-zshrc.d/nodenv.zsh"
+	echo 'export PATH="$NODENV_ROOT/bin:$PATH"' >> "$ZDOTDIR/site-zshrc.d/nodenv.zsh"
+	echo 'eval "$(nodenv init -)"' >> "$ZDOTDIR/site-zshrc.d/nodenv.zsh"
 }
-[[ -r $HOME/.nvm/nvm.sh ]] && source $HOME/.nvm/nvm.sh
-if which nvm &>/dev/null && [[ -n $(nvm alias default) ]]; then
-	nvm use default &> /dev/null
-fi
+
+install-node() {
+	local version='0.10.19'
+	nodenv install $version
+	echo $version > ~/.node-version
+}
 # }}}
 # Misc {{{
 
@@ -395,5 +459,12 @@ fi
 # Site initialization {{{
 if [[ -r $ZDOTDIR/.site-zshrc ]]; then
 	source $ZDOTDIR/.site-zshrc
+fi
+
+if [[ -d $ZDOTDIR/site-zshrc.d ]]; then
+	for script in $ZDOTDIR/site-zshrc.d/*.zsh(.N); do
+		source $script
+	done
+	unset script
 fi
 # }}}
