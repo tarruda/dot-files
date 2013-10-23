@@ -422,8 +422,8 @@ install-plenv() {
 }
 
 install-perl() {
-	version='5.19.5'
-	plenv install $version
+	version='5.18.1'
+	plenv install $version -Duseshrplib
 	echo $version > ~/.perl-version
 }
 # }}}
