@@ -377,7 +377,7 @@ install-rbenv() {
 	mkdir -p "$HOME/.rbenv/plugins"
 	install-github-tree -d "$HOME/.rbenv/plugins/ruby-build" -t 'v20131008' 'sstephenson/ruby-build'
 	mkdir -p "$ZDOTDIR/site-zshrc.d"
-	cat > "$ZDOTDIR/site-zshrc.d/rbenv-01.zsh" <<-EOF
+	cat > "$ZDOTDIR/site-zshrc.d/rbenv.zsh" <<-EOF
 	export RBENV_ROOT="\$HOME/.rbenv"
 	export PATH="\$RBENV_ROOT/bin:\$PATH"
 	eval "\$(rbenv init -)"
@@ -388,14 +388,6 @@ install-ruby() {
 	local version='1.9.3-p448'
 	RUBY_CONFIGURE_OPTS='--enable-shared' rbenv install $version
 	echo $version > "$HOME/.ruby-version"
-	cat > "$ZDOTDIR/site-zshrc.d/rbenv-02.zsh" <<-EOF
-	if [[ -r "\$HOME/.ruby-version" ]]; then
-		main_ruby_version=\$(cat "\$HOME/.ruby-version")
-		export LD_LIBRARY_PATH="\$RBENV_ROOT/versions/\$main_ruby_version/lib:\$LD_LIBRARY_PATH"
-		export PKG_CONFIG_PATH="\$RBENV_ROOT/versions/\$main_ruby_version/lib/pkgconfig:\$PKG_CONFIG_PATH"
-		unset main_ruby_version
-	fi
-	EOF
 }
 
 # }}}
@@ -403,7 +395,7 @@ install-ruby() {
 install-pyenv() {
 	install-github-tree -d "$HOME/.pyenv" -t 'v0.4.0-20130726' 'yyuu/pyenv'
 	mkdir -p "$ZDOTDIR/site-zshrc.d"
-	cat > "$ZDOTDIR/site-zshrc.d/pyenv-01.zsh" <<-EOF
+	cat > "$ZDOTDIR/site-zshrc.d/pyenv.zsh" <<-EOF
 	export PYENV_ROOT="\$HOME/.pyenv"
 	export PATH="\$PYENV_ROOT/bin:\$PATH"
 	eval "\$(pyenv init -)"
@@ -412,31 +404,26 @@ install-pyenv() {
 
 install-python() {
 	local version='2.7.5'
-	LD_LIBRARY_PATH="$PYENV_ROOT/versions/$version/lib" PYTHON_CONFIGURE_OPTS='--enable-shared' pyenv install $version
+	PYTHON_CONFIGURE_OPTS='--enable-shared' LDFLAGS="-Wl,-rpath=$PYENV_ROOT/versions/$version/lib" pyenv install $version
 	echo $version > "$HOME/.python-version"
-	cat > "$ZDOTDIR/site-zshrc.d/pyenv-02.zsh" <<-EOF
-	if [[ -r "\$HOME/.python-version" ]]; then
-		main_python_version=\$(cat "\$HOME/.python-version")
-		export LD_LIBRARY_PATH="\$PYENV_ROOT/versions/\$main_python_version/lib:\$LD_LIBRARY_PATH"
-		export PKG_CONFIG_PATH="\$PYENV_ROOT/versions/\$main_python_version/lib/pkgconfig:\$PKG_CONFIG_PATH"
-		unset main_python_version
-	fi
-	EOF
 }
+# }}}
 # Perl {{{
 install-plenv() {
 	install-github-tree -d "$HOME/.plenv" -t '2.1.1' 'tokuhirom/plenv'
 	mkdir -p "$HOME/.plenv/plugins"
 	install-github-tree -d "$HOME/.plenv/plugins/perl-build" -t '1.05' 'tokuhirom/perl-build'
 	mkdir -p "$ZDOTDIR/site-zshrc.d"
-	echo 'export PLENV_ROOT="$HOME/.plenv"' > "$ZDOTDIR/site-zshrc.d/plenv.zsh"
-	echo 'export PATH="$PLENV_ROOT/bin:$PATH"' >> "$ZDOTDIR/site-zshrc.d/plenv.zsh"
-	echo 'eval "$(plenv init -)"' >> "$ZDOTDIR/site-zshrc.d/plenv.zsh"
+	cat > "$ZDOTDIR/site-zshrc.d/plenv.zsh" <<-EOF
+	export PLENV_ROOT="\$HOME/.plenv"
+	export PATH="\$PLENV_ROOT/bin:\$PATH"
+	eval "\$(plenv init -)"
+	EOF
 }
 
 install-perl() {
-	local version='5.19.5'
-	PERL_CONFIGURE_OPTS='-Duseshrplib' plenv install $version
+	version='5.19.5'
+	plenv install $version
 	echo $version > ~/.perl-version
 }
 # }}}

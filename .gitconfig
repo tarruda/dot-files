@@ -33,7 +33,7 @@
   pushInsteadOf = "gist:"
 
 [push]
-	default = upstream
+  default = upstream
 
 [imap] 
   folder = "[Gmail]/Drafts" 
@@ -43,10 +43,10 @@
   sslverify = true 
 
 [diff]
-	tool = vimdiff
+  tool = vimdiff
 
 [merge]
-	tool = vimdiff
+  tool = vimdiff
 
 [difftool]
-	prompt = true
+  prompt = true
