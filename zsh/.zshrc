@@ -62,6 +62,16 @@ bindkey -M vicmd "v" edit-command-line
 
 setopt no_beep
 
+# History substring search {{{
+zmodload zsh/terminfo
+bindkey "$terminfo[kcuu1]" history-substring-search-up
+bindkey "$terminfo[kcud1]" history-substring-search-down
+
+# bind k and j for VI mode
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
+# }}}
+
 # }}}
 # Completion system {{{
 
@@ -105,6 +115,18 @@ zstyle ':completion:*:(kill|strace):*' command 'ps -u $USER -o pid,%cpu,tty,cput
 # initialize the completion system
 autoload -Uz compinit
 compinit
+
+# Enable on-type prediction of commands
+predict-toggle() {
+  ((predict_on=1-predict_on)) && predict-on || predict-off
+}
+zle -N predict-toggle
+bindkey '^Z'   predict-toggle
+zstyle ':predict' verbose yes
+zstyle ':predict' cursor key
+zstyle ':completion:predict:*' completer  _oldlist _complete _ignored\
+ 	_history _prefix
+autoload predict-on
 
 # }}}
 # Functions {{{
