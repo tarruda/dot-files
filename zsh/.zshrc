@@ -42,18 +42,13 @@ fi
 # }}}
 # Zle {{{
 
+
 # Set vi-mode and create a few additional Vim-like mappings
 bindkey -v
 bindkey "^?" backward-delete-char
 bindkey -M vicmd "^R" redo
 bindkey -M vicmd "u" undo
 bindkey -M vicmd "ga" what-cursor-position
-bindkey -M viins '^p' history-beginning-search-backward
-bindkey -M vicmd '^p' history-beginning-search-backward
-bindkey -M viins '^n' history-beginning-search-forward
-bindkey -M vicmd '^n' history-beginning-search-forward
-bindkey -M vicmd '/' history-incremental-search-forward
-bindkey -M vicmd '?' history-incremental-search-backward
 
 # Allows editing the command line with an external editor
 autoload edit-command-line
@@ -61,16 +56,6 @@ zle -N edit-command-line
 bindkey -M vicmd "v" edit-command-line
 
 setopt no_beep
-
-# History substring search {{{
-zmodload zsh/terminfo
-bindkey "$terminfo[kcuu1]" history-substring-search-up
-bindkey "$terminfo[kcud1]" history-substring-search-down
-
-# bind k and j for VI mode
-bindkey -M vicmd 'k' history-substring-search-up
-bindkey -M vicmd 'j' history-substring-search-down
-# }}}
 
 # }}}
 # Completion system {{{
@@ -82,7 +67,7 @@ if [[ -d $comp_dir ]]; then
 fi
 unset comp_dir
 zstyle ':completion:*' auto-description 'specify: %d'
-zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
+# zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 # don't need prefix when completing approximately
 zstyle ':completion::approximate*:*' prefix-needed false
 # more errors allowed for large words and fewer for small words
@@ -90,7 +75,7 @@ zstyle ':completion:*:approximate:*' max-errors 'reply=(  $((  ($#PREFIX+$#SUFFI
 # Errors format
 zstyle ':completion:*:corrections' format '%B%d (errors %e)%b'
 # Don't complete stuff already on the line
-zstyle ':completion::*:(rm|vi):*' ignore-line true
+zstyle ':completion::*:(rm|vi|vim):*' ignore-line true
 # Don't complete directory we are already in (../here)
 zstyle ':completion:*' ignore-parents parent pwd
 #
@@ -116,18 +101,28 @@ zstyle ':completion:*:(kill|strace):*' command 'ps -u $USER -o pid,%cpu,tty,cput
 autoload -Uz compinit
 compinit
 
+# Prediction {{{
 # Enable on-type prediction of commands
-predict-toggle() {
-  ((predict_on=1-predict_on)) && predict-on || predict-off
-}
-zle -N predict-toggle
-bindkey '^Z'   predict-toggle
-zstyle ':predict' verbose yes
-zstyle ':predict' cursor key
-zstyle ':completion:predict:*' completer  _oldlist _complete _ignored\
- 	_history _prefix
-autoload predict-on
+bindkey '^T' predict-toggle
+zstyle ':predict' verbose no
+zstyle ':completion:incremental:*' completer _complete
+zstyle ':completion:predict:*' completer _complete
 
+predict-toggle() {
+	((predict_on=1-predict_on)) && predict-on || predict-off
+}
+
+zle -N predict-toggle
+
+autoload predict-on
+# }}}
+
+# zle initialization hook
+zle-line-init() {
+	predict-on
+}
+
+zle -N zle-line-init
 # }}}
 # Functions {{{
 
@@ -171,24 +166,6 @@ man() {
 	fi
 	PAGER=$pager command man "$@"
 }
-
-# wrapper for default datadir with znc
-
-# irssi() {
-# 	local ssh_args="-f -L 65535:127.0.0.1:65535 -L 65534:127.0.0.1:65534 irc-proxy"
-# 	local tmpdir
-# 	if which autossh &> /dev/null; then
-# 		tmpdir=$(mktmpdir)
-# 		trap "[[ -d $tmpdir ]] && kill \$(<$tmpdir/pid) && rm -rf $tmpdir" INT HUP TERM EXIT
-# 		AUTOSSH_PIDFILE=$tmpdir/pid autossh -M 65000 -N ${(z)ssh_args}
-# 		sleep 5
-# 	else
-# 		# sleep hack taken from:
-# 		# http://www.g-loaded.eu/2006/11/24/auto-closing-ssh-tunnels/
-# 		ssh ${(z)ssh_args} sleep 5
-# 	fi
-# 	command irssi --home=$DOTDIR/irssi "$@"
-# }
 
 # }}}
 # Aliases {{{
@@ -494,3 +471,16 @@ if [[ -d $ZDOTDIR/site-zshrc.d ]]; then
 	unset script
 fi
 # }}}
+
+# History substring search {{{
+zmodload zsh/terminfo
+bindkey "$terminfo[kcuu1]" history-substring-search-up
+bindkey "$terminfo[kcud1]" history-substring-search-down
+
+# bind k and j for VI mode
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
+
+source $ZDOTDIR/zsh-history-substring-search/zsh-history-substring-search.zsh
+# }}}
+
