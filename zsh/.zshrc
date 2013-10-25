@@ -466,4 +466,3 @@ bindkey -M vicmd 'j' history-substring-search-down
 
 source $ZDOTDIR/zsh-history-substring-search/zsh-history-substring-search.zsh
 # }}}
-
