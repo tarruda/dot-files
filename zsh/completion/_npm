@@ -11,7 +11,7 @@ _npm_commands() {
 			local subcmd desc help
 			for subcmd in `npm --help | grep '^\s' | grep -v '/'`; do
 				subcmd=${subcmd:0:-1}
-				desc=$(npm help $subcmd 2>/dev/null | grep -m1 "^\s\+npm-$subcmd" |\
+				desc=$(npm help $subcmd 2>/dev/null | grep -m1 '^\s\+npm-' |\
 					awk -F'--' '{print $2}' 2> /dev/null)
 				[[ -z $desc ]] && continue
 				subcmd="$subcmd:$desc"
@@ -22,31 +22,33 @@ _npm_commands() {
 	fi
 }
 
-_npm_all() {
+_npm_packages() {
 	if (( ! $+npmcomp_packages )); then
 		npmcomp_packages=()
 		if [[ ! -r /tmp/npmcomp-packages ]]; then
 			echo -n "(saving remote package database to /tmp/npmcomp-packages...)" 2> /dev/null
-			npm search 2> /dev/null | sed '1d' | cut -d '=' -f 1 | \
-				sed -e 's/ \+/:/' -e "s/^\\(.\\+\\):\\(.\\+\\)$/\\1 '\\2'/"\
-			 	> /tmp/npmcomp-packages
-			# npm search 2> /dev/null | sed '1d' | cut -d ' ' -f 1 > /tmp/npmcomp-packages
+			npm search 2> /dev/null | sed '1d' | cut -d ' ' -f 1 >\
+			 	/tmp/npmcomp-packages
 		fi
 		npmcomp_packages=(${(f)"$(</tmp/npmcomp-packages)"})
-		# echo "(reading package database...)" 2> /dev/null
-		# local line
-		# while read line; do
-		# 	npmcomp_packages+=line
-		# done < /tmp/npmcomp-packages
 	fi
+	_wanted npm_pkgs expl 'Npm packages' compadd -a npmcomp_packages
 }
 
 _npm_installed() {
-	if [[ -d node_modules ]]; then
-		installed_pkgs=()
+	local installed_pkgs global p
+	if [[ $words[(i)-g] -le $#words || $words[(i)--global] -le $#words ]]; then
+		p=$(npm root -g)
 	else
-		installed_pkgs=(`ls node_modules`)
+		p=$(npm root)
 	fi
+
+	if [[ -d $p ]]; then
+		installed_pkgs=(`ls $p`)
+	else
+		installed_pkgs=()
+	fi
+	_wanted installed_pkgs expl 'Installed packages' compadd -a installed_pkgs
 }
 
 local expl
@@ -72,11 +74,16 @@ case "$words[1]" in
 			'(--save-optional)--save-optional[Declare the package as an optional dependency in package.json]' \
 			'1: :->packages' &&  return 0
 
-		if [[ "$state" == packages ]]; then
-			_npm_all
-			_wanted npm_pkgs expl 'Npm packages' compadd -a npmcomp_packages
-		fi ;;
-	remove|rm|r)
-		_npm_installed
-		_wanted installed_pkgs expl 'installed packages' compadd -a installed_pkgs ;;
+		[[ "$state" == packages ]] && _npm_packages
+		;;
+	show|view|v|info|repo)
+		_arguments '1: :->packages' &&  return 0
+		[[ "$state" == packages ]] && _npm_packages
+		;;
+	uninstall|unlink|un|remove|rm|r)
+		_arguments \
+			'(-g --global)'{-g,--global}'[Remove global package]' \
+			'1: :->installed' &&  return 0
+		[[ "$state" == "installed" ]] && _npm_installed
+		;;
 esac
