@@ -1,0 +1,82 @@
+#compdef npm
+#autoload
+
+# npm completion, based this pip completion function:
+# https://github.com/robbyrussell/oh-my-zsh/blob/master/plugins/pip/_pip
+
+_npm_commands() {
+	if (( ! $+npmcomp_commands )); then
+		if [[ ! -r ~/.npmcomp-commands ]]; then
+			echo -n " (saving npm command database to $HOME/.npmcomp-commands, please wait...)" 2> /dev/null
+			local subcmd desc help
+			for subcmd in `npm --help | grep '^\s' | grep -v '/'`; do
+				subcmd=${subcmd:0:-1}
+				desc=$(npm help $subcmd 2>/dev/null | grep -m1 "^\s\+npm-$subcmd" |\
+					awk -F'--' '{print $2}' 2> /dev/null)
+				[[ -z $desc ]] && continue
+				subcmd="$subcmd:$desc"
+				echo $subcmd >> ~/.npmcomp-commands
+			done
+		fi
+		npmcomp_commands=(${(f)"$(<~/.npmcomp-commands)"})
+	fi
+}
+
+_npm_all() {
+	if (( ! $+npmcomp_packages )); then
+		npmcomp_packages=()
+		if [[ ! -r /tmp/npmcomp-packages ]]; then
+			echo -n "(saving remote package database to /tmp/npmcomp-packages...)" 2> /dev/null
+			npm search 2> /dev/null | sed '1d' | cut -d '=' -f 1 | \
+				sed -e 's/ \+/:/' -e "s/^\\(.\\+\\):\\(.\\+\\)$/\\1 '\\2'/"\
+			 	> /tmp/npmcomp-packages
+			# npm search 2> /dev/null | sed '1d' | cut -d ' ' -f 1 > /tmp/npmcomp-packages
+		fi
+		npmcomp_packages=(${(f)"$(</tmp/npmcomp-packages)"})
+		# echo "(reading package database...)" 2> /dev/null
+		# local line
+		# while read line; do
+		# 	npmcomp_packages+=line
+		# done < /tmp/npmcomp-packages
+	fi
+}
+
+_npm_installed() {
+	if [[ -d node_modules ]]; then
+		installed_pkgs=()
+	else
+		installed_pkgs=(`ls node_modules`)
+	fi
+}
+
+local expl
+local -a all_pkgs installed_pkgs
+
+_arguments \
+	'(-v --version)'{-v,--version}'[show version number of program and exit]' \
+	'(-h --help)'{-h,--help}'[show help]' \
+	'*:: :->subcmds' && return 0
+
+if (( CURRENT == 1 )); then
+	_npm_commands
+	_describe -t commands 'Subcommands' npmcomp_commands
+	return
+fi
+
+case "$words[1]" in
+	install|i)
+		_arguments \
+			'(-g --global)'{-g,--global}'[Install as a global package]' \
+			'(--save)--save[Declare the package as a dependency in package.json]' \
+			'(--save-dev)--save-dev[Declare the package as a development dependency in package.json]' \
+			'(--save-optional)--save-optional[Declare the package as an optional dependency in package.json]' \
+			'1: :->packages' &&  return 0
+
+		if [[ "$state" == packages ]]; then
+			_npm_all
+			_wanted npm_pkgs expl 'Npm packages' compadd -a npmcomp_packages
+		fi ;;
+	remove|rm|r)
+		_npm_installed
+		_wanted installed_pkgs expl 'installed packages' compadd -a installed_pkgs ;;
+esac

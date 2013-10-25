@@ -102,6 +102,8 @@ if [ ! -e "$HOME/.ssh/config" ]; then
 fi
 
 if which gpg-agent &> /dev/null; then
+	# Use ssh-add once to add an ssh key to the list of keys managed by
+	# gnupg-agent
 	if ! ps -C gpg-agent &> /dev/null; then
 		ttl=2592000 # 1 month
 		gpg-agent --daemon --enable-ssh-support \

@@ -31,13 +31,16 @@ setopt rm_star_wait # wait 10 seconds before really executing 'rm -rf *'
 
 autoload -U colors && colors
 autoload -U promptinit
+setopt prompt_subst
 
-PROMPT='%m :: %2~ %B»%b '
+PROMPT='%m %{$fg[blue]%}::%{$reset_color%} %2~ %{$fg[green]%}»%{$reset_color%} '
 if [[ -n $MINGW64_ENV ]]; then
 	PROMPT="(mingw-x64)$PROMPT"
 elif [[ -n $MINGW32_END ]]; then
 	PROMPT="(mingw-i686)$PROMPT"
 fi
+# Display return code of the last command
+# RPROMPT='%{$?%}'
 
 # }}}
 # Zle {{{
@@ -67,7 +70,7 @@ if [[ -d $comp_dir ]]; then
 fi
 unset comp_dir
 zstyle ':completion:*' auto-description 'specify: %d'
-# zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
+zstyle ':completion:*' completer _expand _complete _ignored _approximate _correct
 # don't need prefix when completing approximately
 zstyle ':completion::approximate*:*' prefix-needed false
 # more errors allowed for large words and fewer for small words
@@ -101,28 +104,6 @@ zstyle ':completion:*:(kill|strace):*' command 'ps -u $USER -o pid,%cpu,tty,cput
 autoload -Uz compinit
 compinit
 
-# Prediction {{{
-# Enable on-type prediction of commands
-bindkey '^T' predict-toggle
-zstyle ':predict' verbose no
-zstyle ':completion:incremental:*' completer _complete
-zstyle ':completion:predict:*' completer _complete
-
-predict-toggle() {
-	((predict_on=1-predict_on)) && predict-on || predict-off
-}
-
-zle -N predict-toggle
-
-autoload predict-on
-# }}}
-
-# zle initialization hook
-zle-line-init() {
-	predict-on
-}
-
-zle -N zle-line-init
 # }}}
 # Functions {{{
 
@@ -276,7 +257,8 @@ alias OPTIONS='burl OPTIONS'
 # SSH/GnuPG {{{
 
 if ! which gpg-agent &> /dev/null; then
-	# Invoke ssh-add on demand, not needed if using gpg-agent
+	# Invoke ssh-add on demand, not needed if using gnupg-agent(but ssh-add has to
+	# be invoked one time to add it to the list of gnupg-agent managed keys)
 	git() {
 		case $1 in
 			pull|push|fetch)
@@ -432,13 +414,15 @@ install-nodenv() {
 	mkdir -p "$HOME/.nodenv/plugins"
 	install-github-tree -d "$HOME/.nodenv/plugins/node-build" -t 'master' 'oinutter/node-build'
 	mkdir -p "$ZDOTDIR/site-zshrc.d"
-	echo 'export NODENV_ROOT="$HOME/.nodenv"' > "$ZDOTDIR/site-zshrc.d/nodenv.zsh"
-	echo 'export PATH="$NODENV_ROOT/bin:$PATH"' >> "$ZDOTDIR/site-zshrc.d/nodenv.zsh"
-	echo 'eval "$(nodenv init -)"' >> "$ZDOTDIR/site-zshrc.d/nodenv.zsh"
+	cat > "$ZDOTDIR/site-zshrc.d/nodenv.zsh" <<-EOF
+	export NODENV_ROOT="\$HOME/.nodenv"
+	export PATH="\$NODENV_ROOT/bin:\$PATH"
+	eval "\$(nodenv init -)"
+	EOF
 }
 
 install-node() {
-	local version='0.10.19'
+	local version='0.10.20'
 	nodenv install $version
 	echo $version > ~/.node-version
 }
@@ -471,7 +455,6 @@ if [[ -d $ZDOTDIR/site-zshrc.d ]]; then
 	unset script
 fi
 # }}}
-
 # History substring search {{{
 zmodload zsh/terminfo
 bindkey "$terminfo[kcuu1]" history-substring-search-up
