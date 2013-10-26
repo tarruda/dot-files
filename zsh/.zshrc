@@ -116,8 +116,9 @@ autoload -Uz compinit
 compinit
 
 # }}}
-# Prediction {{{
-# Enable on-type prediction of commands
+# Autosuggestions {{{
+# Enable on-type completion of commands. This configuration emulates fish's
+# autosuggest feature using zsh's builtin 'predict-on' widget.
 zstyle ':predict' verbose no
 zstyle ':completion:incremental:*' completer _complete
 zstyle ':completion:predict:*' completer _complete
@@ -125,51 +126,96 @@ zstyle ':completion:predict:*' completer _complete
 autoload predict-on
 
 accept-line() {
-	# When predicting, ignore the RBUFFER
-	[[ -n $ZLE_PREDICTING ]] && RBUFFER=''
+	# When autosuggesting, ignore RBUFFER
+	[[ -n $ZLE_AUTOSUGGESTING ]] && RBUFFER=''
 	zle .accept-line
 }
 
-disable-prediction() {
-	if [[ -n $ZLE_PREDICTING ]]; then
-		unset ZLE_PREDICTING
+disable-autosuggestions() {
+	if [[ -n $ZLE_AUTOSUGGESTING ]]; then
+		unset ZLE_AUTOSUGGESTING
 		predict-off
+		highlight-suggested-text
 	fi
 }
 
-enable-prediction() {
-	ZLE_PREDICTING=1
+enable-autosuggestions() {
+	ZLE_AUTOSUGGESTING=1
 	predict-on
+	# Save the prediction widgets
+	zle -A self-insert insert-and-predict-orig
+	zle -A backward-delete-char delete-backward-and-predict-orig
+	zle -A delete-char-or-list delete-no-predict-orig
+	# Replace prediction widgets by versions that will also highlight RBUFFER
+	zle -N self-insert insert-and-predict-and-highlight
+	zle -N magic-space insert-and-predict-and-highlight
+	zle -N backward-delete-char delete-backward-and-predict-and-highlight
+	zle -N delete-char-or-list delete-no-predict-and-highlight
+	highlight-suggested-text
 }
 
-# When entering vi command mode, disable prediction as its very likely
-# I'm going to edit the middle of the line
+toggle-autosuggestions() {
+	if [[ -n $ZLE_AUTOSUGGESTING ]]; then
+		disable-autosuggestions
+	else
+		enable-autosuggestions
+	fi
+}
+
+# When entering vi command mode, disable autosuggestions as its
+# possible the user is going to edit the middle of the line
 vi-cmd-mode() {
-	disable-prediction
+	disable-autosuggestions
+	highlight-suggested-text
 	zle .vi-cmd-mode
 }
 
-# Disable prediction when moving the char to the left using arrows
+# Disable autosuggestions when moving the char to the left using arrows
 vi-backward-char() {
-	disable-prediction
+	disable-autosuggestions
+	highlight-suggested-text
 	zle .vi-backward-char
 }
 
-# Searching history with the arrows also disables prediction
+# Searching history with the arrows also disables autosuggestions
 history-search-forward() {
-	disable-prediction
+	disable-autosuggestions
+	highlight-suggested-text
 	zle .history-search-forward
 }
 
 history-search-backward() {
-	disable-prediction
+	disable-autosuggestions
+	highlight-suggested-text
 	zle .history-search-backward
 }
 
-# Start prediction automatically with zle
+highlight-suggested-text() {
+	if [[ -n $ZLE_AUTOSUGGESTING ]]; then
+		region_highlight=("$(( $CURSOR + 1 )) $(( $CURSOR + $#RBUFFER )) fg=8")
+	else
+		region_highlight=()
+	fi
+}
+
+insert-and-predict-and-highlight() {
+	zle insert-and-predict-orig
+	highlight-suggested-text
+}
+
+delete-backward-and-predict-and-highlight() {
+	zle delete-backward-and-predict-orig
+	highlight-suggested-text
+}
+
+delete-no-predict-and-highlight() {
+	zle delete-no-predict-orig
+	highlight-suggested-text
+}
+
+# Start autosuggesting automatically with zle
 zle-line-init() {
-	ZLE_PREDICTING=1
-	predict-on
+	enable-autosuggestions
 }
 
 zle -N zle-line-init
@@ -177,10 +223,14 @@ zle -N accept-line
 zle -N vi-cmd-mode
 zle -N history-search-forward
 zle -N history-search-backward
-zle -N enable-prediction
+zle -N enable-autosuggestions
+zle -N insert-and-predict-and-highlight
+zle -N delete-backward-and-predict-and-highlight
+zle -N delete-no-predict-and-highlight
+zle -N toggle-autosuggestions
 
-# If needed, I can re-enable prediction with CTRL+T
-bindkey '^T' enable-prediction
+# If needed, I can re-enable autosuggestions with CTRL+T
+bindkey '^T' toggle-autosuggestions
 # }}}
 # Functions {{{
 
