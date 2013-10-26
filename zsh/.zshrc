@@ -52,11 +52,24 @@ bindkey "^?" backward-delete-char
 bindkey -M vicmd "^R" redo
 bindkey -M vicmd "u" undo
 bindkey -M vicmd "ga" what-cursor-position
+bindkey -M viins '^p' history-beginning-search-backward
+bindkey -M vicmd '^p' history-beginning-search-backward
+bindkey -M viins '^n' history-beginning-search-forward
+bindkey -M vicmd '^n' history-beginning-search-forward
+bindkey -M vicmd '/' history-incremental-search-forward
+bindkey -M vicmd '?' history-incremental-search-backward
 
 # Allows editing the command line with an external editor
 autoload edit-command-line
 zle -N edit-command-line
 bindkey -M vicmd "v" edit-command-line
+
+# Rebind up/down j/k keys to history forward/backward
+zmodload zsh/terminfo
+bindkey "$terminfo[kcuu1]" history-search-forward
+bindkey "$terminfo[kcud1]" history-search-backward
+bindkey -M vicmd 'k' history-search-backward
+bindkey -M vicmd 'j' history-search-forward
 
 setopt no_beep
 
@@ -104,6 +117,26 @@ zstyle ':completion:*:(kill|strace):*' command 'ps -u $USER -o pid,%cpu,tty,cput
 autoload -Uz compinit
 compinit
 
+# Prediction {{{
+predict-toggle() {
+	((predict_on=1-predict_on)) && predict-on || predict-off
+}
+
+zle -N predict-toggle
+
+# Enable on-type prediction of commands
+bindkey '^T' predict-toggle
+zstyle ':predict' verbose no
+zstyle ':completion:incremental:*' completer _complete
+zstyle ':completion:predict:*' completer _complete
+
+autoload predict-on
+
+zle-line-init() {
+	predict-on
+}
+zle -N zle-line-init
+# }}}
 # }}}
 # Functions {{{
 
@@ -456,13 +489,6 @@ if [[ -d $ZDOTDIR/site-zshrc.d ]]; then
 fi
 # }}}
 # History substring search {{{
-zmodload zsh/terminfo
-bindkey "$terminfo[kcuu1]" history-substring-search-up
-bindkey "$terminfo[kcud1]" history-substring-search-down
-
-# bind k and j for VI mode
-bindkey -M vicmd 'k' history-substring-search-up
-bindkey -M vicmd 'j' history-substring-search-down
 
 source $ZDOTDIR/zsh-history-substring-search/zsh-history-substring-search.zsh
 # }}}
