@@ -52,9 +52,7 @@ bindkey "^?" backward-delete-char
 bindkey -M vicmd "^R" redo
 bindkey -M vicmd "u" undo
 bindkey -M vicmd "ga" what-cursor-position
-bindkey -M viins '^p' history-beginning-search-backward
 bindkey -M vicmd '^p' history-beginning-search-backward
-bindkey -M viins '^n' history-beginning-search-forward
 bindkey -M vicmd '^n' history-beginning-search-forward
 bindkey -M vicmd '/' history-incremental-search-forward
 bindkey -M vicmd '?' history-incremental-search-backward
@@ -117,26 +115,72 @@ zstyle ':completion:*:(kill|strace):*' command 'ps -u $USER -o pid,%cpu,tty,cput
 autoload -Uz compinit
 compinit
 
+# }}}
 # Prediction {{{
-predict-toggle() {
-	((predict_on=1-predict_on)) && predict-on || predict-off
-}
-
-zle -N predict-toggle
-
 # Enable on-type prediction of commands
-bindkey '^T' predict-toggle
 zstyle ':predict' verbose no
 zstyle ':completion:incremental:*' completer _complete
 zstyle ':completion:predict:*' completer _complete
 
 autoload predict-on
 
-zle-line-init() {
+accept-line() {
+	# When predicting, ignore the RBUFFER
+	[[ -n $ZLE_PREDICTING ]] && RBUFFER=''
+	zle .accept-line
+}
+
+disable-prediction() {
+	if [[ -n $ZLE_PREDICTING ]]; then
+		unset ZLE_PREDICTING
+		predict-off
+	fi
+}
+
+enable-prediction() {
+	ZLE_PREDICTING=1
 	predict-on
 }
+
+# When entering vi command mode, disable prediction as its very likely
+# I'm going to edit the middle of the line
+vi-cmd-mode() {
+	disable-prediction
+	zle .vi-cmd-mode
+}
+
+# Disable prediction when moving the char to the left using arrows
+vi-backward-char() {
+	disable-prediction
+	zle .vi-backward-char
+}
+
+# Searching history with the arrows also disables prediction
+history-search-forward() {
+	disable-prediction
+	zle .history-search-forward
+}
+
+history-search-backward() {
+	disable-prediction
+	zle .history-search-backward
+}
+
+# Start prediction automatically with zle
+zle-line-init() {
+	ZLE_PREDICTING=1
+	predict-on
+}
+
 zle -N zle-line-init
-# }}}
+zle -N accept-line
+zle -N vi-cmd-mode
+zle -N history-search-forward
+zle -N history-search-backward
+zle -N enable-prediction
+
+# If needed, I can re-enable prediction with CTRL+T
+bindkey '^T' enable-prediction
 # }}}
 # Functions {{{
 
