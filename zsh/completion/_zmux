@@ -17,7 +17,7 @@ _arguments\
 
 case $state in
 	cmd)
-		_arguments "1:Command:(open close list new rm edit edit-close)"
+		_arguments "1:Command:($(zmux list-commands))"
 		;;
 	session)
 		_arguments "2:Session:(${sessions})"
