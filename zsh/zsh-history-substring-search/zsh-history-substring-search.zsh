@@ -174,6 +174,9 @@ if [[ $+functions[_zsh_highlight] -eq 0 ]]; then
 fi
 
 function _history-substring-search-begin() {
+  # Ensure highlights are cleared when the user accepts the line
+  zle -N accept-line _history-substring-search-accept-line
+
   setopt localoptions extendedglob
 
   _history_substring_search_refresh_display=
@@ -555,6 +558,11 @@ function _history-substring-search-down-search() {
     #
     _history-substring-search-not-found
   fi
+}
+
+function _history-substring-search-accept-line() {
+  region_highlight=()
+  zle .accept-line
 }
 
 # -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-

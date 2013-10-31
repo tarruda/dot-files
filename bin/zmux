@@ -1,0 +1,192 @@
+#!/usr/bin/env zsh
+program=$0
+zmux_command=$1
+session_name=$2
+sessions_repository="$HOME/.tmux-sessions"
+session_dir="$sessions_repository/$session_name"
+
+zmodload zsh/zutil
+
+split() {
+	local o_target o_detach o_dir args
+	o_target=(-t $pane_id)
+	# ignore 'detach' option to ensure we get the unique pane id with
+	# display-message
+	o_detach=(-d)
+	o_print=(-P)
+	o_format=(-F)
+	o_dir=(-c $project_dir)
+	zparseopts -D -K t:=o_target d:=o_detach c:=o_dir P:=o_print F:=o_format
+	args=(-P -F '#{pane_id}' -t $o_target[2])
+	if [[ -n $project_dir ]]; then
+		args+=(-c $o_dir[2])
+	fi
+	pane_id=$(tmux split-window ${(z)args} "$@")
+}
+
+send-keys() {
+	local o_target
+	o_target=(-t $pane_id)
+	zparseopts -D -K t:=o_target
+	tmux send-keys -t $o_target[2] "$@"
+}
+
+run-command() {
+	local o_target
+	o_target=(-t $pane_id)
+	zparseopts -D -K t:=o_target
+	send-keys -t $o_target[2] -l "$@"
+ 	send-keys -t $o_target[2] "C-m"
+}
+
+set() {
+	tmux set -t $session_name -q "@$1" $2
+}
+
+get() {
+	tmux show -t $session_name -v "@$1" 2> /dev/null
+}
+
+function {
+local session_open="$session_dir/tmux-open.zsh"
+local session_close="$session_dir/tmux-close.zsh"
+
+if [[ -z $session_name && $zmux_command != (close|list) ]]; then
+	print "Needs a session name" >&2
+	exit 1
+fi
+
+local session_open_template session_close_template
+read -d '' -r session_open_template << "EOF"
+# If you want the session to have a default directory, set the project_dir
+# variable
+# project_dir="~/project"
+
+# Basic session template for editing a project with vim.
+# Vim has a session persistence system, configure it to save
+# in the session directory
+vim_session_file="$session_dir/session.vim"
+setup_cmd="mksession! ${(q)vim_session_file}"
+
+# If the vim session file exists, load at startup instead of creating
+# a new one
+if [[ -r $vim_session_file ]]; then
+	setup_cmd="so ${(q)vim_session_file}"
+fi
+
+# When vim exits, save the session back to the file
+teardown_cmd="au VimLeavePre * mksession! ${(q)vim_session_file}"
+split -p 75
+
+# Save the vim pane id into the tmux session. This will be used
+# to gracefully shutdown vim later
+set vim-pane $pane_id
+
+run-command "vim -c '${setup_cmd}' -c '${teardown_cmd}'"
+EOF
+
+read -d '' -r session_close_template << "EOF"
+# Put any cleanup commands here to gracefully shutdown your sessions
+# when 'zmux close' is called.
+
+# get the vim pane
+vim_pane_id=$(get vim-pane)
+
+# send escape to ensure vim is in normal mode
+send-keys -t $vim_pane_id "Escape"
+
+# write all buffers and quit vim
+send-keys -t $vim_pane_id ":wqa" "C-m"
+EOF
+
+case $zmux_command in
+	open)
+		if [[ ! -r "$session_dir/" ]]; then
+			print "Session '$session_name' isn't registered" >&2
+			exit 1
+		fi
+		if [[ ! -r $session_open ]]; then
+			print "Session '$session_name' has no script" >&2
+			exit 1
+		fi
+		if ! tmux has-session -t $session_name &> /dev/null; then
+			TMUX= tmux new-session -d -s $session_name -n main
+			session_id=$(tmux display -p -t $session_name '#{session_id}')
+			window_id=$(tmux display -p -t $session_name '#{window_id}')
+			pane_id=$(tmux display -p -t $session_name '#{pane_id}')
+			source $session_open
+			if [[ -n $project_dir ]]; then
+				tmux set-option -t $session_id default-path $project_dir
+			fi
+		fi
+		if [[ -z $TMUX ]]; then
+			tmux attach-session -t $session_name
+		else
+			tmux switch-client -t $session_name
+		fi
+		;;
+	close)
+		if [[ -z $session_name ]]; then
+			sessions=($($program list))
+		else
+			sessions=($session_name)
+		fi
+		for session_name in $sessions; do
+			session_dir="$sessions_repository/$session_name"
+			session_close="$session_dir/tmux-close.zsh"
+			[[ -r $session_close ]] && source $session_close
+			if tmux has-session -t $session_name; then
+				tmux kill-session -t $session_name
+				print "Session '$session_name' closed successfully"
+			fi
+		done
+		;;
+	list)
+		sessions="$sessions_repository/*(/N:t)"
+		for session in ${~sessions}; do
+			print $session
+		done
+		;;
+	new)
+		mkdir -p -m 700 $session_dir
+		[[ -e $session_open ]] && print 'Session script already exists' >&2
+		print $session_open_template | vim - -c "file $session_open" -c "setf zsh"
+		if [[ -r $session_open ]]; then
+			print "Session '$session_name' created successfully"
+		else
+			print "Session '$session_name' was not created" >&2
+			exit 1
+		fi
+		;;
+	rm)
+		if [[ ! -r $session_open ]]; then
+			print "Session '$session_name' doesn't exist" >&2
+			exit 1
+		fi
+		rm -f $session_open
+		print "Session '$session_name' removed successfully"
+		;;
+	edit|edit-close)
+		if [[ ! -r $session_open ]]; then
+			print "Session '$session_name' isn't registered" >&2
+			exit 1
+		fi
+		if [[ ! -r $session_open ]]; then
+			print "Session '$session_name' has no script" >&2
+			exit 1
+		fi
+		if [[ $zmux_command == "edit-close" ]]; then
+			if [[ -r $session_close ]]; then
+				vim $session_close
+			else
+				print $session_close_template | vim - -c "file $session_close" -c "setf zsh"
+			fi
+		else
+			vim $session_open
+		fi
+		;;
+	*)
+		print "Requires a command (open|new|rm|edit)" >&2
+		;;
+esac
+}

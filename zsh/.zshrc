@@ -8,7 +8,6 @@
 zmodload zsh/pcre
 zmodload zsh/complist
 zmodload zsh/zutil
-zmodload zsh/zpty
 
 # }}}
 # History {{{
@@ -25,6 +24,7 @@ setopt auto_cd # change dir by typing the dir name
 setopt auto_pushd # change dir push to directory stack automatically
 setopt pushd_ignore_dups # dont push duplicates to directory stack
 setopt rm_star_wait # wait 10 seconds before really executing 'rm -rf *'
+setopt interactive_comments # allow comments in interactive shells
 
 # }}}
 # Prompt {{{
@@ -62,13 +62,6 @@ autoload edit-command-line
 zle -N edit-command-line
 bindkey -M vicmd "v" edit-command-line
 
-# Rebind up/down j/k keys to history forward/backward
-zmodload zsh/terminfo
-bindkey "$terminfo[kcuu1]" history-search-forward
-bindkey "$terminfo[kcud1]" history-search-backward
-bindkey -M vicmd 'k' history-search-backward
-bindkey -M vicmd 'j' history-search-forward
-
 setopt no_beep
 
 # }}}
@@ -89,7 +82,7 @@ zstyle ':completion:*:approximate:*' max-errors 'reply=(  $((  ($#PREFIX+$#SUFFI
 # Errors format
 zstyle ':completion:*:corrections' format '%B%d (errors %e)%b'
 # Don't complete stuff already on the line
-zstyle ':completion::*:(rm|vi|vim):*' ignore-line true
+zstyle ':completion::*:(rm):*' ignore-line true
 # Don't complete directory we are already in (../here)
 zstyle ':completion:*' ignore-parents parent pwd
 #
@@ -115,122 +108,6 @@ zstyle ':completion:*:(kill|strace):*' command 'ps -u $USER -o pid,%cpu,tty,cput
 autoload -Uz compinit
 compinit
 
-# }}}
-# Autosuggestions {{{
-# Enable on-type completion of commands. This configuration emulates fish's
-# autosuggest feature using zsh's builtin 'predict-on' widget.
-zstyle ':predict' verbose no
-zstyle ':completion:incremental:*' completer _complete
-zstyle ':completion:predict:*' completer _complete
-
-autoload predict-on
-
-accept-line() {
-	# When autosuggesting, ignore RBUFFER
-	[[ -n $ZLE_AUTOSUGGESTING ]] && RBUFFER=''
-	zle .accept-line
-}
-
-disable-autosuggestions() {
-	if [[ -n $ZLE_AUTOSUGGESTING ]]; then
-		unset ZLE_AUTOSUGGESTING
-		predict-off
-		highlight-suggested-text
-	fi
-}
-
-enable-autosuggestions() {
-	ZLE_AUTOSUGGESTING=1
-	predict-on
-	# Save the prediction widgets
-	zle -A self-insert insert-and-predict-orig
-	zle -A backward-delete-char delete-backward-and-predict-orig
-	zle -A delete-char-or-list delete-no-predict-orig
-	# Replace prediction widgets by versions that will also highlight RBUFFER
-	zle -N self-insert insert-and-predict-and-highlight
-	zle -N magic-space insert-and-predict-and-highlight
-	zle -N backward-delete-char delete-backward-and-predict-and-highlight
-	zle -N delete-char-or-list delete-no-predict-and-highlight
-	highlight-suggested-text
-}
-
-toggle-autosuggestions() {
-	if [[ -n $ZLE_AUTOSUGGESTING ]]; then
-		disable-autosuggestions
-	else
-		enable-autosuggestions
-	fi
-}
-
-# When entering vi command mode, disable autosuggestions as its
-# possible the user is going to edit the middle of the line
-vi-cmd-mode() {
-	disable-autosuggestions
-	highlight-suggested-text
-	zle .vi-cmd-mode
-}
-
-# Disable autosuggestions when moving the char to the left using arrows
-vi-backward-char() {
-	disable-autosuggestions
-	highlight-suggested-text
-	zle .vi-backward-char
-}
-
-# Searching history with the arrows also disables autosuggestions
-history-search-forward() {
-	disable-autosuggestions
-	highlight-suggested-text
-	zle .history-search-forward
-}
-
-history-search-backward() {
-	disable-autosuggestions
-	highlight-suggested-text
-	zle .history-search-backward
-}
-
-highlight-suggested-text() {
-	if [[ -n $ZLE_AUTOSUGGESTING ]]; then
-		region_highlight=("$(( $CURSOR + 1 )) $(( $CURSOR + $#RBUFFER )) fg=8")
-	else
-		region_highlight=()
-	fi
-}
-
-insert-and-predict-and-highlight() {
-	zle insert-and-predict-orig
-	highlight-suggested-text
-}
-
-delete-backward-and-predict-and-highlight() {
-	zle delete-backward-and-predict-orig
-	highlight-suggested-text
-}
-
-delete-no-predict-and-highlight() {
-	zle delete-no-predict-orig
-	highlight-suggested-text
-}
-
-# Start autosuggesting automatically with zle
-zle-line-init() {
-	enable-autosuggestions
-}
-
-zle -N zle-line-init
-zle -N accept-line
-zle -N vi-cmd-mode
-zle -N history-search-forward
-zle -N history-search-backward
-zle -N enable-autosuggestions
-zle -N insert-and-predict-and-highlight
-zle -N delete-backward-and-predict-and-highlight
-zle -N delete-no-predict-and-highlight
-zle -N toggle-autosuggestions
-
-# If needed, I can re-enable autosuggestions with CTRL+T
-bindkey '^T' toggle-autosuggestions
 # }}}
 # Functions {{{
 
@@ -444,6 +321,10 @@ else
 	}
 fi
 
+if which tmuxifier &> /dev/null; then
+	eval "$(tmuxifier init -)"
+fi
+
 alias e=vi
 
 # }}}
@@ -583,6 +464,18 @@ if [[ -d $ZDOTDIR/site-zshrc.d ]]; then
 fi
 # }}}
 # History substring search {{{
-
 source $ZDOTDIR/zsh-history-substring-search/zsh-history-substring-search.zsh
+# bind k and j for VI mode
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
+# }}}
+# Autosuggestions {{{
+export ZLE_AUTOSUGGEST_SERVER_LOG_ERRORS=1
+source $ZDOTDIR/zsh-autosuggestions/autosuggestions.zsh
+zle-line-init() {
+	zle autosuggest-start
+}
+zle -N zle-line-init
+bindkey '^T' autosuggest-toggle
+bindkey '^F' autosuggest-accept-suggested-word
 # }}}
