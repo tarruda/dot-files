@@ -1,0 +1,95 @@
+#!/usr/bin/env zsh
+
+zmodload zsh/curses
+zcurses init
+
+line=0
+selected=1
+windows=()
+descs=()
+actions=()
+typeset -A running_sessions added
+running_sessions=($(tmux list-sessions -F '#{session_name} #{session_id}'))
+
+for session_name in $(zmux list); do
+	added[$session_name]=1
+	id=$running_sessions[$session_name]
+	current_status=''
+	if [[ -n $id ]]; then
+		current_status=" (running, id = $id)"
+	fi
+	window_name="session_$line"
+	zcurses addwin $window_name 1 $COLUMNS $line 0
+	desc="$session_name $current_status"
+	desc=${(r:$((COLUMNS - 1))::.:::)${desc}}
+	zcurses string $window_name $desc
+	windows+=$window_name
+	descs+=$desc
+	actions+="zmux open $session_name"
+	((line++))
+done
+
+unmanaged_session_start=$((line + 1))
+
+for session_name in ${(k)running_sessions}; do
+	if [[ -z $added[$session_name] ]]; then
+		# unmanaged session
+		window_name="session_$line"
+		zcurses addwin $window_name 1 $COLUMNS $line 0
+		current_status=" (unmanaged, id = $running_sessions[$session_name])"
+		desc="$session_name $current_status"
+		desc=${(r:$((COLUMNS - 1))::.:::)${desc}}
+		zcurses string $window_name $desc
+		windows+=$window_name
+		descs+=$desc
+		actions+=$running_sessions[$session_name]
+		((line++))
+	fi
+done
+
+move() {
+	if (( $1 < 1 )) || (( $1 > $#windows )); then
+		return
+	fi
+	current=$windows[$selected]
+	zcurses delwin $current
+	zcurses addwin $current 1 $COLUMNS $((selected - 1)) 0
+	zcurses move $current 0 0
+	zcurses clear $current bot
+	zcurses move $current 0 0
+	zcurses string $current $descs[$selected]
+
+	new=$windows[$1]
+	zcurses move $new 0 0
+	zcurses clear $new bot
+	zcurses move $new 0 0
+	zcurses attr $new black/yellow
+	zcurses string $new $descs[$1]
+
+	selected=$1
+	zcurses refresh $windows
+}
+
+move 1
+
+while true; do
+	zcurses input $windows[$selected] char key
+	if [[ $char == $'\n' ]]; then
+		break
+	elif [[ $char == 'k' || $key == 'UP' ]]; then
+		move $(( selected - 1 ))
+	elif [[ $char == 'j' || $key == 'DOWN' ]]; then
+		move $(( selected + 1 ))
+	fi
+done
+zcurses end
+
+if (( selected >= unmanaged_session_start )); then
+	if [[ -z $TMUX ]]; then
+		tmux attach-session -t $actions[$selected]
+	else
+		tmux switch-client -t $actions[$selected]
+	fi
+else
+	eval $actions[$selected]
+fi

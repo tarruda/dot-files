@@ -55,6 +55,7 @@ window() {
 		if [[ -n $project_dir ]]; then
 			project_dir=${~project_dir}
 			session_id=$(cd $project_dir && TMUX= tmux new-session $args)
+			print $session_id > "$session_dir/session-id"
 		 	tmux set-option -t $session_id -q default-path $project_dir
 		else
 			session_id=$(TMUX= tmux new-session $args)
@@ -101,7 +102,7 @@ if [[ -z $zmux_command ]]; then
 	exit 1
 fi
 
-if [[ -z $session_name && $zmux_command != (close|list|list-commands) ]]; then
+if [[ -z $session_name && $zmux_command != (close|list|list-commands|select) ]]; then
 	print "Need a session name" >&2
 	exit 1
 fi
@@ -189,6 +190,7 @@ case $zmux_command in
 		for session_name in $sessions; do
 			session_dir="$sessions_repository/$session_name"
 			session_close="$session_dir/tmux-close.zsh"
+			rm "$session_dir/session-id"
 			if tmux has-session -t $session_name; then
 				if [[ -r $session_close ]]; then
 					# For consistency with setup scripts, populate {session,window,pane}_id
@@ -278,6 +280,12 @@ case $zmux_command in
 		else
 			$EDITOR $session_open
 		fi
+		;;
+	select)
+		zmodload zsh/parameter
+		this_file="${funcsourcetrace[1]%:*}"
+		here=${this_file:h}
+		${here}/zmux-select
 		;;
 	*)
 		print "Invalid command" >&2
