@@ -35,10 +35,6 @@ done
 paths=(
 $DOTDIR/bin
 )
-# tmuxifier
-if [[ -x "$DOTDIR/tmux/tmuxifier/bin/tmuxifier" ]]; then
-	paths+=$DOTDIR/tmux/tmuxifier/bin
-fi
 for dir in $paths; do
 	if [[ -d $dir ]]; then
 		PATH="$dir:$PATH"
@@ -47,7 +43,8 @@ done
 prefixes_dir="$HOME/.user-prefixes"
 # paths/manpaths for programs installed in home dir
 if [[ -d $prefixes_dir ]]; then
-	for dir in $prefixes_dir/*(/ND); do
+	for dir in "$prefixes_dir"/*; do
+		dir=${dir:A}
 		if [ -d "$dir/bin" ]; then
 			PATH="$dir/bin:$PATH"
 		fi

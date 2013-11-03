@@ -51,6 +51,11 @@ On the file /etc/pulse/default.pa, add the following line:
 
 load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1;192.168.56.0/24 auth-anonymous=1
 
+On the file /etc/pulse/daemon.conf add:
+
+exit-idle-time = -1
+daemonize = yes
+
 This will enable remote anonymous connections in the virtualbox network.
 On a ubuntu VM, install the required packages:
 
