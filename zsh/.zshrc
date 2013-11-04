@@ -321,10 +321,6 @@ else
 	}
 fi
 
-if which tmuxifier &> /dev/null; then
-	eval "$(tmuxifier init -)"
-fi
-
 alias e=vi
 
 # }}}
@@ -463,12 +459,12 @@ if [[ -d $ZDOTDIR/site-zshrc.d ]]; then
 	unset script
 fi
 # }}}
-# History substring search {{{
-source $ZDOTDIR/zsh-history-substring-search/zsh-history-substring-search.zsh
-# bind k and j for VI mode
-bindkey -M vicmd 'k' history-substring-search-up
-bindkey -M vicmd 'j' history-substring-search-down
-# }}}
+# # History substring search {{{
+# source $ZDOTDIR/zsh-history-substring-search/zsh-history-substring-search.zsh
+# # bind k and j for VI mode
+# bindkey -M vicmd 'k' history-substring-search-up
+# bindkey -M vicmd 'j' history-substring-search-down
+# # }}}
 # Autosuggestions {{{
 export ZLE_AUTOSUGGEST_SERVER_LOG_ERRORS=1
 source $ZDOTDIR/zsh-autosuggestions/autosuggestions.zsh
