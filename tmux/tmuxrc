@@ -20,7 +20,7 @@ set -g detach-on-destroy off
 setw -g mode-mouse on
 
 # open tree instead of session list
-bind s run 'tmuxer'
+bind s run 'tmuxer choose-session'
 bind-key -t vi-choice h tree-collapse
 bind-key -t vi-choice l tree-expand
 
