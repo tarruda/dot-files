@@ -16,6 +16,11 @@
 #
 # If some icons are not being shown, try installing *-icon-theme packages:
 #   $ sudo apt-get install gnome-icon-theme-full
+# Or better yet, install faenza icon theme:
+#
+#   $ sudo apt-add-repository ppa:tiheum/equinox
+#   $ sudo apt-get update
+#   $ sudo apt-get install faenza-icon-theme
 #
 # The best way to run this script is automatically whenever the system is
 # updated. Add the following to /etc/apt/apt.conf.d/00update-windows-shortcuts
@@ -26,8 +31,8 @@
 
 import re, sys, os, socket, struct
 import xdg.Menu, xdg.DesktopEntry, xdg.Config
-from gi.repository import Gtk
-from PythonMagick import Image, Blob
+import gtk
+from PythonMagick import Image, Blob, Geometry, Color
 
             
 
@@ -42,7 +47,8 @@ def icon_attr(entry):
     name = re.sub('\..{3,4}$', '', name)
 
     # imlib2 cannot load svg
-    iconinfo = theme.lookup_icon(name, 128, Gtk.IconLookupFlags.NO_SVG)
+    
+    iconinfo = theme.lookup_icon(name, 128, gtk.ICON_LOOKUP_GENERIC_FALLBACK)
     if iconinfo:
         iconfile = iconinfo.get_filename()
         if hasattr(iconinfo, 'free'):
@@ -59,10 +65,16 @@ def walk_menu(entry):
         conn.sendall('\x01')
         img_path = icon_attr(entry.DesktopEntry).encode('utf-8')
         if img_path:
-            img = Image(img_path)
-            if img.magick() != 'ICO':
-                # convert to ICO
-                img.magick('ICO')
+            # Create an empty image and set the background color to
+            # transparent. This is important to have transparent background
+            # when converting from SVG
+            img = Image()
+            img.backgroundColor(Color(0, 0, 0, 0xffff))
+            img.read(img_path)
+            # scale the image to 48x48 pixels
+            img.scale(Geometry(48, 48))
+            # ensure the image is converted to ICO
+            img.magick('ICO')
             b = Blob()
             img.write(b)
             # icon length plus data
@@ -100,7 +112,9 @@ if lang:
 # lie to get the same menu as in GNOME
 xdg.Config.setWindowManager('GNOME')
 
-theme = Gtk.IconTheme.get_default()
+theme = gtk.icon_theme_get_default()
+
+# theme = Gtk.IconTheme.get_default()
 
 menu = xdg.Menu.parse('applications.menu')
 
