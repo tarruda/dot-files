@@ -11,6 +11,8 @@ function() {
 	.global.gitignore .global.gitignore
 	.asoundrc .asoundrc
 	.irbrc .irbrc
+	.haskeline .haskeline
+	.ghci .ghci
 	vimperator .vimperator
 	tmux/.tmux.conf .tmux.conf
 	emacs.d .emacs.d

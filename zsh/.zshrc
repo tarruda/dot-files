@@ -468,10 +468,10 @@ fi
 # Autosuggestions {{{
 export ZLE_AUTOSUGGEST_SERVER_LOG_ERRORS=1
 source $ZDOTDIR/zsh-autosuggestions/autosuggestions.zsh
-zle-line-init() {
-	zle autosuggest-start
-}
-zle -N zle-line-init
+# zle-line-init() {
+# 	zle autosuggest-start
+# }
+# zle -N zle-line-init
 bindkey '^T' autosuggest-toggle
 bindkey '^F' autosuggest-accept-suggested-word
 # }}}

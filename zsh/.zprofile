@@ -51,10 +51,13 @@ if [[ -d $prefixes_dir ]]; then
 		if [[ -d "$dir/share/man" ]]; then
 			MANPATH="$dir/share/man:$MANPATH"
 		fi
+		if [[ -d "$dir/lib/pkgconfig" ]]; then
+			PKG_CONFIG_PATH="$dir/lib/pkgconfig:$PKG_CONFIG_PATH"
+		fi
 	done
 fi
 unset dir paths prefixes_dir
-export PATH MANPATH
+export PATH MANPATH PKG_CONFIG_PATH
 
 # }}}
 # Environment {{{

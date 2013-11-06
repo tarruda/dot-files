@@ -429,9 +429,13 @@ endif
 " Addons {{{
 function! LoadAddons() 
   let s:vim_addons = []
+  " Vim-Dispatch {{{ "
+  call add(s:vim_addons, 'github:tpope/vim-dispatch.git')
+  " }}}
   " Slimux {{{
   if $TMUX != ''
     call add(s:vim_addons, 'github:epeli/slimux')
+    nnoremap <silent> <f5> :SlimuxSendKeysLast<cr>
     nnoremap <silent> <f6> :SlimuxREPLSendLine<cr>
     inoremap <silent> <f6> <esc>:SlimuxREPLSendLine<cr>i
     vnoremap <silent> <f6> :SlimuxREPLSendSelection<cr>
@@ -502,6 +506,10 @@ function! LoadAddons()
   " gnupg {{{
   let g:GPGPreferSymmetric = 1
   call add(s:vim_addons, 'github:jamessan/vim-gnupg.git')
+  " }}}
+  " Omnisharp {{{
+  let g:Omnisharp_stop_server = 0
+  call add(s:vim_addons, 'github:nosami/Omnisharp.git')
   " }}}
   " Other {{{
   call add(s:vim_addons, 'github:Raimondi/delimitMate') " autoclose brackets,quotes...

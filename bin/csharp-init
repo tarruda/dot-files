@@ -1,0 +1,143 @@
+#!/usr/bin/env zsh
+
+# Generates a minimal c# project structure. The .sln file is generated because
+# omnisharp depends on it. This was based on the solution structure generated
+# by monodevelop
+
+if ! which uuidgen &> /dev/null; then
+	echo "Need 'uuidgen' utility from the e2fsprogs package" >&2
+	exit 1
+fi
+
+files=($(ls))
+if (( ${#files} )); then
+	echo "Directory is not empty: ${#files} files found" >&2
+	exit 1
+fi
+
+guid=${$(uuidgen):u}
+name=${$(pwd):t}
+
+
+cat > ${name}.sln << EOF
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "${name}", "${name}.csproj", "{${guid}}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{${guid}}.Debug|x86.ActiveCfg = Debug|x86
+		{${guid}}.Debug|x86.Build.0 = Debug|x86
+		{${guid}}.Release|x86.ActiveCfg = Release|x86
+		{${guid}}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+EndGlobal
+EOF
+
+cat > ${name}.csproj << EOF
+<?xml version="1.0" encoding="utf-8"?>
+<Project
+  DefaultTargets="Build"
+  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '\$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '\$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{${guid}}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>${name}</RootNamespace>
+    <AssemblyName>${name}</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '\$(Configuration)|\$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <Externalconsole>true</Externalconsole>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '\$(Configuration)|\$(Platform)' == 'Release|x86' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <Externalconsole>true</Externalconsole>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="src\**\*.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <Import Project="\$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>
+EOF
+
+mkdir src
+cat > src/Program.cs << EOF
+using System;
+
+namespace ${name}
+{
+	class Program
+	{
+		static void Main()
+		{
+			Console.WriteLine("Hello, world!");
+		}
+	}
+}
+EOF
+
+cat > AssemblyInfo.cs << EOF
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
+// Information about this assembly is defined by the following attributes. 
+// Change them to the values specific to your project.
+
+[assembly: AssemblyTitle("${name}")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("")]
+[assembly: AssemblyCopyright("$(whoami)")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+
+// The assembly version has the format "{Major}.{Minor}.{Build}.{Revision}".
+// The form "{Major}.{Minor}.*" will automatically update the build and revision,
+// and "{Major}.{Minor}.{Build}.*" will update just the revision.
+
+[assembly: AssemblyVersion("1.0.*")]
+
+// The following attributes are used to specify the signing key for the assembly, 
+// if desired. See the Mono documentation for more information about signing.
+
+//[assembly: AssemblyDelaySign(false)]
+//[assembly: AssemblyKeyFile("")]
+EOF
+
+cat > .gitignore << EOF
+/bin/
+/obj/
+EOF
+
+echo "Enter 'xbuild' to compile the project, 'xbuild /target:clean' to clean"

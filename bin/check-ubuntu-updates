@@ -1,10 +1,9 @@
-#!/bin/sh
+#!/usr/bin/env zsh
 
 # Edit the user crontab and add something like this
 # * * * * * $HOME/.dot-files/bin/check-ubuntu-updates
-
-# Do the actual job in a normal zsh interactive environment
-zsh -l -i << "EOF"
+which pyenv &> /dev/null || exit 1
+eval "$(pyenv init 2>&1)"
 updates=$(/usr/lib/update-notifier/apt-check 2>&1)
 
 if [[ "$updates" != "0;0" ]]; then
@@ -12,4 +11,3 @@ if [[ "$updates" != "0;0" ]]; then
 	security=${updates#*;}
 	growl-updates $(cat ~/.growl-server-ip) $normal $security
 fi
-EOF
