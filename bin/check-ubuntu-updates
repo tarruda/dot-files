@@ -1,14 +1,70 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
+# This script depends on the package 'update-notifier-common'(apt-get install
+# update-notifier-common) and python-gntp(pip install gntp)
+#
+# Tested on ubuntu 12.04
+#
+# Edit the user crontab(crontab -e) and add the following line to check for
+# updates every hour:
+#
+#   0 * * * * $HOME/.dot-files/bin/check-ubuntu-updates
+#
 
-exec 2>> ~/.craps
-# Edit the user crontab and add something like this
-# * * * * * $HOME/.dot-files/bin/check-ubuntu-updates
-which pyenv &> /dev/null || exit 1
-eval "$(pyenv init 2>&1)"
+# Uncomment to enable logging
+# exec 2>> ~/.check-ubuntu-updates.log
+# exec >> ~/.check-ubuntu-updates.log
+
+# Pyenv setup (optional)
+export PATH="$HOME/.pyenv/bin:$HOME/.dot-files/bin:$PATH"
+which pyenv || exit 1
+eval "$(pyenv init -)"
+# 
+
 updates=$(/usr/lib/update-notifier/apt-check 2>&1)
 
-if [[ "$updates" != "0;0" ]]; then
-	normal=${updates%;*}
-	security=${updates#*;}
-	growl-updates $(cat ~/.growl-server-ip) $normal $security
-fi
+[ "$updates" = "0;0" ] && exit # no updates, exit
+
+normal=${updates%;*}
+security=${updates#*;}
+server_ip=$(cat "$HOME/.growl-server-ip")
+
+python << EOF
+import gntp.notifier
+
+
+def send(description, applicationName='devbox', noteType="Message",
+    title="Updates are available", applicationIcon=None, hostname='127.0.0.1',
+    password=None, port=23053, sticky=False, priority=None,
+    callback=None, notificationIcon=None, identifier=None):
+
+    growl = gntp.notifier.GrowlNotifier(
+        applicationName=applicationName,
+        notifications=[noteType],
+        defaultNotifications=[noteType],
+        applicationIcon=applicationIcon,
+        hostname=hostname,
+        password=password,
+        port=port,
+        )
+
+    result = growl.register()
+
+    return growl.notify(
+        noteType=noteType,
+        title=title,
+        description=description,
+        icon=notificationIcon,
+        sticky=sticky,
+        priority=priority,
+        callback=callback,
+        identifier=identifier,
+        )
+
+
+ip = '${server_ip}'
+normal_updates = '${normal}'
+security_updates = '${security}'
+
+send('%s Upgrades\\n%s Security updates' %\\
+        (normal_updates, security_updates,), hostname=ip)
+EOF

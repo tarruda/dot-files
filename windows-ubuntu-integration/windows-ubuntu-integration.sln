@@ -2,6 +2,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileShortcutGenerator", "FileShortcutGenerator\FileShortcutGenerator.csproj", "{53CD8967-C0FC-4D27-8296-1DCABAD8EBEA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpCommand", "TcpCommand\TcpCommand.csproj", "{0D2E1499-6F0C-4A0B-9FAD-866CF1D551B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -12,5 +14,9 @@ Global
 		{53CD8967-C0FC-4D27-8296-1DCABAD8EBEA}.Debug|x86.Build.0 = Debug|x86
 		{53CD8967-C0FC-4D27-8296-1DCABAD8EBEA}.Release|x86.ActiveCfg = Release|x86
 		{53CD8967-C0FC-4D27-8296-1DCABAD8EBEA}.Release|x86.Build.0 = Release|x86
+		{0D2E1499-6F0C-4A0B-9FAD-866CF1D551B1}.Debug|x86.ActiveCfg = Debug|x86
+		{0D2E1499-6F0C-4A0B-9FAD-866CF1D551B1}.Debug|x86.Build.0 = Debug|x86
+		{0D2E1499-6F0C-4A0B-9FAD-866CF1D551B1}.Release|x86.ActiveCfg = Release|x86
+		{0D2E1499-6F0C-4A0B-9FAD-866CF1D551B1}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 EndGlobal

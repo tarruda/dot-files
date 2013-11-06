@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Appearance Settings
+Icon=preferences-desktop-theme
+Exec=lxappearance
+StartupNotify=true
+Categories=Settings;DesktopSettings;GTK;X-LXDE-Settings;

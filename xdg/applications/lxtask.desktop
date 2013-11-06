@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Task Manager
+Exec=lxtask
+Icon=utilities-system-monitor
+StartupNotify=true
+Type=Application
+Categories=GTK;System;Monitor;

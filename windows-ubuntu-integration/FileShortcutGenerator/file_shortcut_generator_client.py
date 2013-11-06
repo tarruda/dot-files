@@ -7,11 +7,29 @@
 #   - python-pythonmagick
 #   - gnome-menus
 
+# To override or add custom .desktop files, just set XDG_DATA_HOME to a
+# custom directory that contains an 'applications' subdirectory containing
+# custom entries. eg:
+#
+#   $ export XDG_DATA_HOME=$HOME/.xdg
+#   $ mkdir $XDG_DATA_HOME/applications # <- add custom .desktop files here
+#
+# If some icons are not being shown, try installing *-icon-theme packages:
+#   $ sudo apt-get install gnome-icon-theme-full
+#
+# The best way to run this script is automatically whenever the system is
+# updated. Add the following to /etc/apt/apt.conf.d/00update-windows-shortcuts
+#
+# DPkg::Post-Invoke {"sudo -E -u [USER] [PATH TO THIS FILE]";};  
+#
+
 
 import re, sys, os, socket, struct
 import xdg.Menu, xdg.DesktopEntry, xdg.Config
 from gi.repository import Gtk
 from PythonMagick import Image, Blob
+
+            
 
 def icon_attr(entry):
     name = entry.getIcon()

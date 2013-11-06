@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Rxvt Unicode
+Icon=terminal
+Exec= urxvt -title rxvt-unicode -sl 10000 -sb -sr
+StartupNotify=true
+Categories=Terminal;

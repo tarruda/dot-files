@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Tmux
+Icon=terminal
+Exec=urxvt -title tmux -e sh -c tmuxer
+StartupNotify=true
+Categories=Terminal;

@@ -7,9 +7,9 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{53CD8967-C0FC-4D27-8296-1DCABAD8EBEA}</ProjectGuid>
-    <RootNamespace>FileShortcutGenerator</RootNamespace>
-    <AssemblyName>FileShortcutGenerator</AssemblyName>
+    <ProjectGuid>{0D2E1499-6F0C-4A0B-9FAD-866CF1D551B1}</ProjectGuid>
+    <RootNamespace>TcpCommand</RootNamespace>
+    <AssemblyName>TcpCommand</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <!-- dont show console window in this executable -->
     <OutputType>WinExe</OutputType>
@@ -41,21 +41,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Windows.Forms" />
-  </ItemGroup>
-
-  <!-- This COM reference is necessary for creating file shortcuts.
-       More details at:
-       http://stackoverflow.com/questions/1501608/how-do-you-create-an-application-shortcut-lnk-file-in-c-sharp-with-command-li/1501727#1501727
--->
-  <ItemGroup>
-    <COMReference Include="IWshRuntimeLibrary">
-      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-    </COMReference>
   </ItemGroup>
 
   <ItemGroup>

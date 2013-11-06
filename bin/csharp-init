@@ -49,10 +49,12 @@ cat > ${name}.csproj << EOF
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{${guid}}</ProjectGuid>
-    <OutputType>Exe</OutputType>
     <RootNamespace>${name}</RootNamespace>
     <AssemblyName>${name}</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <!-- dont show console window in this executable -->
+    <OutputType>WinExe</OutputType>
+    <NoWin32Manifest>False</NoWin32Manifest>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '\$(Configuration)|\$(Platform)' == 'Debug|x86' ">
