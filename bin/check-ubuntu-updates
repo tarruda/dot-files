@@ -1,5 +1,6 @@
 #!/usr/bin/env zsh
 
+exec 2>> ~/.craps
 # Edit the user crontab and add something like this
 # * * * * * $HOME/.dot-files/bin/check-ubuntu-updates
 which pyenv &> /dev/null || exit 1
