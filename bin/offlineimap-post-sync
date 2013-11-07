@@ -1,4 +1,0 @@
-#!/bin/sh
-
-hardlink -t -m /media/mail/tpadilha84-gmail.com
-notmuch new
