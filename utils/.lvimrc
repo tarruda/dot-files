@@ -1,7 +1,0 @@
-let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/](build)$',
-  \ 'file': '\v\.(ico|res|exe)$',
-  \ }
-
-let &tags=getcwd().'/tags'
-let g:ctrlp_working_path_mode = ''
