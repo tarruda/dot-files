@@ -4,3 +4,6 @@
 [submodule "zsh/zsh-syntax-highlighting"]
 	path = zsh/zsh-syntax-highlighting
 	url = gh:zsh-users/zsh-syntax-highlighting
+[submodule "zsh/zsh-history-substring-search"]
+	path = zsh/zsh-history-substring-search
+	url = gh:zsh-users/zsh-history-substring-search

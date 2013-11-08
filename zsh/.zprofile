@@ -73,6 +73,7 @@ export EDITOR=vim
 export ACKRC=$DOTDIR/.ackrc
 export XCOMPOSEFILE=$DOTDIR/.XCompose
 export VBOX_USER_HOME=$HOME/.virtualbox
+export USER_DAEMONS_DIR=$DOTDIR/services
 # Thanks this article for the following two environment variables
 # http://my.opera.com/CrazyTerabyte/blog/2010/11/04/how-x11-xcompose-works
 export GTK_IM_MODULE=xim
