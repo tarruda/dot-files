@@ -459,19 +459,35 @@ if [[ -d $ZDOTDIR/site-zshrc.d ]]; then
 	unset script
 fi
 # }}}
-# # History substring search {{{
-source $ZDOTDIR/zsh-history-substring-search/zsh-history-substring-search.zsh
-# bind k and j for VI mode
-bindkey -M vicmd 'k' history-substring-search-up
-bindkey -M vicmd 'j' history-substring-search-down
+# Plugins {{{
+# Syntax highlighting {{{
+# plugin=$ZDOTDIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# if [[ -r $plugin ]]; then
+# 	source $plugin
+# fi
+# }}}
+# History substring search {{{
+plugin=$ZDOTDIR/zsh-history-substring-search/zsh-history-substring-search.zsh
+if [[ -r $plugin ]]; then
+	source $plugin
+	# bind k and j for VI mode
+	bindkey -M vicmd 'k' history-substring-search-up
+	bindkey -M vicmd 'j' history-substring-search-down
+fi
 # }}}
 # Autosuggestions {{{
-export ZLE_AUTOSUGGEST_SERVER_LOG_ERRORS=1
-source $ZDOTDIR/zsh-autosuggestions/autosuggestions.zsh
-zle-line-init() {
-	zle autosuggest-start
-}
-zle -N zle-line-init
-bindkey '^T' autosuggest-toggle
-bindkey '^F' autosuggest-accept-suggested-small-word
+plugin=$ZDOTDIR/zsh-autosuggestions/autosuggestions.zsh
+if [[ -r $plugin ]]; then
+	export ZLE_AUTOSUGGEST_SERVER_LOG_ERRORS=1
+	source $plugin
+	zle-line-init() {
+		zle autosuggest-start
+	}
+	zle -N zle-line-init
+	bindkey '^T' autosuggest-toggle
+	bindkey '^F' vi-forward-blank-word
+	bindkey '^f' vi-forward-word
+fi
+# }}}
+unset plugin
 # }}}

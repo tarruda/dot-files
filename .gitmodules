@@ -1,3 +1,6 @@
 [submodule "zsh/zsh-autosuggestions"]
 	path = zsh/zsh-autosuggestions
 	url = ta:zsh-autosuggestions
+[submodule "zsh/zsh-syntax-highlighting"]
+	path = zsh/zsh-syntax-highlighting
+	url = gh:zsh-users/zsh-syntax-highlighting
