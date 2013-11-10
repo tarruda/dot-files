@@ -78,6 +78,7 @@ export USER_DAEMONS_DIR=$DOTDIR/services
 # http://my.opera.com/CrazyTerabyte/blog/2010/11/04/how-x11-xcompose-works
 export GTK_IM_MODULE=xim
 export QT_IM_MODULE=xim
+export GPGKEY=F5EC672E
 export EMAIL='tpadilha84@gmail.com'
 if which vim &> /dev/null; then
 	read PAGER <<- EOF

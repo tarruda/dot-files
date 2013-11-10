@@ -496,6 +496,15 @@ function! LoadAddons()
   setl shiftwidth=2
   setl expandtab
   " }}}
+  " Haskell mode {{{
+  " augroup haskell_mode
+  "   au BufEnter *.hs compiler ghc
+  " augroup END
+  let g:haddock_browser="/usr/bin/firefox"
+  let g:haddock_browser_callformat='%s file://%s > /dev/null 2>&1 &'
+  let g:haddock_indexfiledir="~/"
+  " call add(s:vim_addons, 'darcs:http://code.haskell.org/haskellmode-vim/')
+  " }}}
   " Project-local vimrc {{{
   call add(s:vim_addons, 'github:MarcWeber/vim-addon-local-vimrc')
   let g:local_vimrc = {

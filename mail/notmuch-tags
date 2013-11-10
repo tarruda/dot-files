@@ -1,0 +1,4 @@
++sent -inbox -unread -- folder:sent and tag:unread and tag:inbox and not tag:sent
++lists +zsh -inbox -- tag:inbox and to:zsh-users@zsh.org 
++lists +vim -inbox -- tag:inbox and to:vim_use@googlegroups.com 
++lists +tmux -inbox -- tag:inbox and to:tmux-users@lists.sourceforge.net 

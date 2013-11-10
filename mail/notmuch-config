@@ -1,0 +1,15 @@
+[database]
+path=/media/mail/tpadilha84@gmail.com
+
+[user]
+name=Thiago de Arruda
+primary_email=tpadilha84@gmail.com
+
+[new]
+# Tags to add to all new messages
+tags=unread;inbox;
+# Files/directories to ignore
+ignore=
+
+[maildir]
+synchronize_flags=true

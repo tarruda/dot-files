@@ -1,0 +1,28 @@
+[general]
+pythonfile = ~/.dot-files/mail/offlineimap.py
+accounts = gmail
+ui = TTY.TTYUI
+
+[Account gmail]
+localrepository = gmailLocal
+remoterepository = gmailRemote
+maxage = 1000
+
+[Repository gmailLocal]
+type = Maildir
+localfolders = /media/mail/tpadilha84@gmail.com
+
+[Repository gmailRemote]
+type = Gmail
+remotehost = imap.gmail.com
+realdelete=no
+maxconnections=3
+ssl = yes
+cert_fingerprint = 6d1b5b5ee0180ab493b71d3b94534b5ab937d042
+remoteport = 993
+remoteuser = tpadilha84@gmail.com
+remotepasseval = decrypt_password("tpadilha84@gmail.com")
+
+folderfilter = lambda foldername: foldername in ['[Gmail]/All Mail', '[Gmail]/Sent Mail']
+
+nametrans = lambda foldername: re.sub('^\[Gmail\]/All Mail$', 'all', re.sub('^\[Gmail\]/Sent Mail$', 'sent',foldername))

@@ -13,10 +13,11 @@ function() {
 	.irbrc .irbrc
 	.haskeline .haskeline
 	.ghci .ghci
-	vimperator .vimperator
 	tmux/.tmux.conf .tmux.conf
 	emacs.d .emacs.d
-	mail/muttrc .muttrc
+	mail/offlineimaprc .offlineimaprc
+	mail/notmuch-config .notmuch-config
+	mail/notmuch-tags .notmuch-tags
 	weechat .weechat
 	.Xresources .Xdefaults
 	)

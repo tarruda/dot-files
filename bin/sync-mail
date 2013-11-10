@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+offlineimap
+notmuch new
+notmuch tag --batch --input="$HOME/.notmuch-tags"
