@@ -442,6 +442,9 @@ function! LoadAddons()
     nnoremap <silent> <f7> ggvG$:SlimuxREPLSendSelection<cr>
   endif
   " }}}
+  " Vimproc {{{
+  call add(s:vim_addons, 'github:Shougo/vimproc.vim')
+  " }}}
   " CtrlP {{{
   call add(s:vim_addons, 'github:kien/ctrlp.vim')
   set wildignore+=*.o,*.so,*.dll,*.exe,*.bak,*.swp,*.class,*.pyc,*.pyd,*.pyo,*~
@@ -460,6 +463,7 @@ function! LoadAddons()
   " }}}
   " Syntastic {{{
   let g:syntastic_coffee_checkers=['coffee']
+  let g:syntastic_haskell_checkers=['ghc_mod', 'hlint']
   call add(s:vim_addons, 'github:scrooloose/syntastic')
   " }}}
   " YouCompleteMe {{{
@@ -496,14 +500,10 @@ function! LoadAddons()
   setl shiftwidth=2
   setl expandtab
   " }}}
-  " Haskell mode {{{
-  " augroup haskell_mode
-  "   au BufEnter *.hs compiler ghc
-  " augroup END
-  let g:haddock_browser="/usr/bin/firefox"
-  let g:haddock_browser_callformat='%s file://%s > /dev/null 2>&1 &'
-  let g:haddock_indexfiledir="~/"
-  " call add(s:vim_addons, 'darcs:http://code.haskell.org/haskellmode-vim/')
+  " Haskell {{{
+  call add(s:vim_addons, 'github:dag/vim2hs')
+  call add(s:vim_addons, 'github:ujihisa/neco-ghc')
+  call add(s:vim_addons, 'github:eagletmt/ghcmod-vim')
   " }}}
   " Project-local vimrc {{{
   call add(s:vim_addons, 'github:MarcWeber/vim-addon-local-vimrc')

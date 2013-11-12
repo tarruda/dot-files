@@ -15,9 +15,9 @@ function() {
 	.ghci .ghci
 	tmux/.tmux.conf .tmux.conf
 	emacs.d .emacs.d
-	mail/offlineimaprc .offlineimaprc
-	mail/notmuch-config .notmuch-config
-	mail/notmuch-tags .notmuch-tags
+	# mail/offlineimaprc .offlineimaprc
+	# mail/notmuch-config .notmuch-config
+	# mail/notmuch-tags .notmuch-tags
 	weechat .weechat
 	.Xresources .Xdefaults
 	)
