@@ -171,7 +171,6 @@ endfunction
 " ScratchPad {{{
 augroup scratchpad
   au!
-  au VimLeavePre .scratchpads/scratchpad.* bufdo call ScratchPadSave()
   au BufNewFile,BufRead .scratchpads/scratchpad.* call ScratchPadLoad()
 augroup END
 
@@ -184,7 +183,7 @@ function! ScratchPadSave()
 endfunction
 
 function! ScratchPadLoad()
-  nnoremap <silent> <buffer> q :close<cr>
+  nnoremap <silent> <buffer> q :w<cr>:close<cr>
   setlocal bufhidden=hide buflisted noswapfile
 endfunction
 
@@ -497,6 +496,7 @@ function! LoadAddons()
   " Syntastic {{{
   let g:syntastic_coffee_checkers=['coffee']
   let g:syntastic_haskell_checkers=['ghc_mod', 'hlint']
+  let g:syntastic_ignore_files=['\.scratchpads/scratchpad\.\.*']
   call add(s:vim_addons, 'github:scrooloose/syntastic')
   " }}}
   " YouCompleteMe {{{
