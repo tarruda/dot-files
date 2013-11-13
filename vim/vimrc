@@ -111,6 +111,7 @@ elseif isdirectory('/dev/shm')
 endif
 " }}}
 " Terminal keycode sequences {{{
+:set <f1>=OP
 if ! has('gui_running')
   " this is used to represent ctrl+tab in terminal vim
   :set <f20>=[34~
@@ -294,17 +295,15 @@ endif
 nmap T @t
 nnoremap <silent> <c-j> :m .+1<cr>==
 nnoremap <silent> <c-k> :m .-2<cr>==
-" Quickly open help in current window
-nnoremap <leader>h :Help 
 " Quickly open a scratchpad
 nnoremap <leader>sp :ScratchPad<cr>
 " Move selections
 vnoremap <silent> <c-j> :m '>+1<cr>gv=gv
 vnoremap <silent> <c-k> :m '<-2<cr>gv=gv
-" Disable help key
-inoremap <f1> <esc>
-nnoremap <f1> <esc>
-vnoremap <f1> <esc>
+" Remap the help key
+inoremap <f1> <esc>:Help 
+nnoremap <f1> <esc>:Help 
+vnoremap <f1> <esc>:Help 
 " search/replace the word under the cursor
 nnoremap <leader>z :let @z = expand("<cword>")<cr>q:i%s/\C\v<<esc>"zpa>//g<esc>hi
 " Quickly toggle spell on/off
@@ -544,6 +543,19 @@ function! LoadAddons()
   call add(s:vim_addons, 'github:dag/vim2hs')
   call add(s:vim_addons, 'github:ujihisa/neco-ghc')
   call add(s:vim_addons, 'github:eagletmt/ghcmod-vim')
+  call add(s:vim_addons, 'github:Twinside/vim-hoogle')
+
+  function! OpenHoogle(search)
+    exe 'Hoogle ' . a:search
+    let num = bufnr('HoogleSearch')
+    exe num . "wincmd w"
+    map <silent> <buffer> q <esc>:HoogleClose<cr>
+    map <silent> <buffer> <cr> <esc>:HoogleInfo<cr>
+  endfunction
+
+  command! -nargs=? HoogleOpen call OpenHoogle(<q-args>)
+
+  au BufNewFile,BufRead *.hs map <buffer> <leader>h :HoogleOpen 
   " }}}
   " Project-local vimrc {{{
   call add(s:vim_addons, 'github:MarcWeber/vim-addon-local-vimrc')

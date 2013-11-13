@@ -31,10 +31,7 @@ for dir in $paths; do
 		PATH="$PATH:$dir"
 	fi
 done
-# path to user programs
-paths=(
-$DOTDIR/bin
-)
+paths=()
 for dir in $paths; do
 	if [[ -d $dir ]]; then
 		PATH="$dir:$PATH"
@@ -140,3 +137,5 @@ if [[ -r $ZDOTDIR/.site-zprofile ]]; then
 	source $ZDOTDIR/.site-zprofile
 fi
 # }}}
+# path to user programs
+export PATH="$DOTDIR/bin:$PATH"
