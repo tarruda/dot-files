@@ -191,7 +191,12 @@ function! OpenScratchPad(ftype)
   if a:0 > 0
     let ftype = a:ftype
   else
-    let ftype = expand('%:e')
+    let pads = split(globpath('.scratchpads', 'scratchpad.*'), '\n')
+    if len(pads) > 0
+      let ftype = matchstr(pads[0], 'scratchpad\.\zs\(.\+\)$')
+    else
+      let ftype = expand('%:e')
+    endif
   endif
 
   if ftype == ''
