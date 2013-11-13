@@ -154,43 +154,11 @@ command! DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
       \ | wincmd p | diffthis
 
 command! -nargs=? -complete=help Help call OpenHelpInCurrentWindow(<q-args>)
-" Quickly open help in the current window
-"" :view $VIMRUNTIME/doc/help.txt<cr>
-nnoremap <silent> <leader>h :Help 
+
+command! -nargs=? -complete=customlist,ScratchPadComplete ScratchPad call OpenScratchPad(<q-args>)
+
 " }}}
 " Utility functions {{{
-
-" Autocomplete google contact when composing emails. Based from:
-" http://www.recursivedream.com/blog/2012/auto-completing-google-contacts-in-vim
-function! CompleteGoogleContact(findstart, base)
-  if a:findstart == 1
-    let line = getline('.')
-    let idx = col('.')
-    while idx > 0
-      let idx -= 1
-      let c = line[idx]
-      " break on header and previous email
-      if c == ':' || c == '>'
-        return idx + 2
-      else
-        continue
-      endif
-    endwhile
-    return idx
-  elseif a:base != ''
-    let trim = "sed '/^$/d' | cut -f1,2"
-    let fmt = 'awk ''BEGIN{FS=OFS="\t"}{printf "%s <%s>\n", $2, $1}'''
-    let goobookrc = $HOME.'/.mail-accounts/'.$EMAIL.'/goobookrc'
-    if filereadable(goobookrc)
-      let goobook = "goobook -c ".goobookrc
-    else
-      let goobook = "goobook"
-    endif
-    return split(system(goobook.' query '.a:base.'|'.trim.'|'.fmt), '\n')
-  else
-    return []
-  endif
-endfunc
 
 function! OpenHelpInCurrentWindow(topic)
   view $VIMRUNTIME/doc/help.txt
@@ -199,6 +167,65 @@ function! OpenHelpInCurrentWindow(topic)
   setl nomodifiable
   exe 'keepjumps help ' . a:topic
 endfunction
+
+" ScratchPad {{{
+augroup scratchpad
+  au!
+  au VimLeavePre .scratchpads/scratchpad.* bufdo call ScratchPadSave()
+  au BufNewFile,BufRead .scratchpads/scratchpad.* call ScratchPadLoad()
+augroup END
+
+function! ScratchPadSave()
+  let ftype = matchstr(expand('%'), 'scratchpad\.\zs\(.\+\)$')
+  if ftype == ''
+    return
+  endif
+  write
+endfunction
+
+function! ScratchPadLoad()
+  nnoremap <silent> <buffer> q :close<cr>
+  setlocal bufhidden=hide buflisted noswapfile
+endfunction
+
+function! OpenScratchPad(ftype)
+  if a:0 > 0
+    let ftype = a:ftype
+  else
+    let ftype = expand('%:e')
+  endif
+
+  if ftype == ''
+    echoerr 'Scratchpad need a filetype'
+    return
+  endif
+
+  let scratchpad_name = '.scratchpads/scratchpad.' . ftype
+  let scr_bufnum = bufnr(scratchpad_name)
+
+  if scr_bufnum == -1
+    " open the scratchpad
+    exe "new " . scratchpad_name
+    let dir = expand('%:p:h')
+    if !isdirectory(dir)
+      call mkdir(dir)
+    endif
+  else
+    " Scratch buffer is already created. Check whether it is open
+    " in one of the windows
+    let scr_winnum = bufwinnr(scr_bufnum)
+    if scr_winnum != -1
+      " Jump to the window which has the scratchpad if we are not
+      " already in that window
+      if winnr() != scr_winnum
+        exe scr_winnum . "wincmd w"
+      endif
+    else
+      exe "split +buffer" . scr_bufnum
+    endif
+  endif
+endfunction
+" }}}
 
 function! GetVisualSelection()
   let [lnum1, col1] = getpos("'<")[1:2]
@@ -265,6 +292,8 @@ nnoremap <silent> <c-j> :m .+1<cr>==
 nnoremap <silent> <c-k> :m .-2<cr>==
 " Quickly open help in current window
 nnoremap <leader>h :Help 
+" Quickly open a scratchpad
+nnoremap <leader>sp :ScratchPad<cr>
 " Move selections
 vnoremap <silent> <c-j> :m '>+1<cr>gv=gv
 vnoremap <silent> <c-k> :m '<-2<cr>gv=gv
@@ -365,6 +394,10 @@ augroup filetype_settings
         \ | setl foldmethod=marker
         \ | setl foldenable
   " \ | setl listchars=tab:\ \ ,eol:¬,extends:❯,precedes:❮
+  " }}}
+  " Haskell {{{
+  au FileType haskell
+        \ setl omnifunc=necoghc#omnifunc
   " }}}
   " Nasm {{{
   au FileType nasm 
@@ -501,6 +534,8 @@ function! LoadAddons()
   setl expandtab
   " }}}
   " Haskell {{{
+  let g:haskell_autotags = 1
+  let g:haskell_tags_generator = 'fast-tags'
   call add(s:vim_addons, 'github:dag/vim2hs')
   call add(s:vim_addons, 'github:ujihisa/neco-ghc')
   call add(s:vim_addons, 'github:eagletmt/ghcmod-vim')
@@ -536,12 +571,12 @@ function! LoadAddons()
   call add(s:vim_addons, 'github:danro/rename.vim')
   call add(s:vim_addons, 'github:mattn/webapi-vim')
   call add(s:vim_addons, 'github:mattn/gist-vim')
-  call add(s:vim_addons, 'github:vim-scripts/scratch.vim')
   call add(s:vim_addons, 'github:godlygeek/csapprox')
   call add(s:vim_addons, 'github:godlygeek/tabular.git')
   call add(s:vim_addons, 'github:mileszs/ack.vim')
   call add(s:vim_addons, 'github:PProvost/vim-ps1.git')
   call add(s:vim_addons, 'github:alunny/pegjs-vim.git')
+  call add(s:vim_addons, 'github:vim-scripts/Decho.git')
   " }}}
   " load 'after' directory
   let &runtimepath = &runtimepath.','.g:rc_dir.'/after'
