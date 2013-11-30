@@ -292,6 +292,14 @@ if &term == 'tmux'
 endif
 " }}}
 " Mappings {{{
+" Quickly open/close quickfix and location list, based on
+" github:Valloric/ListToogle
+augroup quick_loc_list
+  au! BufWinEnter quickfix nnoremap <silent> <buffer> q :cclose<cr>:lclose<cr>
+augroup END
+nnoremap <silent> <leader>q :botright copen 10<cr>
+nnoremap <silent> <leader>l :botright lopen 10<cr>
+
 nmap T @t
 nnoremap <silent> <c-j> :m .+1<cr>==
 nnoremap <silent> <c-k> :m .-2<cr>==
@@ -400,10 +408,11 @@ augroup filetype_settings
   " }}}
   " Haskell {{{
   au FileType haskell
-        \   setl omnifunc=necoghc#omnifunc
-        \ | setl softtabstop=4
+        \   setl softtabstop=4
         \ | setl shiftwidth=4
         \ | setl textwidth=75
+        \ | nnoremap <buffer> <leader>h :Hoogle 
+
   " }}}
   " Nasm {{{
   au FileType nasm 
@@ -501,8 +510,12 @@ function! LoadAddons()
   nnoremap <silent> <leader>p :CtrlPTag<CR>
   " }}}
   " Syntastic {{{
+  let g:syntastic_error_symbol = '✗'
+  let g:syntastic_warning_symbol = '⚠'
+  let g:syntastic_always_populate_loc_list = 1
   let g:syntastic_coffee_checkers=['coffee']
   let g:syntastic_haskell_checkers=['ghc_mod', 'hlint']
+  let g:syntastic_python_checkers = ['pylint']
   let g:syntastic_ignore_files=['\.scratchpads/scratchpad\.\.*']
   call add(s:vim_addons, 'github:scrooloose/syntastic')
   " }}}
@@ -544,13 +557,11 @@ function! LoadAddons()
   " Haskell {{{
   let g:haskell_autotags = 1
   let g:hoogle_search_jump_back = 0
+  let g:hoogle_search_count = 30
   let g:haskell_tags_generator = 'fast-tags'
   call add(s:vim_addons, 'github:dag/vim2hs')
-  call add(s:vim_addons, 'github:ujihisa/neco-ghc')
   call add(s:vim_addons, 'github:eagletmt/ghcmod-vim')
   call add(s:vim_addons, 'github:Twinside/vim-hoogle')
-
-  au BufNewFile,BufRead *.hs nnoremap <buffer> <leader>h :Hoogle 
 
   " }}}
   " Project-local vimrc {{{
@@ -590,6 +601,7 @@ function! LoadAddons()
   call add(s:vim_addons, 'github:PProvost/vim-ps1.git')
   call add(s:vim_addons, 'github:alunny/pegjs-vim.git')
   call add(s:vim_addons, 'github:vim-scripts/Decho.git')
+  call add(s:vim_addons, 'github:Valloric/python-indent.git')
   " }}}
   " load 'after' directory
   let &runtimepath = &runtimepath.','.g:rc_dir.'/after'
