@@ -10,7 +10,7 @@ python_lib_dir=${python_lib:h}
 python_config_dir=${$(ls $python_lib_dir/**/config.c):h}
 pushd $python_config_dir
 for file in ../../libpython*; do
-	ln -s $file
+    ln -s $file
 done
 popd
 
@@ -25,8 +25,8 @@ perl_lib_dir=${perl_lib:h}
 rpath=$python_lib_dir:$ruby_lib_dir:$perl_lib_dir
 export LDFLAGS="-Wl,-rpath=$rpath"
 
-configure --with-features=huge --enable-gui=gnome2 --enable-pythoninterp\
- 	--enable-rubyinterp --enable-perlinterp --prefix=$HOME/.user-prefixes/vim
+./configure --with-features=huge --enable-gui=gnome2 --enable-pythoninterp\
+    --enable-rubyinterp --enable-perlinterp --prefix=$HOME/.user-prefixes/vim
 
 make
 

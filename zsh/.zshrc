@@ -102,7 +102,7 @@ zstyle ':completion:*' squeeze-slashes true
 # ignore extensions when completing edit commands
 zstyle ":completion:*:*:(vim|vi|e):*:*files" ignored-patterns '(*~|*.(o|swp|swo|tgz|tbz|tar.(gz|bz2|xz)))'
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
-zstyle ':completion:*:(kill|strace):*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
+zstyle ':completion:*:(kill|strace|gdb):*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
 # initialize the completion system
 autoload -Uz compinit

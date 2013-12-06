@@ -138,4 +138,4 @@ if [[ -r $ZDOTDIR/.site-zprofile ]]; then
 fi
 # }}}
 # path to user programs
-export PATH="$DOTDIR/bin:$PATH"
+export PATH="$DOTDIR/bin:$HOME/bin:$HOME/.bin:$PATH"

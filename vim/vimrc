@@ -28,7 +28,7 @@ if !exists('g:vimrc_done_basic_init')
   endif
   let $RCDIR = g:rc_dir
   let g:vam_plugins_dir = g:rc_dir.'/addons'
-  let &runtimepath = g:rc_dir.','.g:vam_plugins_dir.'/vim-addon-manager,'.$VIMRUNTIME
+  let &runtimepath = g:rc_dir.','.g:vam_plugins_dir.'/vim-addon-manager,'.g:vam_plugins_dir.'/eclim,'.$VIMRUNTIME
   let g:has_python = has('python') || has('python3')
 endif
 
@@ -516,6 +516,7 @@ function! LoadAddons()
   let g:syntastic_coffee_checkers=['coffee']
   let g:syntastic_haskell_checkers=['ghc_mod', 'hlint']
   let g:syntastic_python_checkers = ['pylint']
+  let g:syntastic_scala_checkers = []
   let g:syntastic_ignore_files=['\.scratchpads/scratchpad\.\.*']
   call add(s:vim_addons, 'github:scrooloose/syntastic')
   " }}}
