@@ -161,6 +161,48 @@ command! -nargs=? -complete=customlist,ScratchPadComplete ScratchPad call OpenSc
 " }}}
 " Utility functions {{{
 
+" Restore cursor position, window position, and last search after running a
+" command.
+" from: http://stackoverflow.com/questions/12374200/using-uncrustify-with-vim
+function! Preserve(command)
+  " Save the last search.
+  let search = @/
+
+  " Save the current cursor position.
+  let cursor_position = getpos('.')
+
+  " Save the current window position.
+  normal! H
+  let window_position = getpos('.')
+  call setpos('.', cursor_position)
+
+  " Execute the command.
+  execute a:command
+
+  " Restore the last search.
+  let @/ = search
+
+  " Restore the previous window position.
+  call setpos('.', window_position)
+  normal! zt
+
+  " Restore the previous cursor position.
+  call setpos('.', cursor_position)
+endfunction
+
+" Specify path to your Uncrustify configuration file.
+let g:uncrustify_cfg_file_path =
+    \ shellescape(fnamemodify('~/.uncrustify.cfg', ':p'))
+
+" Don't forget to add Uncrustify executable to $PATH (on Unix) or 
+" %PATH% (on Windows) for this command to work.
+function! Uncrustify(language)
+  call Preserve(':silent %!uncrustify'
+      \ . ' -q '
+      \ . ' -l ' . a:language
+      \ . ' -c ' . g:uncrustify_cfg_file_path)
+endfunction
+
 function! OpenHelpInCurrentWindow(topic)
   view $VIMRUNTIME/doc/help.txt
   setl filetype=help
@@ -398,6 +440,15 @@ augroup filetype_settings
         \   setl foldmethod=marker
         \ | setl foldenable
   " }}}
+  " C/C++ {{{
+  au FileType c,cpp
+        \   nnoremap <buffer> <silent> <leader>ff :call Uncrustify('c')<cr>
+        \ | setl commentstring=//%s
+  " }}}
+  " Moonscript {{{
+  au FileType moon
+        \   setl commentstring=--%s
+  " }}}
   " Zsh/sh {{{
   au FileType sh,bash,zsh setl noexpandtab
   au FileType zsh 
@@ -520,9 +571,13 @@ function! LoadAddons()
   let g:syntastic_ignore_files=['\.scratchpads/scratchpad\.\.*']
   call add(s:vim_addons, 'github:scrooloose/syntastic')
   " }}}
+  " Lua {{{
+  call add(s:vim_addons, 'github:leafo/moonscript-vim')
+  " }}}
   " YouCompleteMe {{{
   if g:has_python
     call add(s:vim_addons, 'github:Valloric/YouCompleteMe')
+    au FileType c,cpp nnoremap <buffer> <c-]> :YcmCompleter GoToDefinitionElseDeclaration<CR>
   endif
   " }}}
   " NERDTree {{{

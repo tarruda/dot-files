@@ -8,16 +8,16 @@
 [core]
   excludesfile = ~/.global.gitignore
 
-[url "http://github.com/"]
+[url "https://github.com/"]
   insteadOf = "gh:"
+
+[url "git@bitbucket.org:"]
+  insteadOf = "bb:"
 
 [url "git@github.com:"]
   pushInsteadOf = "gh:"
-  pushInsteadOf = "https://github.com/"
-  pushInsteadOf = "http://github.com/"
-  pushInsteadOf = "git://github.com/"
 
-[url "http://github.com/tarruda/"]
+[url "https://github.com/tarruda/"]
   insteadOf = "ta:"
 
 [url "git@github.com:tarruda/"]
@@ -27,9 +27,6 @@
   insteadOf = "gist:"
 
 [url "git@gist.github.com:"]
-  pushInsteadOf = "https://gist.github.com/"
-  pushInsteadOf = "http://gist.github.com/"
-  pushInsteadOf = "git://gist.github.com/"
   pushInsteadOf = "gist:"
 
 [push]
