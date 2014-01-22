@@ -638,6 +638,7 @@ function! LoadAddons()
   " Other {{{
   call add(s:vim_addons, 'github:Raimondi/delimitMate') " autoclose brackets,quotes...
   call add(s:vim_addons, 'github:tpope/vim-tbone')
+  call add(s:vim_addons, 'github:plasticboy/vim-markdown')
   call add(s:vim_addons, 'github:tpope/vim-repeat')
   call add(s:vim_addons, 'github:tpope/vim-surround')
   call add(s:vim_addons, 'github:tpope/vim-fugitive')

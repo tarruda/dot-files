@@ -7,7 +7,9 @@ function() {
 	typeset -A map
 	map=(
 	zsh/.zshenv .zshenv
+	.hgrc .hgrc
 	.gitconfig .gitconfig
+	.gdbinit .gdbinit
 	.global.gitignore .global.gitignore
 	.asoundrc .asoundrc
 	.irbrc .irbrc
