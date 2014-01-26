@@ -10,6 +10,7 @@ from __future__ import generators
 
 KEEP = {
     'TRUE': 1,
+    'DO_INIT': 1,
     'FEAT_MBYTE': 1,
     'FEAT_WINDOWS': 1,
     'FEAT_VISUAL': 1,
@@ -1310,35 +1311,48 @@ for file in *.(c|h); do
 done
 
 # now do a bunch of edits to make it compile
+
 sed -i -f - vim.h << "EOF"
 /\#\ define\ VIM__H/ {
 	i\
 		#ifndef VIM__H
 	a\
-/* Temporary includes to make it compile on cmake */\n\
+/* Temporary includes to make this thing compile */\n\
 #include <stdio.h>\n\
 #include <stdlib.h>\n\
 #include <unistd.h>\n\
+#include <string.h>\n\
+#include <ctype.h>\n\
+#include <wctype.h>\n\
 #include <sys/stat.h>\n\
 #include <sys/types.h>\n\
 #include <sys/time.h>\n\
+#include <iconv.h>\n\
 #define TRUE 1\n\
 #define FALSE 0\n\
 /* end */
 }
 $ a\
-		#endif /* VIM__H */
+#endif /* VIM__H */
 /#include "feature\.h"/ d
 /# include "os_unix\.h"/ d
 /#   define EILSEQ 123/ d
 EOF
 
-sed -i '/^EXTERN XIC xic INIT(= NULL);$/d' globals.h
+sed -i -f - farsi.c << "EOF"
+/static int toF_Xor_X_ (int c);/i \
+#include "vim.h"\n
+EOF
+
+sed -i '/^XIC xic INIT(= NULL);$/d' globals.h
 
 sed -i '/im_/d' proto/mbyte.pro
 
-sed -i '/gui_update_cursor/d' src/hangulin.c
+sed -i -e '/read_eintr/d' -e '/write_eintr/d' proto/fileio.pro
 
+sed -i '/gui_update_cursor/d' hangulin.c
+
+vim -u NONE -E -s -c '%s/gui_redraw_block(\_.\{-});\n/\r/g' -c 'update' -c 'quit' hangulin.c || true
 vim -u NONE -E -s -c '%s/^static int xim_is_active = FALSE;\_.\{-}\nxim_get_status_area_height(){\_.\{-}}//g' -c 'update' -c 'quit' mbyte.c || true
 
 
