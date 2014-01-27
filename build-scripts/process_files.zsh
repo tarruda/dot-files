@@ -43,7 +43,6 @@ KEEP = {
     'FEAT_RIGHTLEFT': 1,
     'FEAT_FKMAP': 1,
     'FEAT_ARABIC': 1,
-    'FEAT_EMACS_TAGS': 1,
     'FEAT_TAG_BINS': 1,
     'FEAT_TAG_OLDSTATIC': 1,
     'FEAT_CSCOPE': 1,
@@ -105,7 +104,10 @@ KEEP = {
     'VIM_BACKTICK': 1,
     'UNIX': 1,
     'SIZEOF_INT': 4,
-    'USE_ICONV': 1
+    'USE_ICONV': 1,
+    'HAVE_DUP': 1,
+    'HAVE_ST_MODE': 1,
+    'HAVE_ACL': 1
 }
 # -----------------------------------------------------------------------------
 # cpp.py
@@ -1233,6 +1235,7 @@ gui_beval.pro
 gui_w32.pro
 if_mzsch.pro
 if_xcmdsrv.pro  
+os_unix.pro
 os_beos.pro
 os_win32.pro
 winclip.pro
@@ -1285,7 +1288,6 @@ tmp=/tmp/processing-file-$RANDOM
 for file in *.pro; do
 	print "processing $file"
 	cp $file $tmp
-	# vim -u NONE -E -s -c '%s/ __ARGS(\([^;]\{-}\))\ *;/\1;/g' -c 'update' -c 'quit' $tmp || true
 	$cpp $tmp > $file
 	uncrustify -l c -c $uncrustify_cfg -f $file > $tmp
 	cp $tmp $file
@@ -1300,36 +1302,56 @@ for file in *.(c|h); do
 	print "processing $file"
 	# copy the file to a temporary location
 	cp $file $tmp
-	# remove INIT macros
-	# vim -u NONE -E -s -c '%s/ INIT(\([^;]\{-}\))\ *;/\1;/g' -c 'update' -c 'quit' $tmp || true
-	# # remove __ARGS from prototypes
-	# vim -u NONE -E -s -c '%s/ __ARGS(\([^;]\{-}\))\ *;/\1;/g' -c 'update' -c 'quit' $tmp || true
-	# vim -u NONE -E -s -c '%s/ __ARGS(\(\_.\{-}\))\ *;/\1;/g' -c 'update' -c 'quit' $tmp || true
 	$cpp $tmp > $file
 	uncrustify -l c -c $uncrustify_cfg -f $file > $tmp
 	cp $tmp $file
 done
 
 # now do a bunch of edits to make it compile
-
 sed -i -f - vim.h << "EOF"
 /\#\ define\ VIM__H/ {
 	i\
 		#ifndef VIM__H
 	a\
-/* Temporary includes to make this thing compile */\n\
-#include <stdio.h>\n\
-#include <stdlib.h>\n\
-#include <unistd.h>\n\
-#include <string.h>\n\
-#include <ctype.h>\n\
-#include <wctype.h>\n\
-#include <sys/stat.h>\n\
-#include <sys/types.h>\n\
-#include <sys/time.h>\n\
-#include <iconv.h>\n\
-#define TRUE 1\n\
-#define FALSE 0\n\
+/* Temporary preprocessor directives to make this thing compile */\
+#include <stdio.h>\
+#include <stdlib.h>\
+#include <unistd.h>\
+#include <string.h>\
+#include <setjmp.h>\
+#include <ctype.h>\
+#include <wctype.h>\
+#include <fcntl.h>\
+#include <sys/stat.h>\
+#include <sys/types.h>\
+#include <sys/time.h>\
+#include <iconv.h>\
+#define TRUE 1\
+#define FALSE 0\
+#define SYS_VIMRC_FILE "$VIM/vimrc"\
+#define DFLT_HELPFILE "$VIMRUNTIME/doc/help.txt"\
+#define FILETYPE_FILE "filetype.vim"\
+#define FTPLUGIN_FILE "ftplugin.vim"\
+#define INDENT_FILE "indent.vim"\
+#define FTOFF_FILE "ftoff.vim"\
+#define FTPLUGOF_FILE "ftplugof.vim"\
+#define INDOFF_FILE "indoff.vim"\
+#define USR_VIMRC_FILE "$HOME/.vimrc"\
+#define VIMINFO_FILE "$HOME/.viminfo"\
+#define VIMRC_FILE ".vimrc"\
+#define SYNTAX_FNAME "$VIMRUNTIME/syntax/%s.vim"\
+#define DFLT_VDIR "$HOME/.vim/view"\
+#define DFLT_ERRORFILE "errors.err"\
+#define DFLT_RUNTIMEPATH "~/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,~/.vim/after"\
+#define TEMPDIRNAMES "$TMPDIR", "/tmp", ".", "$HOME" /* Try several directories to put the temp files. */\
+#define TEMPNAMELEN 256\
+#define SPECIAL_WILDCHAR "`'{" /* Special wildcards that need to be handled by the shell */\
+#define CHECK_INODE /* used when checking if a swap file already\
+#define DFLT_MAXMEM (5*1024) /* use up to 5 Mbyte for a buffer */\
+#define DFLT_MAXMEMTOT (10*1024) /* use up to 10 Mbyte for Vim */\
+#define JMP_BUF sigjmp_buf\
+#define SETJMP(x) sigsetjmp((x), 1)\
+#define LONGJMP siglongjmp\
 /* end */
 }
 $ a\
@@ -1338,6 +1360,10 @@ $ a\
 /# include "os_unix\.h"/ d
 /#   define EILSEQ 123/ d
 EOF
+
+for file in $proto_remove; do
+	sed -i "/$file/d" proto.h
+done
 
 sed -i -f - farsi.c << "EOF"
 /static int toF_Xor_X_ (int c);/i \
@@ -1383,6 +1409,10 @@ else()
   set(DEBUG 0)
 endif(CMAKE_BUILD_TYPE MATCHES Debug)
 
+# download and build dependencies
+execute_process(COMMAND sh "${PROJECT_SOURCE_DIR}/scripts/get-deps.sh"
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
 # generate configuration header and update include directories
 configure_file (
   "${PROJECT_SOURCE_DIR}/config.h.in"
@@ -1401,3 +1431,80 @@ cat > "config.h.in" << "EOF"
 #define DEBUG
 #endif
 EOF
+
+mkdir -p scripts
+
+cat > "scripts/build.sh" << "EOF"
+#!/bin/sh -e
+
+rm -rf build
+mkdir build
+cd build
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../
+make
+EOF
+
+cat > "scripts/env.sh" << "EOF"
+pkgroot="$(pwd)"
+deps="$pkgroot/.deps"
+prefix="$deps/usr"
+export PATH="$prefix/bin:$PATH"
+EOF
+
+cat > "scripts/get-deps.sh" << "EOF"
+#!/bin/sh -e
+download() {
+	local url=$1
+	local tgt=$2
+	local sha1=$3
+
+	if [ ! -d "$tgt" ]; then
+		mkdir -p "$tgt"
+		if which wget > /dev/null 2>&1; then
+			tmp_dir=$(mktemp -d "/tmp/download_sha1check_XXXXXXX")
+			fifo="$tmp_dir/fifo"
+			mkfifo "$fifo"
+			# download, untar and calculate sha1 sum in one pass
+			(wget "$url" -O - | tee "$fifo" | \
+				(cd "$tgt";  tar --strip-components=1 -xvzf -)) &
+			sum=$(sha1sum < "$fifo" | cut -d ' ' -f1)
+			rm -rf "$tmp_dir"
+			if [ "$sum" != "$sha1" ]; then
+				echo "SHA1 sum doesn't match, expected '$sha1' got '$sum'"
+				exit 1
+			fi
+		else
+			echo "Missing wget utility"
+			exit 1
+		fi
+	fi
+}
+
+github_download() {
+	local repo=$1
+	local ver=$2
+	download "https://github.com/${repo}/archive/${ver}.tar.gz" "$3" "$4"
+}
+
+. scripts/env.sh
+
+uv_repo=joyent/libuv
+uv_ver=v0.11.18
+uv_dir="$deps/uv-$uv_ver"
+uv_sha1=11ad2afbc8e6ab82ee15691b117e5736ef1d15e3
+
+if [ ! -e "$prefix/lib/libuv.a" ]; then
+	github_download "$uv_repo" "$uv_ver" "$uv_dir" "$uv_sha1"
+	(
+	cd "$uv_dir"
+	sh autogen.sh
+	./configure --prefix="$prefix"
+	make
+	make install
+	rm "$prefix/lib/"libuv*.so "$prefix/lib/"libuv*.so.*
+	)
+fi
+EOF
+
+chmod +x scripts/build.sh
+chmod +x scripts/get-deps.sh
