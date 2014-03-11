@@ -109,7 +109,6 @@ HOST = '192.168.56.1'
 PORT = 55556
 conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 conn.connect((HOST, PORT))
-print 'connected'
 
 lang = os.environ.get('LANG')
 if lang:
@@ -122,7 +121,7 @@ theme = gtk.icon_theme_get_default()
 
 # theme = Gtk.IconTheme.get_default()
 
-menu = xdg.Menu.parse('gnome-applications.menu')
+menu = xdg.Menu.parse('gnome-applications.menu') # for ubuntu 12.04, use 'applications.menu'
 
 map(walk_menu, menu.getEntries())
 
