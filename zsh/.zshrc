@@ -358,9 +358,9 @@ install-github-tree() {
 # }}}
 # Ruby {{{
 install-rbenv() {
-	install-github-tree -d "$HOME/.rbenv" -t 'v0.4.0' 'sstephenson/rbenv'
+	install-github-tree -d "$HOME/.rbenv" -t '14bc162ca606e0c61da8d82e1b99b0946d7be13f' 'sstephenson/rbenv'
 	mkdir -p "$HOME/.rbenv/plugins"
-	install-github-tree -d "$HOME/.rbenv/plugins/ruby-build" -t 'v20131008' 'sstephenson/ruby-build'
+	install-github-tree -d "$HOME/.rbenv/plugins/ruby-build" -t 'v20140225' 'sstephenson/ruby-build'
 	mkdir -p "$ZDOTDIR/site-zshrc.d"
 	cat > "$ZDOTDIR/site-zshrc.d/rbenv.zsh" <<-EOF
 	export RBENV_ROOT="\$HOME/.rbenv"
@@ -378,7 +378,7 @@ install-ruby() {
 # }}}
 # Python {{{
 install-pyenv() {
-	install-github-tree -d "$HOME/.pyenv" -t 'v0.4.0-20130726' 'yyuu/pyenv'
+	install-github-tree -d "$HOME/.pyenv" -t 'v0.4.0-20140311' 'yyuu/pyenv'
 	mkdir -p "$ZDOTDIR/site-zshrc.d"
 	cat > "$ZDOTDIR/site-zshrc.d/pyenv.zsh" <<-EOF
 	export PYENV_ROOT="\$HOME/.pyenv"
@@ -414,9 +414,9 @@ install-perl() {
 # }}}
 # Node.js {{{
 install-nodenv() {
-	install-github-tree -d "$HOME/.nodenv" -t 'master' 'oinutter/nodenv'
+	install-github-tree -d "$HOME/.nodenv" -t 'e152c07a05ddfb0f776e1db932ee7ed36c09d36e' 'oinutter/nodenv'
 	mkdir -p "$HOME/.nodenv/plugins"
-	install-github-tree -d "$HOME/.nodenv/plugins/node-build" -t 'master' 'oinutter/node-build'
+	install-github-tree -d "$HOME/.nodenv/plugins/node-build" -t 'bed4f461ead747457adc353965bba11e43be3ac3' 'oinutter/node-build'
 	mkdir -p "$ZDOTDIR/site-zshrc.d"
 	cat > "$ZDOTDIR/site-zshrc.d/nodenv.zsh" <<-EOF
 	export NODENV_ROOT="\$HOME/.nodenv"

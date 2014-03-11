@@ -21,5 +21,6 @@ echo $python_include
 EXTRA_CMAKE_ARGS="-DPYTHON_LIBRARY=$libpython"
 EXTRA_CMAKE_ARGS+=" -DPYTHON_INCLUDE_DIR=$python_include"
 EXTRA_CMAKE_ARGS+=" -DEXTRA_RPATH=$python_prefix/lib" 
+export EXTRA_CMAKE_ARGS
 
-EXTRA_CMAKE_ARGS=$EXTRA_CMAKE_ARGS ./install.sh --clang-completer --omnisharp-completer
+./install.sh --clang-completer --omnisharp-completer
