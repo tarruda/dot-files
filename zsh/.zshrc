@@ -134,6 +134,14 @@ pg_top() {
 	command pg_top -U $o_user[2] -h $o_host[2] "$@"
 }
 
+pr() {
+	curl https://github.com/neovim/neovim/pull/$1.patch | git am
+}
+
+mpr() {
+	curl https://github.com/neovim/neovim/pull/$1.patch | git am -3
+}
+
 # wrapper for reading man pages
 
 man() {

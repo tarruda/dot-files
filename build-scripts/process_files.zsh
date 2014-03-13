@@ -1,5 +1,7 @@
 #!/bin/zsh -e
 
+# Refactor:
+# vim_tempname(fileio.c)
 cpp=/tmp/vim-cpp.py
 
 # if [[ ! -e $cpp ]]; then
@@ -7,107 +9,412 @@ cat > $cpp << "EOF"
 #!/usr/bin/env python
 
 from __future__ import generators
+import json
+class IgnoreException(BaseException):
+    pass
+def ignorer(): raise IgnoreException()
+COLLECTED = None
+
+IGNORE = [
+    'ALIGN_LONG', 
+    'BINARY_FILE_IO', 
+    'BREAKCHECK_SKIP', 
+    'BT_REGEXP_DEBUG_LOG', 
+    'BT_REGEXP_DUMP', 
+    'BT_REGEXP_LOG', 
+    'B_IMODE_IM', 
+    'CASE_INSENSITIVE_FILENAME', 
+    'CHECK_DOUBLE_CLICK', 
+    'CHECK_INODE', 
+    'CMDBUFFSIZE', 
+    'CP_UTF8', 
+    'CREATE_DUMMY_FILE', 
+    'DEBUG', 
+    'DEBUG_TERMRESPONSE', 
+    'DEBUG_TRIEWALK', 
+    'DEFAULT_TERM', 
+    'DFLT_BDIR', 
+    'DFLT_DIR', 
+    'DFLT_HELPFILE', 
+    'DFLT_MAXMEM', 
+    'DFLT_MAXMEMTOT', 
+    'DFLT_VDIR', 
+    'DO_DECLARE_EXCMD', 
+    'DO_INIT', 
+    'ECHILD', 
+    'EEXIST', 
+    'EILSEQ', 
+    'EINTR', 
+    'ENABLE_LOG', 
+    'ENOENT', 
+    'EVIM_FILE', 
+    'EX', 
+    'EXRC_FILE', 
+    'EXTERN', 
+    'FILETYPE_FILE', 
+    'FTOFF_FILE', 
+    'FTPLUGIN_FILE', 
+    'FTPLUGOF_FILE', 
+    'GVIMRC_FILE', 
+    'HANGUL_DEFAULT_KEYBOARD', 
+    'HAS_BW_FLAGS', 
+    'HAS_SWAP_EXISTS_ACTION', 
+    'HAVE_ACL', 
+    'HAVE_ATTRIBUTE_UNUSED',
+    'HAVE_BCMP',
+    'HAVE_BIND_TEXTDOMAIN_CODESET', 
+    'HAVE_BUFLIST_MATCH', 
+    'HAVE_CHECK_STACK_GROWTH', 
+    'HAVE_CONFIG_H', 
+    'HAVE_DATE_TIME',
+    'HAVE_DIRENT_H',
+    'HAVE_DLFCN_H',
+    'HAVE_DLOPEN',
+    'HAVE_DLSYM',
+    'HAVE_DUP', 
+    'HAVE_ERRNO_H',
+    'HAVE_EX_SCRIPT_NI', 
+    'HAVE_FCHDIR',
+    'HAVE_FCHOWN',
+    'HAVE_FCNTL_H',
+    'HAVE_FD_CLOEXEC',
+    'HAVE_FLOAT_FUNCS',
+    'HAVE_FSEEKO',
+    'HAVE_FSYNC',
+    'HAVE_GETCWD',
+    'HAVE_GETPWENT',
+    'HAVE_GETPWNAM',
+    'HAVE_GETPWUID',
+    'HAVE_GETRLIMIT',
+    'HAVE_GETTEXT',
+    'HAVE_GETTIMEOFDAY',
+    'HAVE_GETWD',
+    'HAVE_GET_LOCALE_VAL', 
+    'HAVE_ICONV',
+    'HAVE_ICONV_H',
+    'HAVE_INTTYPES_H',
+    'HAVE_ISWUPPER',
+    'HAVE_LANGINFO_H',
+    'HAVE_LIBGEN_H',
+    'HAVE_LIBINTL_H',
+    'HAVE_LOCALE_H',
+    'HAVE_LSTAT',
+    'HAVE_MATH_H',
+    'HAVE_MEMCMP',
+    'HAVE_MEMSET',
+    'HAVE_MKDTEMP',
+    'HAVE_NANOSLEEP',
+    'HAVE_NL_LANGINFO_CODESET',
+    'HAVE_NL_MSG_CAT_CNTR',
+    'HAVE_OPENDIR',
+    'HAVE_OSPEED',
+    'HAVE_PATHDEF', 
+    'HAVE_POLL_H',
+    'HAVE_PUTENV',
+    'HAVE_PWD_H',
+    'HAVE_QSORT',
+    'HAVE_READLINK',
+    'HAVE_RENAME',
+    'HAVE_SANDBOX', 
+    'HAVE_SELECT',
+    'HAVE_SELINUX',
+    'HAVE_SETENV',
+    'HAVE_SETENV', 
+    'HAVE_SETJMP_H',
+    'HAVE_SETPGID',
+    'HAVE_SETSID',
+    'HAVE_SGTTY_H',
+    'HAVE_SIGACTION',
+    'HAVE_SIGALTSTACK',
+    'HAVE_SIGCONTEXT',
+    'HAVE_SIGSET',
+    'HAVE_SIGSTACK',
+    'HAVE_SIGVEC',
+    'HAVE_STDARG_H',
+    'HAVE_STDINT_H',
+    'HAVE_STDLIB_H',
+    'HAVE_STRCASECMP',
+    'HAVE_STRERROR',
+    'HAVE_STRFTIME',
+    'HAVE_STRINGS_H',
+    'HAVE_STRING_H',
+    'HAVE_STRNCASECMP',
+    'HAVE_STROPTS_H',
+    'HAVE_STRPBRK',
+    'HAVE_STRTOL',
+    'HAVE_ST_BLKSIZE',
+    'HAVE_ST_MODE', 
+    'HAVE_SVR4_PTYS',
+    'HAVE_SYSCONF',
+    'HAVE_SYSINFO',
+    'HAVE_SYSINFO_MEM_UNIT',
+    'HAVE_SYS_IOCTL_H',
+    'HAVE_SYS_PARAM_H',
+    'HAVE_SYS_POLL_H',
+    'HAVE_SYS_RESOURCE_H',
+    'HAVE_SYS_SELECT_H',
+    'HAVE_SYS_STATFS_H',
+    'HAVE_SYS_SYSCTL_H',
+    'HAVE_SYS_SYSINFO_H',
+    'HAVE_SYS_TIME_H',
+    'HAVE_SYS_TYPES_H',
+    'HAVE_SYS_UTSNAME_H',
+    'HAVE_SYS_WAIT_H',
+    'HAVE_TERMCAP_H',
+    'HAVE_TERMIOS_H',
+    'HAVE_TERMIO_H',
+    'HAVE_TGETENT',
+    'HAVE_TOTAL_MEM', 
+    'HAVE_TOWLOWER',
+    'HAVE_TOWUPPER',
+    'HAVE_UNISTD_H',
+    'HAVE_UP_BC_PC',
+    'HAVE_USLEEP',
+    'HAVE_UTIME',
+    'HAVE_UTIMES',
+    'HAVE_UTIME_H',
+    'HAVE_WCHAR_H',
+    'HAVE_WCTYPE_H',
+    'HT_DEBUG', 
+    'INDENT_FILE', 
+    'INDOFF_FILE', 
+    'INIT', 
+    'IN_OPTION_C', 
+    'LEN_FROM_CONV', 
+    'LINE_ATTR', 
+    'LONG_LONG_OFF_T', 
+    'MAXNAMLEN', 
+    'MAXPATHL', 
+    'MAY_LOOP', 
+    'MESSAGE_FILE', 
+    'MIN', 
+    'MKSESSION_NL', 
+    'MSWIN', 
+    'NAMLEN', 
+    'NFA_REGEXP_DEBUG_LOG', 
+    'NFA_REGEXP_ERROR_LOG', 
+    'NOPROTO', 
+    'NO_EXPANDPATH', 
+    'OK', 
+    'ONE_CLIPBOARD', 
+    'OPEN_CHR_FILES', 
+    'O_NOCTTY', 
+    'O_NOFOLLOW', 
+    'O_NONBLOCK', 
+    'POUND', 
+    'PTYRANGE0', 
+    'PTYRANGE1', 
+    'PTY_DONE', 
+    'RANGE', 
+    'RETSIGTYPE',
+    'R_OK', 
+    'SEEK_END', 
+    'SEEK_SET', 
+    'SET_SIG_ALARM', 
+    'SIGABRT',
+    'SIGALRM',
+    'SIGBUS',
+    'SIGFPE',
+    'SIGHAS3ARGS', 
+    'SIGHASARG', 
+    'SIGHUP',
+    'SIGILL',
+    'SIGINT',
+    'SIGPIPE',
+    'SIGPWR',
+    'SIGQUIT',
+    'SIGRETURN',
+    'SIGSEGV',
+    'SIGSTKSZ', 
+    'SIGSTP',
+    'SIGSYS',
+    'SIGTERM',
+    'SIGTRAP',
+    'SIGTSTP',
+    'SIGUSR1',
+    'SIGUSR2',
+    'SIGWINCH', 
+    'SIG_ERR', 
+    'SIZEOF_INT', 
+    'SIZEOF_LONG', 
+    'SIZEOF_OFF_T', 
+    'SMALL_MALLOC', 
+    'SMALL_MEM', 
+    'SPECIAL_WILDCHAR', 
+    'SPELL_PRINTTREE', 
+    'STATFS', 
+    'SYNTAX_FNAME', 
+    'SYS_GVIMRC_FILE', 
+    'SYS_MENU_FILE', 
+    'SYS_NMLN', 
+    'SYS_SELECT_WITH_SYS_TIME',
+    'SYS_VIMRC_FILE', 
+    'S_ISBLK',
+    'S_ISCHR',
+    'S_ISDIR',
+    'S_ISFIFO',
+    'S_ISREG',
+    'S_ISSOCK',
+    'TEMPDIRNAMES', 
+    'TERMINFO',
+    'TGETENT_ZERO_ERR',
+    'THROW_ON_ERROR_TRUE', 
+    'THROW_ON_INTERRUPT_TRUE', 
+    'THROW_TEST', 
+    'TIME_WITH_SYS_TIME',
+    'TIOCSETN', 
+    'TTYM_SGR', 
+    'UINT32_TYPEDEF', 
+    'UNIX', 
+    'USEMAN_S',
+    'USEMEMMOVE',
+    'USER_HIGHLIGHT', 
+    'USE_FILE_CHOOSER', 
+    'USE_FNAME_CASE', 
+    'USE_FOPEN_NOINH', 
+    'USE_FSTATFS', 
+    'USE_GETCWD', 
+    'USE_IM_CONTROL', 
+    'USE_INPUT_BUF', 
+    'USE_MCH_ACCESS', 
+    'USE_MCH_ERRMSG', 
+    'USE_START_TV', 
+    'USE_UNICODE_DIGRAPHS', 
+    'USE_UTF8_STRING', 
+    'USE_WCHAR_FUNCTIONS', 
+    'USE_X11R6_XIM', 
+    'USE_XSMP_INTERACT',
+    'USR_EXRC_FILE', 
+    'USR_EXRC_FILE2', 
+    'USR_GVIMRC_FILE', 
+    'USR_GVIMRC_FILE2', 
+    'USR_GVIMRC_FILE3', 
+    'USR_VIMRC_FILE', 
+    'USR_VIMRC_FILE2', 
+    'USR_VIMRC_FILE3', 
+    'VIMINFO_FILE', 
+    'VIMINFO_FILE2', 
+    'VIMPACKAGE', 
+    'VIMRC_FILE', 
+    'VIM_MEMCMP', 
+    'VIM_MEMMOVE', 
+    'VIM__H', 
+    'VMS_TEMPNAM', 
+    'WEXITSTATUS', 
+    'WIFEXITED', 
+    'W_OK', 
+    '_', 
+    '_FILE_OFFSET_BITS',
+    '_IO_PTEM_H', 
+    '_NO_PROTO', 
+    '_REGEXP_H', 
+    '_TANDEM_SOURCE', 
+    '__PARMS', 
+    'bind_textdomain_codeset', 
+    'bindtextdomain', 
+    'mblen', 
+    'mch_errmsg', 
+    'mch_memmove', 
+    'mch_msg', 
+    'signal', 
+    'textdomain', 
+    'vim_mkdir', 
+    'vim_strpbrk'
+]
 
 KEEP = {
-    'TRUE': 1,
-    'DO_INIT': 1,
-    'FEAT_MBYTE': 1,
-    'FEAT_WINDOWS': 1,
-    'FEAT_VISUAL': 1,
-    'FEAT_QUICKFIX': 1,
-    'FEAT_VIRTUALEDIT': 1,
-    'FEAT_BROWSE_CMD': 1,
-    'FEAT_LISTCMDS': 1,
-    'FEAT_VERTSPLIT': 1,
-    'FEAT_CMDHIST': 1,
-    'FEAT_JUMPLIST': 1,
-    'FEAT_CMDWIN': 1,
-    'FEAT_FOLDING': 1,
-    'FEAT_DIGRAPHS': 1,
-    'FEAT_LANGMAP': 1,
-    'FEAT_KEYMAP': 1,
-    'FEAT_LOCALMAP': 1,
-    'FEAT_INS_EXPAND': 1,
-    'FEAT_CMDL_COMPL': 1,
-    'FEAT_VISUALEXTRA': 1,
-    'FEAT_CLIPBOARD': 1,
-    'FEAT_VIRTUALEDIT': 1,
-    'FEAT_VREPLACE': 1,
-    'FEAT_CMDL_INFO': 1,
-    'FEAT_LINEBREAK': 1,
-    'FEAT_EX_EXTRA': 1,
-    'FEAT_SEARCH_EXTRA': 1,
-    'FEAT_SEARCHPATH': 1,
-    'FEAT_FIND_ID': 1,
-    'FEAT_PATH_EXTRA': 1,
-    'FEAT_RIGHTLEFT': 1,
-    'FEAT_FKMAP': 1,
+    'ALL_BUILTIN_TCAPS': 1,
+    'CURSOR_SHAPE': 1,
+    'ECHOE': 1,
+    'ESC_CHG_TO_ENG_MODE': 1,
+    'FALSE': 'false',
     'FEAT_ARABIC': 1,
-    'FEAT_TAG_BINS': 1,
-    'FEAT_TAG_OLDSTATIC': 1,
-    'FEAT_CSCOPE': 1,
-    'FEAT_TAG_ANYWHITE': 1,
-    'FEAT_EVAL': 1,
-    'FEAT_FLOAT': 1,
-    'FEAT_PROFILE': 1,
-    'FEAT_RELTIME': 1,
-    'FEAT_TEXTOBJ': 1,
-    'FEAT_COMPL_FUNC': 1,
-    'FEAT_USR_CMDS': 1,
-    'FEAT_POSTSCRIPT': 1,
-    'FEAT_PRINTER': 1,
-    'FEAT_MODIFY_FNAME': 1,
+    'FEAT_AUTOCHDIR': 1,
     'FEAT_AUTOCMD': 1,
-    'FEAT_DIFF': 1,
-    'FEAT_TITLE': 1,
-    'FEAT_STL_OPT': 1,
-    'FEAT_CMDL_INFO': 1,
+    'FEAT_BROWSE_CMD': 1,
     'FEAT_BYTEOFF': 1,
-    'FEAT_WILDIGN': 1,
-    'FEAT_WILDMENU': 1,
-    'FEAT_VIMINFO': 1,
-    'FEAT_SYN_HL': 1,
-    'FEAT_CONCEAL': 1,
-    'FEAT_SPELL': 1,
-    'FEAT_LISP': 1,
     'FEAT_CINDENT': 1,
-    'FEAT_SMARTINDENT': 1,
+    'FEAT_CMDHIST': 1,
+    'FEAT_CMDL_COMPL': 1,
+    'FEAT_CMDL_INFO': 1,
+    'FEAT_CMDWIN': 1,
     'FEAT_COMMENTS': 1,
+    'FEAT_COMPL_FUNC': 1,
+    'FEAT_CONCEAL': 1,
+    'FEAT_CON_DIALOG': 1,
     'FEAT_CRYPT': 1,
-    'FEAT_SESSION': 1,
-    'FEAT_MULTI_LANG': 1,
+    'FEAT_CSCOPE': 1,
+    'FEAT_CURSORBIND': 1,
+    'FEAT_DIFF': 1,
+    'FEAT_DIGRAPHS': 1,
+    'FEAT_EVAL': 1,
+    'FEAT_EX_EXTRA': 1,
+    'FEAT_FIND_ID': 1,
+    'FEAT_FKMAP': 1,
+    'FEAT_FLOAT': 1,
+    'FEAT_FOLDING': 1,
     'FEAT_GETTEXT': 1,
     'FEAT_HANGULIN': 1,
-    'FEAT_XFONTSET': 1,
-    'FEAT_LIBCALL': 1,
-    'FEAT_SCROLLBIND': 1,
-    'FEAT_CURSORBIND': 1,
+    'FEAT_HUGE': 1,
+    'FEAT_INS_EXPAND': 1,
+    'FEAT_JUMPLIST': 1,
+    'FEAT_KEYMAP': 1,
+    'FEAT_LANGMAP': 1,
+    'FEAT_LINEBREAK': 1,
+    'FEAT_LISP': 1,
+    'FEAT_LISTCMDS': 1,
+    'FEAT_LOCALMAP': 1,
+    'FEAT_MBYTE': 1,
     'FEAT_MENU': 1,
-    'FEAT_CON_DIALOG': 1,
-    'FEAT_WRITEBACKUP': 1,
-    'FEAT_MOUSE_XTERM': 1,
-    'FEAT_MOUSE_URXVT': 1,
-    'FEAT_MOUSE_NET': 1,
-    'FEAT_MOUSE_DEC': 1,
-    'FEAT_MOUSE_SGR': 1,
-    'FEAT_MOUSE_GPM': 1,
+    'FEAT_MODIFY_FNAME': 1,
     'FEAT_MOUSE': 1,
+    'FEAT_MOUSE_DEC': 1,
+    'FEAT_MOUSE_NET': 1,
+    'FEAT_MOUSE_SGR': 1,
     'FEAT_MOUSE_TTY': 1,
-    'FEAT_TERMRESPONSE': 1,
-    'FEAT_MOUSESHAPE': 1,
-    'FEAT_AUTOCHDIR': 1,
+    'FEAT_MOUSE_URXVT': 1,
+    'FEAT_MOUSE_XTERM': 1,
+    'FEAT_MULTI_LANG': 1,
+    'FEAT_PATH_EXTRA': 1,
     'FEAT_PERSISTENT_UNDO': 1,
-    'CURSOR_SHAPE': 1,
-    'ALL_BUILTIN_TCAPS': 1,
+    'FEAT_POSTSCRIPT': 1,
+    'FEAT_PRINTER': 1,
+    'FEAT_PROFILE': 1,
+    'FEAT_QUICKFIX': 1,
+    'FEAT_RELTIME': 1,
+    'FEAT_RIGHTLEFT': 1,
+    'FEAT_SCROLLBIND': 1,
+    'FEAT_SEARCHPATH': 1,
+    'FEAT_SEARCH_EXTRA': 1,
+    'FEAT_SESSION': 1,
+    'FEAT_SIGNS': 1,
+    'FEAT_SMARTINDENT': 1,
+    'FEAT_SPELL': 1,
+    'FEAT_STL_OPT': 1,
+    'FEAT_SYN_HL': 1,
+    'FEAT_TAG_BINS': 1,
+    'FEAT_TAG_OLDSTATIC': 1,
+    'FEAT_TERMRESPONSE': 1,
+    'FEAT_TEXTOBJ': 1,
+    'FEAT_TITLE': 1,
+    'FEAT_USR_CMDS': 1,
+    'FEAT_VERTSPLIT': 1,
+    'FEAT_VIMINFO': 1,
+    'FEAT_VIRTUALEDIT': 1,
+    'FEAT_VISUAL': 1,
+    'FEAT_VISUALEXTRA': 1,
+    'FEAT_VREPLACE': 1,
+    'FEAT_WAK': 1,
+    'FEAT_WILDIGN': 1,
+    'FEAT_WILDMENU': 1,
+    'FEAT_WINDOWS': 1,
+    'FEAT_WRITEBACKUP': 1,
+    'ICANON': 1,
     'STARTUPTIME': 1,
-    'ESC_CHG_TO_ENG_MODE': 1,
-    'VIM_BACKTICK': 1,
+    'TRUE': 'true',
     'UNIX': 1,
-    'SIZEOF_INT': 4,
     'USE_ICONV': 1,
-    'HAVE_DUP': 1,
-    'HAVE_ST_MODE': 1,
-    'HAVE_ACL': 1
+    'VIM_BACKTICK': 1
 }
 # -----------------------------------------------------------------------------
 # cpp.py
@@ -265,12 +572,7 @@ class Preprocessor(object):
             t.value = str(v)
             self.macros[k] = Macro(k, [t])
 
-        self.define("EXTERN")
         self.define("__ARGS(x) x")
-        self.define("INIT(x) x")
-        tm = time.localtime()
-        self.define("__DATE__ \"%s\"" % time.strftime("%b %d %Y",tm))
-        self.define("__TIME__ \"%s\"" % time.strftime("%H:%M:%S",tm))
         self.parser = None
 
     # -----------------------------------------------------------------------------
@@ -595,7 +897,7 @@ class Preprocessor(object):
                 if t.value in self.macros and t.value not in expanded:
                     # Yes, we found a macro match
                     expanded[t.value] = True
-                    if t.value not in ['EXTERN', '__ARGS', 'INIT']: continue
+                    if t.value not in ['__ARGS', 'TRUE', 'FALSE']: continue
                     
                     m = self.macros[t.value]
                     if not m.arglist:
@@ -655,7 +957,10 @@ class Preprocessor(object):
     def evalexpr(self,tokens):
         # tokens = tokenize(line)
         # Search for defined macros
+        tokens = copy.copy(tokens)
         i = 0
+        ignoring = False
+        orig = "".join([x.value for x in tokens])
         while i < len(tokens):
             if tokens[i].type == self.t_ID and tokens[i].value == 'defined':
                 j = i + 1
@@ -666,7 +971,11 @@ class Preprocessor(object):
                         j += 1
                         continue
                     elif tokens[j].type == self.t_ID:
-                        if tokens[j].value in self.macros:
+                        if COLLECTED: COLLECTED['tested'][tokens[j].value] = 1
+                        if tokens[j].value in IGNORE:
+                            result = 'IGNORE'
+                            break
+                        elif tokens[j].value in self.macros:
                             result = "1L"
                         else:
                             result = "0L"
@@ -678,16 +987,24 @@ class Preprocessor(object):
                     else:
                         self.error(self.source,tokens[i].lineno,"Malformed defined()")
                     j += 1
-                tokens[i].type = self.t_INTEGER
-                tokens[i].value = self.t_INTEGER_TYPE(result)
-                del tokens[i+1:j+1]
+                tokens[i] = copy.copy(tokens[i])
+                if result == 'IGNORE':
+                    tokens[i].type = 'IGNORE'
+                else: 
+                    tokens[i].type = self.t_INTEGER
+                    tokens[i].value = self.t_INTEGER_TYPE(result)
+                    del tokens[i+1:j+1]
             i += 1
         tokens = self.expand_macros(tokens)
         for i,t in enumerate(tokens):
             if t.type == self.t_ID:
                 tokens[i] = copy.copy(t)
-                tokens[i].type = self.t_INTEGER
-                tokens[i].value = self.t_INTEGER_TYPE("0L")
+                if COLLECTED: COLLECTED['tested'][tokens[i].value] = 1
+                if tokens[i].value in IGNORE:
+                    tokens[i].type = 'IGNORE'
+                else:
+                    tokens[i].type = self.t_INTEGER
+                    tokens[i].value = self.t_INTEGER_TYPE("0L")
             elif t.type == self.t_INTEGER:
                 tokens[i] = copy.copy(t)
                 # Strip off any trailing suffixes
@@ -695,14 +1012,20 @@ class Preprocessor(object):
                 while tokens[i].value[-1] not in "0123456789abcdefABCDEF":
                     tokens[i].value = tokens[i].value[:-1]
         
-        expr = "".join([str(x.value) for x in tokens])
-        expr = expr.replace("&&"," and ")
-        expr = expr.replace("||"," or ")
-        expr = expr.replace("!"," not ")
+            expr = "".join([('ignorer()' if x.type == 'IGNORE' else str(x.value)) for x in tokens])
+            expr = expr.replace("&&"," and ")
+            expr = expr.replace("||"," or ")
+            expr = expr.replace("!"," not ")
+            expr = re.sub('/\*[\s\S]*?\*/', '', expr)
+            if expr == "0L  not = '#'": # handle special case
+                expr = '1L'
         try:
             result = eval(expr)
+        except IgnoreException:
+            return 'ignore'
         except StandardError:
-            self.error(self.source,tokens[0].lineno,"Couldn't evaluate expression")
+            if 'ignorer' in expr: return 'ignore'
+            self.error(self.source,tokens[0].lineno,"Couldn't evaluate expression: %s" % expr)
             result = 0
         return result
 
@@ -720,8 +1043,6 @@ class Preprocessor(object):
         if not source:
             source = ""
             
-        # self.define("__FILE__ \"%s\"" % source)
-
         self.source = source
         chunk = []
         enable = True
@@ -745,63 +1066,60 @@ class Preprocessor(object):
                 else:
                     name = ""
                     args = []
-                
-                if name == 'define':
-                    if enable:
-                        # for tok in self.expand_macros(chunk):
-                        #     yield tok
-                        # chunk = []
-                        self.define(args)
-                        chunk.extend(x)
-                # elif name == 'include':
-                #     if enable:
-                #         for tok in self.expand_macros(chunk):
-                #             yield tok
-                #         chunk = []
-                #         oldfile = self.macros['__FILE__']
-                #         for tok in self.include(args):
-                #             yield tok
-                #         self.macros['__FILE__'] = oldfile
-                #         self.source = source
-                elif name == 'undef':
-                    if enable:
-                        # for tok in self.expand_macros(chunk):
-                        #     yield tok
-                        # chunk = []
-                        self.undef(args)
-                        chunk.extend(x)
+
+                if COLLECTED and name == 'define':
+                    COLLECTED['defined'][args[0].value] = 1
                 elif name == 'ifdef':
-                    ifstack.append((enable,iftrigger))
+                    if COLLECTED: COLLECTED['tested'][args[0].value] = 1
+                    ign = args[0].value in IGNORE
+                    ifstack.append((enable,iftrigger,ign));
                     if enable:
+                        if ign:
+                            chunk.extend(x)
+                            continue
                         if not args[0].value in self.macros:
                             enable = False
                             iftrigger = False
                         else:
                             iftrigger = True
                 elif name == 'ifndef':
-                    ifstack.append((enable,iftrigger))
+                    if COLLECTED: COLLECTED['tested'][args[0].value] = 1
+                    ign = args[0].value in IGNORE
+                    ifstack.append((enable,iftrigger,ign));
                     if enable:
+                        if ign:
+                            chunk.extend(x)
+                            continue
                         if args[0].value in self.macros:
                             enable = False
                             iftrigger = False
                         else:
                             iftrigger = True
                 elif name == 'if':
-                    ifstack.append((enable,iftrigger))
+                    ifstack.append((enable,iftrigger,False))
+                    if COLLECTED: result = self.evalexpr(args)
                     if enable:
                         result = self.evalexpr(args)
+                        if result == 'ignore':
+                            ifstack.pop()
+                            ifstack.append((enable,iftrigger,True))
+                            chunk.extend(x)
+                            continue
                         if not result:
                             enable = False
                             iftrigger = False
                         else:
                             iftrigger = True
                 elif name == 'elif':
+                    if COLLECTED: result = self.evalexpr(args)
                     if ifstack:
                         if ifstack[-1][0]:     # We only pay attention if outer "if" allows this
                             if enable:         # If already true, we flip enable False
                                 enable = False
                             elif not iftrigger:   # If False, but not triggered yet, we'll check expression
                                 result = self.evalexpr(args)
+                                if result == 'ignore':
+                                    raise Exception('ERRRR!!! %s')
                                 if result:
                                     enable  = True
                                     iftrigger = True
@@ -812,6 +1130,9 @@ class Preprocessor(object):
                     if ifstack:
                         if ifstack[-1][0]:
                             if enable:
+                                if ifstack[-1][2]: #ignoring
+                                    chunk.extend(x)
+                                    continue
                                 enable = False
                             elif not iftrigger:
                                 enable = True
@@ -821,7 +1142,9 @@ class Preprocessor(object):
 
                 elif name == 'endif':
                     if ifstack:
-                        enable,iftrigger = ifstack.pop()
+                        enable,iftrigger,ign = ifstack.pop()
+                        if enable and ign:
+                            chunk.extend(x)
                     else:
                         self.error(self.source,dirtokens[0].lineno,"Misplaced #endif")
                 else:
@@ -959,19 +1282,6 @@ class Preprocessor(object):
             print "Bad macro definition"
 
     # ----------------------------------------------------------------------
-    # undef()
-    #
-    # Undefine a macro
-    # ----------------------------------------------------------------------
-
-    def undef(self,tokens):
-        id = tokens[0].value
-        try:
-            del self.macros[id]
-        except LookupError:
-            pass
-
-    # ----------------------------------------------------------------------
     # parse()
     #
     # Parse input text.
@@ -1000,6 +1310,11 @@ lexer = lex.lex()
 import sys
 f = open(sys.argv[1])
 input = f.read()
+if len(sys.argv) > 2:
+    collected = open('/tmp/collected.json')
+    COLLECTED = json.load(collected)
+    collected.close()
+
 
 p = Preprocessor(lexer)
 p.parse(input,sys.argv[1])
@@ -1007,11 +1322,16 @@ while True:
     tok = p.token()
     if not tok: break
     sys.stdout.write(tok.value)
+if COLLECTED:
+    collected = open('/tmp/collected.json', 'w')
+    json.dump(COLLECTED, collected)
+    collected.close()
 EOF
 chmod +x $cpp
 # fi
 
 root_remove=(
+Makefile
 configure
 Contents
 Contents.info
@@ -1065,6 +1385,7 @@ configure
 configure.in
 dehqx.py
 dimm.idl
+dosinst.c
 dosinst.h
 feature.h
 glbl_ime.cpp
@@ -1099,7 +1420,6 @@ gui_xmebwp.h
 gvim.exe.mnf
 GvimExt
 gvimtutor
-hardcopy.c
 if_lua.c
 if_mzsch.c
 if_mzsch.h
@@ -1113,6 +1433,7 @@ if_python3.c
 if_python.c
 if_ruby.c
 if_sniff.c
+pty.c
 if_sniff.h
 if_tcl.c
 if_xcmdsrv.c
@@ -1177,18 +1498,22 @@ os_mswin.c
 os_os2_cfg.h
 os_qnx.c
 os_qnx.h
-os_unix.c
-os_unix.h
+# os_unix.c
+# os_unix.h
 os_vms.c
 os_vms_conf.h
 os_vms_fix.com
 os_vms_mms.c
 os_w32dll.c
+termlib.c
+dlldata.c
 os_w32exe.c
 os_win16.c
 os_win16.h
 os_win32.c
 os_win32.h
+memfile_test.c
+winclip.c
 pathdef.sh
 README.txt
 swis.s
@@ -1231,13 +1556,15 @@ xxd
 )
 
 proto_remove=(
+termlib.pro
 gui_beval.pro
 gui_w32.pro
 if_mzsch.pro
 if_xcmdsrv.pro  
-os_unix.pro
+# os_unix.pro
 os_beos.pro
 os_win32.pro
+pty.pro
 winclip.pro
 gui_gtk.pro
 gui_x11.pro
@@ -1247,6 +1574,7 @@ gui_gtk_x11.pro
 gui_xmdlg.pro
 if_perl.pro
 os_msdos.pro
+os_mswin.pro
 workshop.pro
 gui_mac.pro
 if_perlsfio.pro
@@ -1266,6 +1594,34 @@ if_tcl.pro
 os_amiga.pro
 os_win16.pro
 )
+
+po_remove=(
+Make_ming.mak
+Make_mvc.mak
+README_mingw.txt
+README_mvc.txt
+README.txt
+)
+
+testdir_remove=(
+Make_vms.mms
+python2
+python3
+python_after
+python_before
+python_x
+vms.vim
+dos.vim
+amiga.vim
+os2.vim
+todos.vim
+Make_amiga.mak
+Make_dos.mak
+Make_ming.mak
+Make_os2.mak
+main.aap
+)
+
 uncrustify_cfg=../neov/uncrustify.cfg
 uncrustify_cfg=${uncrustify_cfg:a}
 
@@ -1273,18 +1629,54 @@ for file in $root_remove; do
 	rm -rf $file
 done
 
+# echo '{"tested": {}, "defined": {}}' > /tmp/collected.json
 cd src
 for file in $src_remove; do
 	rm -rf $file
 done
+# for file in *.(c|h); do
+# 	echo collecting from $file
+# 	$cpp $file true > /dev/null
+# done
+
+cd testdir
+for file in $testdir_remove; do
+	rm -rf $file
+done
+cd ..
+
+cd po
+for file in $po_remove; do
+	rm -rf $file
+done
+cd ..
 
 cd proto
 for file in $proto_remove; do
 	rm -rf $file
 done
+# for file in *.pro; do
+# 	echo collecting from $file
+# 	$cpp $file true > /dev/null
+# done
 
-tmp=/tmp/processing-file-$RANDOM
+# python << "EOF"
+# import json
+# collected = open('/tmp/collected.json')
+# collected_data = json.load(collected)
+# collected.close()
+# ignored_data = []
+# for k, v in collected_data['tested'].items():
+#     if k in collected_data['defined']:
+#         ignored_data.append(k)
+# ignored_data.sort()
+# ignored = open('/tmp/ignored.json', 'w')
+# json.dump(ignored_data, ignored, indent=2)
+# ignored.close()
+# EOF
+# exit
 
+tmp=/tmp/processing-file
 for file in *.pro; do
 	print "processing $file"
 	cp $file $tmp
@@ -1295,7 +1687,7 @@ done
 cd ..
 
 # edit some files
-sed -i 's/HAVE_CONFIG_H/TRUE/g' blowfish.c
+sed -i '29,38d' blowfish.c
 sed -i 's/while\ \+vim_iswhite(\*pat)/while (vim_iswhite(*pat))/g' if_cscope.c
 
 for file in *.(c|h); do
@@ -1310,84 +1702,60 @@ done
 # now do a bunch of edits to make it compile
 sed -i -f - vim.h << "EOF"
 /\#\ define\ VIM__H/ {
-	i\
-		#ifndef VIM__H
 	a\
-/* Temporary preprocessor directives to make this thing compile */\
-#include <stdio.h>\
-#include <stdlib.h>\
-#include <unistd.h>\
-#include <string.h>\
-#include <setjmp.h>\
-#include <ctype.h>\
-#include <wctype.h>\
-#include <fcntl.h>\
-#include <sys/stat.h>\
-#include <sys/types.h>\
-#include <sys/time.h>\
-#include <iconv.h>\
-#define TRUE 1\
-#define FALSE 0\
-#define SYS_VIMRC_FILE "$VIM/vimrc"\
-#define DFLT_HELPFILE "$VIMRUNTIME/doc/help.txt"\
-#define FILETYPE_FILE "filetype.vim"\
-#define FTPLUGIN_FILE "ftplugin.vim"\
-#define INDENT_FILE "indent.vim"\
-#define FTOFF_FILE "ftoff.vim"\
-#define FTPLUGOF_FILE "ftplugof.vim"\
-#define INDOFF_FILE "indoff.vim"\
-#define USR_VIMRC_FILE "$HOME/.vimrc"\
-#define VIMINFO_FILE "$HOME/.viminfo"\
-#define VIMRC_FILE ".vimrc"\
-#define SYNTAX_FNAME "$VIMRUNTIME/syntax/%s.vim"\
-#define DFLT_VDIR "$HOME/.vim/view"\
-#define DFLT_ERRORFILE "errors.err"\
-#define DFLT_RUNTIMEPATH "~/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,~/.vim/after"\
-#define TEMPDIRNAMES "$TMPDIR", "/tmp", ".", "$HOME" /* Try several directories to put the temp files. */\
-#define TEMPNAMELEN 256\
-#define SPECIAL_WILDCHAR "`'{" /* Special wildcards that need to be handled by the shell */\
-#define CHECK_INODE /* used when checking if a swap file already\
-#define DFLT_MAXMEM (5*1024) /* use up to 5 Mbyte for a buffer */\
-#define DFLT_MAXMEMTOT (10*1024) /* use up to 10 Mbyte for Vim */\
-#define JMP_BUF sigjmp_buf\
-#define SETJMP(x) sigsetjmp((x), 1)\
-#define LONGJMP siglongjmp\
+/* Included when ported to cmake */\
+/* This is needed to replace TRUE/FALSE macros by true/false from c99 */\
+#include <stdbool.h>\
+/* Some defines from the old feature.h */\
+#define SESSION_FILE "Session.vim"\
+#define MAX_MSG_HIST_LEN 200\
+#define SYS_OPTWIN_FILE "$VIMRUNTIME/optwin.vim"\
+#define RUNTIME_DIRNAME "runtime"\
 /* end */
 }
-$ a\
-#endif /* VIM__H */
+/# include "auto\/osdef\.h"/ d
 /#include "feature\.h"/ d
-/# include "os_unix\.h"/ d
-/#   define EILSEQ 123/ d
 EOF
+
+sed -i '/#include "vim.h"/i#undef LC_MESSAGES' ex_cmds2.c
 
 for file in $proto_remove; do
 	sed -i "/$file/d" proto.h
 done
 
-sed -i -f - farsi.c << "EOF"
-/static int toF_Xor_X_ (int c);/i \
-#include "vim.h"\n
-EOF
-
-sed -i '/^XIC xic INIT(= NULL);$/d' globals.h
-
-sed -i '/im_/d' proto/mbyte.pro
-
-sed -i -e '/read_eintr/d' -e '/write_eintr/d' proto/fileio.pro
-
+sed -i '/EXTERN char_u\s*\*p_wig/iEXTERN char_u *p_wak;' option.h
 sed -i '/gui_update_cursor/d' hangulin.c
-
 vim -u NONE -E -s -c '%s/gui_redraw_block(\_.\{-});\n/\r/g' -c 'update' -c 'quit' hangulin.c || true
-vim -u NONE -E -s -c '%s/^static int xim_is_active = FALSE;\_.\{-}\nxim_get_status_area_height(){\_.\{-}}//g' -c 'update' -c 'quit' mbyte.c || true
+
+sed -i 's@^VIMPROG =.\+$@VIMPROG = ../../build/src/vim@' testdir/Makefile
+sed -i 's@^VIM =.\+$@VIM = ../../build/src/vim@' po/Makefile
+sed -i 's/\bDEBUG\b/REGEXP_DEBUG/g' regexp.c
+sed -i 's/\bDEBUG\b/REGEXP_DEBUG/g' regexp_nfa.c
+
+# fix some uncrustify errors
+sed -i '2553s/> =/>=/' misc2.c
+sed -i '4373s/> =/>=/' memline.c
+sed -i '6867s/> =/>=/' spell.c
+sed -i '4402s/> =/>=/' normal.c
+sed -i -e '617s/> =/>=/' -e '752s/> =/>=/' ui.c
 
 
 cat > "CMakeLists.txt" << "EOF"
 file( GLOB NEOVIM_SOURCES *.c )
 
+foreach(sfile ${NEOVIM_SOURCES})
+  get_filename_component(f ${sfile} NAME)
+  if(${f} MATCHES "^(regexp_nfa.c|farsi.c|arabic.c)$")
+    list(APPEND to_remove ${sfile})
+  endif()
+endforeach()
+
+list(REMOVE_ITEM NEOVIM_SOURCES ${to_remove})
+list(APPEND NEOVIM_SOURCES "${PROJECT_BINARY_DIR}/config/auto/pathdef.c")
+
 add_executable (vim ${NEOVIM_SOURCES}) 
 
-target_link_libraries (vim uv msgpack pthread rt) 
+target_link_libraries (vim m termcap selinux) 
 include_directories ("${PROJECT_SOURCE_DIR}/src/proto") 
 EOF
 
@@ -1397,32 +1765,70 @@ cat > "CMakeLists.txt" << "EOF"
 cmake_minimum_required (VERSION 2.6)
 project (NEOVIM)
 
-set (NEOVIM_VERSION_MAJOR 0)
-set (NEOVIM_VERSION_MINOR 0)
-set (NEOVIM_VERSION_PATCH 0)
+set(NEOVIM_VERSION_MAJOR 0)
+set(NEOVIM_VERSION_MINOR 0)
+set(NEOVIM_VERSION_PATCH 0)
 
-set(CMAKE_C_FLAGS "-std=c99") 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# for now use gnu99, later we try to make this c99-compatible
+add_definitions(-DHAVE_CONFIG_H -Wall -std=gnu99)
+# add_definitions(-E -dD -dI -P)
 if(CMAKE_BUILD_TYPE MATCHES Debug)
+  # cmake automatically appends -g to the compiler flags
   set(DEBUG 1)
 else()
   set(DEBUG 0)
-endif(CMAKE_BUILD_TYPE MATCHES Debug)
+endif()
 
 # download and build dependencies
 execute_process(COMMAND sh "${PROJECT_SOURCE_DIR}/scripts/get-deps.sh"
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
-# generate configuration header and update include directories
-configure_file (
-  "${PROJECT_SOURCE_DIR}/config.h.in"
-  "${CMAKE_BINARY_DIR}/config.h"
-  )
+# add dependencies to include/lib directories
+link_directories ("${PROJECT_SOURCE_DIR}/.deps/usr/lib")
+include_directories ("${PROJECT_SOURCE_DIR}/.deps/usr/include") 
+
+include_directories ("${PROJECT_BINARY_DIR}/config") 
 
 add_subdirectory(src)
+add_subdirectory(config)
 EOF
 
-cat > "config.h.in" << "EOF"
+mkdir -p config
+
+cat > config/CMakeLists.txt << "EOF"
+include(CheckTypeSize)
+check_type_size("int" SIZEOF_INT)
+check_type_size("long" SIZEOF_LONG)
+check_type_size("time_t" SIZEOF_TIME_T)
+check_type_size("off_t" SIZEOF_OFF_T)
+
+# generate configuration header and update include directories
+configure_file (
+  "${PROJECT_SOURCE_DIR}/config/config.h.in"
+  "${PROJECT_BINARY_DIR}/config/auto/config.h"
+  )
+# generate pathdef.c
+set(USERNAME $ENV{USER})
+set(HOSTNAME $ENV{HOST})
+configure_file (
+  "${PROJECT_SOURCE_DIR}/config/pathdef.c.in"
+  "${PROJECT_BINARY_DIR}/config/auto/pathdef.c"
+  ESCAPE_QUOTES)
+EOF
+
+cat > config/pathdef.c.in << "EOF"
+#include "${PROJECT_SOURCE_DIR}/src/vim.h"
+char_u *default_vim_dir = (char_u *)"${CMAKE_INSTALL_PREFIX}/share/vim";
+char_u *default_vimruntime_dir = (char_u *)"";
+char_u *all_cflags = (char_u *)"${CMAKE_C_FLAGS}";
+char_u *all_lflags = (char_u *)"${CMAKE_SHARED_LINKER_FLAGS}";
+char_u *compiled_user = (char_u *)"${USERNAME}";
+char_u *compiled_sys = (char_u *)"${HOSTNAME}";
+EOF
+
+cat > "config/config.h.in" << "EOF"
 #define NEOVIM_VERSION_MAJOR @NEOVIM_VERSION_MAJOR@
 #define NEOVIM_VERSION_MINOR @NEOVIM_VERSION_MINOR@
 #define NEOVIM_VERSION_PATCH @NEOVIM_VERSION_PATCH@
@@ -1430,6 +1836,148 @@ cat > "config.h.in" << "EOF"
 #if @DEBUG@
 #define DEBUG
 #endif
+
+#define SIZEOF_INT @SIZEOF_INT@
+#define SIZEOF_LONG @SIZEOF_LONG@
+#define SIZEOF_TIME_T @SIZEOF_TIME_T@
+#define SIZEOF_OFF_T @SIZEOF_OFF_T@
+
+#define _FILE_OFFSET_BITS 64
+#define HAVE_ATTRIBUTE_UNUSED 1
+#define HAVE_BCMP 1
+#define HAVE_BIND_TEXTDOMAIN_CODESET 1
+#define HAVE_DATE_TIME 1
+#define HAVE_DIRENT_H 1
+#define HAVE_DLFCN_H 1
+#define HAVE_DLOPEN 1
+#define HAVE_DLSYM 1
+#define HAVE_ERRNO_H 1
+#define HAVE_FCHDIR 1
+#define HAVE_FCHOWN 1
+#define HAVE_FCNTL_H 1
+#define HAVE_FD_CLOEXEC 1
+#define HAVE_FLOAT_FUNCS 1
+#define HAVE_FSEEKO 1
+#define HAVE_FSYNC 1
+#define HAVE_GETCWD 1
+#define HAVE_GETPWENT 1
+#define HAVE_GETPWNAM 1
+#define HAVE_GETPWUID 1
+#define HAVE_GETRLIMIT 1
+#define HAVE_GETTEXT 1
+#define HAVE_GETTIMEOFDAY 1
+#define HAVE_GETWD 1
+#define HAVE_ICONV 1
+#define HAVE_ICONV_H 1
+#define HAVE_INTTYPES_H 1
+#define HAVE_ISWUPPER 1
+#define HAVE_LANGINFO_H 1
+#define HAVE_LIBGEN_H 1
+#define HAVE_LIBINTL_H 1
+#define HAVE_LOCALE_H 1
+#define HAVE_LSTAT 1
+#define HAVE_MATH_H 1
+#define HAVE_MEMCMP 1
+#define HAVE_MEMSET 1
+#define HAVE_MKDTEMP 1
+#define HAVE_NANOSLEEP 1
+#define HAVE_NL_LANGINFO_CODESET 1
+#define HAVE_NL_MSG_CAT_CNTR 1
+#define HAVE_OPENDIR 1
+#define HAVE_OSPEED 1
+#define HAVE_POLL_H 1
+#define HAVE_PUTENV 1
+#define HAVE_PWD_H 1
+#define HAVE_QSORT 1
+#define HAVE_READLINK 1
+#define HAVE_RENAME 1
+#define HAVE_SELECT 1
+#define HAVE_SELINUX 1
+#define HAVE_SETENV 1
+#define HAVE_SETJMP_H 1
+#define HAVE_SETPGID 1
+#define HAVE_SETSID 1
+#define HAVE_SGTTY_H 1
+#define HAVE_SIGACTION 1
+#define HAVE_SIGALTSTACK 1
+#define HAVE_SIGCONTEXT 1
+#define HAVE_SIGSTACK 1
+#define HAVE_SIGVEC 1
+#define HAVE_ST_BLKSIZE 1
+#define HAVE_STDARG_H 1
+#define HAVE_STDINT_H 1
+#define HAVE_STDLIB_H 1
+#define HAVE_STRCASECMP 1
+#define HAVE_STRERROR 1
+#define HAVE_STRFTIME 1
+#define HAVE_STRING_H 1
+#define HAVE_STRINGS_H 1
+#define HAVE_STRNCASECMP 1
+#define HAVE_STROPTS_H 1
+#define HAVE_STRPBRK 1
+#define HAVE_STRTOL 1
+#define HAVE_SVR4_PTYS 1
+#define HAVE_SYSCONF 1
+#define HAVE_SYSINFO 1
+#define HAVE_SYSINFO_MEM_UNIT 1
+#define HAVE_SYS_IOCTL_H 1
+#define HAVE_SYS_PARAM_H 1
+#define HAVE_SYS_POLL_H 1
+#define HAVE_SYS_RESOURCE_H 1
+#define HAVE_SYS_SELECT_H 1
+#define HAVE_SYS_STATFS_H 1
+#define HAVE_SYS_SYSCTL_H 1
+#define HAVE_SYS_SYSINFO_H 1
+#define HAVE_SYS_TIME_H 1
+#define HAVE_SYS_TYPES_H 1
+#define HAVE_SYS_UTSNAME_H 1
+#define HAVE_SYS_WAIT_H 1
+#define HAVE_TERMCAP_H 1
+#define HAVE_TERMIO_H 1
+#define HAVE_TERMIOS_H 1
+#define HAVE_TGETENT 1
+#define HAVE_TOWLOWER 1
+#define HAVE_TOWUPPER 1
+#define HAVE_UNISTD_H 1
+#define HAVE_UP_BC_PC 1
+#define HAVE_USLEEP 1
+#define HAVE_UTIME 1
+#define HAVE_UTIME_H 1
+#define HAVE_UTIMES 1
+#define HAVE_WCHAR_H 1
+#define HAVE_WCTYPE_H 1
+#define RETSIGTYPE void
+#define SIGRETURN return
+#define SYS_SELECT_WITH_SYS_TIME 1
+#define TERMINFO 1
+#define TGETENT_ZERO_ERR 0
+#define TIME_WITH_SYS_TIME 1
+#define UNIX 1
+#define USEMAN_S 1
+#define USEMEMMOVE 1
+#define USE_XSMP_INTERACT 1
+
+/* Temporary FEAT_* defines to make it compile */
+#define FEAT_CMDWIN 1
+#define FEAT_CON_DIALOG 1
+#define FEAT_POSTSCRIPT 1
+#define FEAT_CSCOPE 1
+#define FEAT_EVAL 1
+#define FEAT_FLOAT 1
+#define FEAT_GETTEXT 1
+#define FEAT_MBYTE 1
+#define FEAT_MOUSE 1
+#define FEAT_MOUSE_TTY 1
+#define FEAT_MOUSE_XTERM 1
+#define FEAT_MULTI_LANG 1
+#define FEAT_SESSION 1
+#define FEAT_TITLE 1
+#define FEAT_SPELL 1
+#define FEAT_STL_OPT 1
+#define FEAT_SYN_HL 1
+#define FEAT_TERMRESPONSE 1
+#define FEAT_VERTSPLIT 1
+#define FEAT_WINDOWS 1
 EOF
 
 mkdir -p scripts
@@ -1440,71 +1988,292 @@ cat > "scripts/build.sh" << "EOF"
 rm -rf build
 mkdir build
 cd build
-cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../
+cmake -DCMAKE_BUILD_TYPE=Debug ../
 make
 EOF
 
-cat > "scripts/env.sh" << "EOF"
-pkgroot="$(pwd)"
-deps="$pkgroot/.deps"
-prefix="$deps/usr"
-export PATH="$prefix/bin:$PATH"
-EOF
+# cat > "scripts/env.sh" << "EOF"
+# pkgroot="$(pwd)"
+# deps="$pkgroot/.deps"
+# prefix="$deps/usr"
+# export PATH="$prefix/bin:$PATH"
+# EOF
 
-cat > "scripts/get-deps.sh" << "EOF"
-#!/bin/sh -e
-download() {
-	local url=$1
-	local tgt=$2
-	local sha1=$3
+# cat > "scripts/get-deps.sh" << "EOF"
+# #!/bin/sh -e
+# download() {
+# 	local url=$1
+# 	local tgt=$2
+# 	local sha1=$3
 
-	if [ ! -d "$tgt" ]; then
-		mkdir -p "$tgt"
-		if which wget > /dev/null 2>&1; then
-			tmp_dir=$(mktemp -d "/tmp/download_sha1check_XXXXXXX")
-			fifo="$tmp_dir/fifo"
-			mkfifo "$fifo"
-			# download, untar and calculate sha1 sum in one pass
-			(wget "$url" -O - | tee "$fifo" | \
-				(cd "$tgt";  tar --strip-components=1 -xvzf -)) &
-			sum=$(sha1sum < "$fifo" | cut -d ' ' -f1)
-			rm -rf "$tmp_dir"
-			if [ "$sum" != "$sha1" ]; then
-				echo "SHA1 sum doesn't match, expected '$sha1' got '$sum'"
-				exit 1
-			fi
-		else
-			echo "Missing wget utility"
-			exit 1
-		fi
-	fi
-}
+# 	if [ ! -d "$tgt" ]; then
+# 		mkdir -p "$tgt"
+# 		if which wget > /dev/null 2>&1; then
+# 			tmp_dir=$(mktemp -d "/tmp/download_sha1check_XXXXXXX")
+# 			fifo="$tmp_dir/fifo"
+# 			mkfifo "$fifo"
+# 			# download, untar and calculate sha1 sum in one pass
+# 			(wget "$url" -O - | tee "$fifo" | \
+# 				(cd "$tgt";  tar --strip-components=1 -xvzf -)) &
+# 			sum=$(sha1sum < "$fifo" | cut -d ' ' -f1)
+# 			rm -rf "$tmp_dir"
+# 			if [ "$sum" != "$sha1" ]; then
+# 				echo "SHA1 sum doesn't match, expected '$sha1' got '$sum'"
+# 				exit 1
+# 			fi
+# 		else
+# 			echo "Missing wget utility"
+# 			exit 1
+# 		fi
+# 	fi
+# }
 
-github_download() {
-	local repo=$1
-	local ver=$2
-	download "https://github.com/${repo}/archive/${ver}.tar.gz" "$3" "$4"
-}
+# github_download() {
+# 	local repo=$1
+# 	local ver=$2
+# 	download "https://github.com/${repo}/archive/${ver}.tar.gz" "$3" "$4"
+# }
 
-. scripts/env.sh
+# . scripts/env.sh
 
-uv_repo=joyent/libuv
-uv_ver=v0.11.18
-uv_dir="$deps/uv-$uv_ver"
-uv_sha1=11ad2afbc8e6ab82ee15691b117e5736ef1d15e3
+# uv_repo=joyent/libuv
+# uv_ver=v0.11.18
+# uv_dir="$deps/uv-$uv_ver"
+# uv_sha1=11ad2afbc8e6ab82ee15691b117e5736ef1d15e3
 
-if [ ! -e "$prefix/lib/libuv.a" ]; then
-	github_download "$uv_repo" "$uv_ver" "$uv_dir" "$uv_sha1"
-	(
-	cd "$uv_dir"
-	sh autogen.sh
-	./configure --prefix="$prefix"
-	make
-	make install
-	rm "$prefix/lib/"libuv*.so "$prefix/lib/"libuv*.so.*
-	)
-fi
-EOF
+# if [ ! -e "$prefix/lib/libuv.a" ]; then
+# 	github_download "$uv_repo" "$uv_ver" "$uv_dir" "$uv_sha1"
+# 	(
+# 	cd "$uv_dir"
+# 	sh autogen.sh
+# 	./configure --prefix="$prefix"
+# 	make
+# 	make install
+# 	rm "$prefix/lib/"libuv*.so "$prefix/lib/"libuv*.so.*
+# 	)
+# fi
+# EOF
 
-chmod +x scripts/build.sh
-chmod +x scripts/get-deps.sh
+# chmod +x scripts/build.sh
+# chmod +x scripts/get-deps.sh
+
+# cat > "src/types.h" << "EOF"
+# #ifndef NEOVIM_TYPES_H
+# #define NEOVIM_TYPES_H
+
+# typedef unsigned char char_u;
+# typedef unsigned short short_u;
+# typedef unsigned int int_u;
+# typedef void *vim_acl_T;
+
+# #endif /* NEOVIM_TYPES_H */
+# EOF
+
+# cat > "src/util.h" << "EOF"
+# #ifndef NEOVIM_UTIL_H
+# #define NEOVIM_UTIL_H
+
+# #define UNUSED(x) (void)(x)
+
+# #endif /* NEOVIM_UTIL_H */
+# EOF
+
+# # Setup module which provides the os layer
+# cat > "src/io.h" << "EOF"
+# #ifndef NEOVIM_IO_H
+# #define NEOVIM_IO_H
+
+# #include "types.h"
+
+# void io_init();
+# char_u io_readbyte();
+
+# #endif /* NEOVIM_IO_H */
+# EOF
+
+# cat > "src/io.c" << "EOF"
+# #include <stdio.h>
+# #include <string.h>
+# #include <stdbool.h>
+# #include <uv.h>
+
+# #include "io.h"
+# #include "util.h"
+
+# #define BUF_SIZE 4096
+
+
+# static uv_thread_t io_thread;
+# static uv_mutex_t io_mutex;
+# static uv_cond_t io_cond;
+# static uv_async_t read_wake_async;
+# static uv_fs_t current_fs_req;
+# static uv_pipe_t stdin_pipe, stdout_pipe;
+# static struct {
+#   unsigned int wpos, rpos;
+#   unsigned char data[BUF_SIZE];
+# } in_buffer = {0, 0, 0};
+# bool reading = false;
+
+
+# /* Private */
+# static void io_main(void *);
+# static void loop_running(uv_idle_t *, int);
+# static void read_wake(uv_async_t *, int);
+# static void alloc_buffer_cb(uv_handle_t *, size_t, uv_buf_t *);
+# static void read_cb(uv_stream_t *, ssize_t, const uv_buf_t *);
+# static void io_lock();
+# static void io_unlock();
+# static void io_wait();
+# static void io_signal();
+
+
+# /* Called at startup to setup the background thread that will handle all
+#  * events and translate to keys. */
+# void io_init() {
+#   uv_mutex_init(&io_mutex);
+#   uv_cond_init(&io_cond);
+#   io_lock();
+#   /* The event loop runs in a background thread */
+#   uv_thread_create(&io_thread, io_main, NULL);
+#   /* Wait for the loop thread to be ready */
+#   io_wait();
+#   io_unlock();
+# }
+
+
+# char_u io_readbyte() {
+#   char rv;
+
+#   io_lock();
+#   if (!reading) {
+#     uv_async_send(&read_wake_async);
+#     reading = true;
+#   }
+
+#   if (in_buffer.rpos == in_buffer.wpos)
+#     io_wait();
+
+#   rv = in_buffer.data[in_buffer.rpos++];
+#   io_unlock();
+
+#   return rv;
+# }
+
+
+# static void io_main(void *arg) {
+#   uv_idle_t idler;
+
+#   UNUSED(arg);
+#   /* use default loop */
+#   uv_loop_t *loop = uv_default_loop();
+#   /* Idler for signaling the main thread when the loop is running */
+#   uv_idle_init(loop, &idler);
+#   uv_idle_start(&idler, loop_running);
+#   /* Async watcher used by the main thread to resume reading */
+#   uv_async_init(loop, &read_wake_async, read_wake);
+#   /* stdin */
+#   uv_pipe_init(loop, &stdin_pipe, 0);
+#   uv_pipe_open(&stdin_pipe, 0);
+#   /* stdout */
+#   uv_pipe_init(loop, &stdout_pipe, 0);
+#   uv_pipe_open(&stdout_pipe, 1);
+#   /* start processing events */
+#   uv_run(loop, UV_RUN_DEFAULT);
+# }
+
+
+# /* Signal the main thread that the loop started running */
+# static void loop_running(uv_idle_t *handle, int status) {
+#   uv_idle_stop(handle);
+#   io_lock();
+#   io_signal();
+#   io_unlock();
+# }
+
+
+# /* Signal tell loop to continue reading stdin */
+# static void read_wake(uv_async_t *handle, int status) {
+#   UNUSED(handle);
+#   UNUSED(status);
+#   uv_read_start((uv_stream_t *)&stdin_pipe, alloc_buffer_cb, read_cb);
+# }
+
+
+# /* Called by libuv to allocate memory for reading. This uses a static buffer */
+# static void alloc_buffer_cb(uv_handle_t *handle, size_t ssize, uv_buf_t *rv) {
+#   int wpos;
+#   UNUSED(handle);
+#   io_lock();
+#   wpos = in_buffer.wpos;
+#   io_unlock();
+#   if (wpos == BUF_SIZE) {
+#     /* No more space in buffer */
+#     rv->len = 0;
+#     return;
+#   }
+#   if (BUF_SIZE < (wpos + ssize))
+#     ssize = BUF_SIZE - wpos;
+#   rv->base = in_buffer.data + wpos;
+#   rv->len = ssize;
+# }
+
+
+# /* This is only used to check how many bytes were read or if an error
+#  * occurred. If the static buffer is full(wpos == BUF_SIZE) try to move
+#  * the data to free space, or stop reading. */
+# static void read_cb(uv_stream_t *s, ssize_t cnt, const uv_buf_t *buf) {
+#   int move_count;
+#   UNUSED(s);
+#   UNUSED(buf); /* Data is already on the static buffer */
+#   if (cnt < 0) {
+#     if (cnt == UV_EOF) {
+#       uv_unref((uv_handle_t *)&stdin_pipe);
+#     } else if (cnt == UV_ENOBUFS) {
+#       /* Out of space in internal buffer, move data to the 'left' as much
+#        * as possible. If we cant move anything, stop reading for now. */
+#       io_lock();
+#       if (in_buffer.rpos == 0)
+#       {
+#         reading = false;
+#         io_unlock();
+#         uv_read_stop((uv_stream_t *)&stdin_pipe);
+#       }
+#       move_count = BUF_SIZE - in_buffer.rpos;
+#       memmove(in_buffer.data, in_buffer.data + in_buffer.rpos, move_count);
+#       in_buffer.wpos -= in_buffer.rpos;
+#       in_buffer.rpos = 0;
+#       io_unlock();
+#     }
+#     else {
+#       fprintf(stderr, "Unexpected error %s\n", uv_strerror(cnt));
+#     }
+#     return;
+#   }
+#   io_lock();
+#   in_buffer.wpos += cnt;
+#   io_signal();
+#   io_unlock();
+# }
+
+
+# /* Helpers for dealing with io synchronization */
+# static void io_lock() {
+#   uv_mutex_lock(&io_mutex);
+# }
+
+
+# static void io_unlock() {
+#   uv_mutex_unlock(&io_mutex);
+# }
+
+
+# static void io_wait() {
+#   uv_cond_wait(&io_cond, &io_mutex);
+# }
+
+
+# static void io_signal() {
+#   uv_cond_signal(&io_cond);
+# }
+# EOF

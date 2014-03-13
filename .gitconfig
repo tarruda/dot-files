@@ -23,6 +23,12 @@
 [url "git@github.com:tarruda/"]
   pushInsteadOf = "ta:"
 
+[url "https://github.com/neovim/"]
+  insteadOf = "nv:"
+
+[url "git@github.com:neovim/"]
+  pushInsteadOf = "nv:"
+
 [url "https://gist.github.com/"]
   insteadOf = "gist:"
 
