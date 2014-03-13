@@ -388,7 +388,7 @@ install-pyenv() {
 }
 
 install-python() {
-	local version='2.7.5'
+	local version='2.7.6'
 	PYTHON_CONFIGURE_OPTS='--enable-shared' LDFLAGS="-Wl,-rpath=$PYENV_ROOT/versions/$version/lib" pyenv install $version
 	echo $version > "$HOME/.python-version"
 }

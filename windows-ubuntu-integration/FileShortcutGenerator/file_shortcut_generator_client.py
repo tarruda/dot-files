@@ -121,7 +121,7 @@ theme = gtk.icon_theme_get_default()
 
 # theme = Gtk.IconTheme.get_default()
 
-menu = xdg.Menu.parse('gnome-applications.menu') # for ubuntu 12.04, use 'applications.menu'
+menu = xdg.Menu.parse(os.environ.get('XDG_DEFAULT_MENU', 'gnome-applications.menu')) # for ubuntu 12.04, set XDG_DEFAULT_MENU to 'applications.menu'
 
 map(walk_menu, menu.getEntries())
 

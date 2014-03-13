@@ -7,7 +7,12 @@
 
 [core]
   excludesfile = ~/.global.gitignore
-	pager = zsh -c \"col -b -x | vim -X -R --cmd 'let g:disable_addons = 1' -c 'set nomod nolist nomodifiable' -c 'set nonumber norelativenumber' -c 'map q :q<cr>' -c 'map <space> <c-d>' -c 'map b <c-u>' -\"
+  pager = vim -X -R --cmd 'let g:disable_addons = 1' -c 'set nomod nolist nomodifiable' -c 'set nonumber norelativenumber' -c 'map q :q<cr>' -c 'map <space> <c-d>' -c 'map b <c-u>' -
+
+[color]
+  ui = true
+  diff = false
+  log = false
 
 [url "https://github.com/"]
   insteadOf = "gh:"
