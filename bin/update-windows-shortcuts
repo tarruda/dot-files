@@ -4,7 +4,7 @@ script="$HOME/.dot-files/windows-ubuntu-integration/FileShortcutGenerator/file_s
 
 export XDG_DATA_HOME="$HOME/.dot-files/xdg"
 
-if $script > /dev/null 2>&1; then
+if $script; then
 	echo "Windows shortcuts were updated successfully" >&2
 else
 	echo "Error updating windows shortcuts!" >&2

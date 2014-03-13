@@ -94,6 +94,8 @@ namespace FileShortcutGeneratorServer
           int nameLength = reader.ReadInt32();
           byte[] nameData = reader.ReadBytes(nameLength);
           string name = Encoding.UTF8.GetString(nameData, 0, nameLength);
+          name = name.Replace(@"\", @" ");
+          name = name.Replace(@"/", @" ");
           name += " (Ubuntu)";
 
           // read command
@@ -106,12 +108,14 @@ namespace FileShortcutGeneratorServer
           string iconPath = null;
           if (iconData != null) {
             iconPath = Path.Combine(iconDirectory, name + ".ico");
+            iconPath = iconPath.Replace(@"\", @"\\");
             File.WriteAllBytes(iconPath, iconData);
           }
 
+          string scpath = Path.Combine(shortcutDirectory, name + ".lnk");
+          scpath = scpath.Replace(@"\", @"\\");
           // Create shortcut and wrap command into a tcp-command call
-          IWshRuntimeLibrary.IWshShortcut shortcut = wsh.CreateShortcut(
-              Path.Combine(shortcutDirectory, name + ".lnk"))
+          IWshRuntimeLibrary.IWshShortcut shortcut = wsh.CreateShortcut(scpath)
             as IWshRuntimeLibrary.IWshShortcut;
           shortcut.TargetPath = tcpCommand;
           shortcut.Arguments = command;

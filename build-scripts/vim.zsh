@@ -1,4 +1,7 @@
 #!/usr/bin/env zsh
+# install ubuntu dependencies:
+# libncursesw5-dev libgnome2-dev libgnomeui-dev libgtk2.0-dev libatk1.0-dev
+# libcairo2-dev libx11-dev libxpm-dev libxt-dev
 
 # This script builds and installs vim in the home directory linked against
 # python/ruby/perl installed by pyenv/rbenv/plenv respectively. Tested with

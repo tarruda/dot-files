@@ -4,8 +4,10 @@
 # Needs the following apt dependencies:
 #   - python-xdg
 #   - python-gi
+#   - python-gtk2
 #   - python-pythonmagick
 #   - gnome-menus
+#   - menu-xdg
 
 # To override or add custom .desktop files, just set XDG_DATA_HOME to a
 # custom directory that contains an 'applications' subdirectory containing
@@ -64,22 +66,25 @@ def walk_menu(entry):
         # byte 1 signals another entry
         conn.sendall('\x01')
         img_path = icon_attr(entry.DesktopEntry).encode('utf-8')
-        if img_path:
-            # Create an empty image and set the background color to
-            # transparent. This is important to have transparent background
-            # when converting from SVG
-            img = Image()
-            img.backgroundColor(Color(0, 0, 0, 0xffff))
-            img.read(img_path)
-            # scale the image to 48x48 pixels
-            img.scale(Geometry(48, 48))
-            # ensure the image is converted to ICO
-            img.magick('ICO')
-            b = Blob()
-            img.write(b)
-            # icon length plus data
-            conn.sendall(struct.pack('i', len(b.data)))
-            conn.sendall(b.data)
+        if img_path and os.path.isfile(img_path):
+            try:
+                # Create an empty image and set the background color to
+                # transparent. This is important to have transparent background
+                # when converting from SVG
+                img = Image()
+                img.backgroundColor(Color(0, 0, 0, 0xffff))
+                img.read(img_path)
+                # scale the image to 48x48 pixels
+                img.scale(Geometry(48, 48))
+                # ensure the image is converted to ICO
+                img.magick('ICO')
+                b = Blob()
+                img.write(b)
+                # icon length plus data
+                conn.sendall(struct.pack('i', len(b.data)))
+                conn.sendall(b.data)
+            except Exception:
+                conn.sendall(struct.pack('i', 0))
         else:
             conn.sendall(struct.pack('i', 0))
 
@@ -116,7 +121,7 @@ theme = gtk.icon_theme_get_default()
 
 # theme = Gtk.IconTheme.get_default()
 
-menu = xdg.Menu.parse('applications.menu')
+menu = xdg.Menu.parse(os.environ.get('XDG_DEFAULT_MENU', 'gnome-applications.menu')) # for ubuntu 12.04, set XDG_DEFAULT_MENU to 'applications.menu'
 
 map(walk_menu, menu.getEntries())
 
