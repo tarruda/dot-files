@@ -95,7 +95,9 @@ zstyle ':completion:*' list-colors ''
 zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
 zstyle ':completion:*' list-suffixes true
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'r:|[._-]=* r:|=* l:|=*'
-zstyle ':completion:*' menu select=2 eval "$(dircolors -b)"
+if which dircolors &> /dev/null; then
+	zstyle ':completion:*' menu select=2 eval "$(dircolors -b)"
+fi
 zstyle ':completion:*' original true
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
 zstyle ':completion:*' squeeze-slashes true
@@ -164,7 +166,7 @@ man() {
 # Aliases {{{
 
 case $OSTYPE in
-	*bsd*)
+	*bsd*|*darwin*)
 		# Make freebsd ls colors look like linux ls
 		# src: http://www.puresimplicity.net/~hemi/freebsd/misc.html
 		export CLICOLOR="YES";
