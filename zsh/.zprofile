@@ -9,13 +9,13 @@
 PATH=''
 paths=(
 # default unix paths
-/sbin
-/bin
-/usr/sbin
-/usr/bin
-/usr/games
 /usr/local/sbin
 /usr/local/bin
+/usr/sbin
+/usr/bin
+/sbin
+/bin
+/usr/games
 )
 if [[ -x /bin/cygpath ]]; then
 	sysroot=$(/bin/cygpath -u $SYSTEMROOT)
