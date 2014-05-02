@@ -134,13 +134,71 @@ pg_top() {
 	command pg_top -U $o_user[2] -h $o_host[2] "$@"
 }
 
+# Start working on a pull request, this requires a .git/user-repo file
+# containing the string "user/repository"
 pr() {
-	curl https://github.com/neovim/neovim/pull/$1.patch | git am
+	local pr_num=$1
+	if [[ -z $pr_num ]]; then
+		echo "Need the pull request number" >&2
+		return 1
+	fi
+	if [[ ! -r .git/user-repo ]]; then
+		echo "Need to setup user/repo" >&2
+		return 1
+	fi
+	if [[ -e .git/current-pull-request ]]; then
+		echo "Already working on pull request $(< .git/current-pull-request)" >&2
+		return 1
+	fi
+	(
+	set -e
+	local user_repo=$(< .git/user-repo)
+	curl "https://github.com/$(< .git/user-repo)/pull/$pr_num.patch" 2> /dev/null | git am
+	echo $pr_num > .git/current-pull-request
+	echo "Working on PR $pr_num"
+	)
 }
 
-mpr() {
-	curl https://github.com/neovim/neovim/pull/$1.patch | git am -3
+# Finish working on a pull request, besides the .git/user-repo file,
+# this requires a .git/ghtok file containing the oauth token for accessing the
+# repository and a .git/current-pull-request created by the `pr` function
+cpr() {
+	if [[ ! -r .git/ghtok ]]; then
+		echo "Need to setup oauth token" >&2
+		return 1
+	fi
+	if [[ ! -r .git/user-repo ]]; then
+		echo "Need to setup user/repo" >&2
+		return 1
+	fi
+	if [[ ! -r .git/current-pull-request ]]; then
+		echo "Not working on a pull request" >&2
+		return 1
+	fi
+	local pr_num=$(< .git/current-pull-request)
+	(
+	set -e
+	rm .git/current-pull-request
+	echo "Will push commits and comment/close on PR $pr_num"
+	git push
+	curl \
+		-X POST \
+		-H "Authorization: token $(< .git/ghtok)"  \
+		-d '{"body": ":+1: merged, thanks"}' \
+		"https://api.github.com/repos/$(< .git/user-repo)/issues/$pr_num/comments" > /dev/null
+	curl \
+		-X PATCH \
+		-H "Authorization: token $(< .git/ghtok)"  \
+		-d '{"state": "closed"}' \
+		"https://api.github.com/repos/$(< .git/user-repo)/issues/$pr_num" > /dev/null
+	echo "Done"
+	)
 }
+
+# Print the stack trace of a core file.
+# From http://www.commandlinefu.com/commands/view/4039/print-stack-trace-of-a-core-file-without-needing-to-enter-gdb-interactively
+# Usage: corebt program corefile
+alias corebt="gdb -q -n -ex bt -batch"
 
 # wrapper for reading man pages
 
@@ -163,6 +221,7 @@ man() {
 # }}}
 # Aliases {{{
 
+alias ptrace-enable='sudo sh -c "echo 0 > /proc/sys/kernel/yama/ptrace_scope"'
 case $OSTYPE in
 	*bsd*)
 		# Make freebsd ls colors look like linux ls
@@ -327,12 +386,29 @@ else
 	weechat() {
 		TERM=screen-256color command weechat-curses "$@"
 	}
+
+	tgdb() {
+		TERM=screen-256color command gdb -tui "$@"
+	}
 fi
 
 alias e=vi
 
 # }}}
-# Github {{{
+# Git/Github {{{
+git-restore-file () {
+	local file=$1
+	if [[ -z $file ]]; then
+		print "Need a filename" >&2
+		return 1
+	fi
+	git checkout $(git rev-list -n1 HEAD -- $file)^ $file
+}
+
+git-last-branches() {
+	git for-each-ref --sort=-committerdate refs/heads/ | head -n10
+}
+
 install-github-tree() {
 	(
 	zmodload zsh/regex
@@ -422,9 +498,9 @@ install-perl() {
 # }}}
 # Node.js {{{
 install-nodenv() {
-	install-github-tree -d "$HOME/.nodenv" -t 'e152c07a05ddfb0f776e1db932ee7ed36c09d36e' 'oinutter/nodenv'
+	install-github-tree -d "$HOME/.nodenv" -t '6231c7843cb6bdd1266a6396ee9ab290346a3de6' 'oinutter/nodenv'
 	mkdir -p "$HOME/.nodenv/plugins"
-	install-github-tree -d "$HOME/.nodenv/plugins/node-build" -t 'bed4f461ead747457adc353965bba11e43be3ac3' 'oinutter/node-build'
+	install-github-tree -d "$HOME/.nodenv/plugins/node-build" -t '0be9dec4f65a2463d5f90c15bd620400bae8cd5f' 'oinutter/node-build'
 	mkdir -p "$ZDOTDIR/site-zshrc.d"
 	cat > "$ZDOTDIR/site-zshrc.d/nodenv.zsh" <<-EOF
 	export NODENV_ROOT="\$HOME/.nodenv"

@@ -50,3 +50,7 @@ bind v copy-mode
 # Select/yank like vim
 bind -t vi-copy 'v' begin-selection
 bind -t vi-copy 'y' copy-selection
+
+bind c neww -c "#{pane_current_path}"
+bind '"' split-window -c "#{pane_current_path}"
+bind '%' split-window -h -c "#{pane_current_path}"

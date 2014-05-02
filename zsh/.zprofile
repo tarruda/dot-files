@@ -67,6 +67,7 @@ export PYTHONSTARTUP=$DOTDIR/.pythonrc
 export WINEARCH=win32
 export WINEPREFIX=$HOME/.wine
 export EDITOR=vim
+export VISUAL=vim
 export ACKRC=$DOTDIR/.ackrc
 export XCOMPOSEFILE=$DOTDIR/.XCompose
 export VBOX_USER_HOME=$HOME/.virtualbox

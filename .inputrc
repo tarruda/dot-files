@@ -26,6 +26,8 @@ $if mode=vi
     set keymap vi-command
     "gg": beginning-of-history
     "G": end-of-history
+    "k": history-search-backward
+    "j": history-search-forward
 
     set keymap vi-insert
     "\C-l": clear-screen
@@ -41,6 +43,10 @@ $endif
 $if Python
 $endif
 
-# IPython needs this to appear at the bottom of the
-# file for clear-screen to work
-set keymap vi
+$if Gdb
+  "\e[15~": "continue\n"
+  "\e[21~": "next\n"
+  "\e[23~": "step\n"
+  "\eOQ": "nexti\n"
+  "\eOR": "stepi\n"
+$endif
