@@ -574,6 +574,17 @@ function! LoadAddons()
   " Lua {{{
   call add(s:vim_addons, 'github:leafo/moonscript-vim')
   " }}}
+  " UltiSnips {{{
+  if g:has_python
+    let g:UltiSnipsEditSplit = 'normal'
+    let g:UltiSnipsSnippetsDir = g:rc_dir . '/UltiSnips'
+    let g:UltiSnipsExpandTrigger="<c-j>"
+    let g:UltiSnipsJumpForwardTrigger="<c-j>"
+    let g:UltiSnipsJumpBackwardTrigger="<c-k>"
+    let g:UltiSnipsListSnippets="<c-tab>"
+    call add(s:vim_addons, 'github:SirVer/ultisnips')
+  endif
+  " }}}
   " YouCompleteMe {{{
   if g:has_python
     call add(s:vim_addons, 'github:Valloric/YouCompleteMe')
@@ -586,17 +597,6 @@ function! LoadAddons()
   autocmd BufEnter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
   " toggle NERDTree
   nnoremap <silent> <F2> :NERDTreeToggle<CR>
-  " }}}
-  " UltiSnips {{{
-  if g:has_python
-    let g:UltiSnipsEditSplit = 'normal'
-    let g:UltiSnipsSnippetsDir = g:rc_dir . '/UltiSnips'
-    let g:UltiSnipsExpandTrigger="<c-j>"
-    let g:UltiSnipsJumpForwardTrigger="<c-j>"
-    let g:UltiSnipsJumpBackwardTrigger="<c-k>"
-    let g:UltiSnipsListSnippets="<c-tab>"
-    call add(s:vim_addons, 'github:SirVer/ultisnips')
-  endif
   " }}}
   " Gundo {{{
   if g:has_python
