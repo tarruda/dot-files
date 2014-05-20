@@ -139,60 +139,81 @@ pg_top() {
 # Start working on a pull request, this requires a .git/user-repo file
 # containing the string "user/repository"
 pr() {
+	if [[ ! -r .git/user-repo ]]; then
+		echo "Need to setup user/repo" >&2
+		return 1
+	fi
+	local user_repo=$(< .git/user-repo)
 	local pr_num=$1
 	if [[ -z $pr_num ]]; then
 		echo "Need the pull request number" >&2
 		return 1
 	fi
-	if [[ ! -r .git/user-repo ]]; then
-		echo "Need to setup user/repo" >&2
-		return 1
-	fi
-	if [[ -e .git/current-pull-request ]]; then
-		echo "Already working on pull request $(< .git/current-pull-request)" >&2
+	local branch=merge-pr-$pr_num
+	if [[ -e .git/refs/heads/$branch ]]; then
+		echo "Already working on pull request $pr_num, delete branch '$branch' and try again" >&2
 		return 1
 	fi
 	(
 	set -e
 	local user_repo=$(< .git/user-repo)
-	curl "https://github.com/$(< .git/user-repo)/pull/$pr_num.patch" 2> /dev/null | git am
-	echo $pr_num > .git/current-pull-request
-	echo "Working on PR $pr_num"
+	git checkout -b $branch
+	curl "https://github.com/$(< .git/user-repo)/pull/$pr_num.patch" 2> /dev/null | git am --3way
 	)
 }
 
 # Finish working on a pull request, besides the .git/user-repo file,
 # this requires a .git/ghtok file containing the oauth token for accessing the
-# repository and a .git/current-pull-request created by the `pr` function
-cpr() {
-	if [[ ! -r .git/ghtok ]]; then
-		echo "Need to setup oauth token" >&2
-		return 1
-	fi
+# repository
+mpr() {
 	if [[ ! -r .git/user-repo ]]; then
 		echo "Need to setup user/repo" >&2
 		return 1
 	fi
-	if [[ ! -r .git/current-pull-request ]]; then
-		echo "Not working on a pull request" >&2
+	local user_repo=$(< .git/user-repo)
+	if [[ ! -r .git/ghtok ]]; then
+		echo "Need to setup oauth token" >&2
 		return 1
 	fi
-	local pr_num=$(< .git/current-pull-request)
+	local ghtok=$(< .git/ghtok)
+	local pr_num=$1
+	if [[ -z $pr_num ]]; then
+		echo "Need the pull request number" >&2
+		return 1
+	fi
+	local branch=merge-pr-$pr_num
+	if [[ ! -e .git/refs/heads/$branch ]]; then
+		echo "Not working on $pr_num" >&2
+		return 1
+	fi
 	(
 	set -e
-	rm .git/current-pull-request
 	echo "Will push commits and comment/close on PR $pr_num"
+	git checkout master
+	echo "Retrieving the PR title..."
+	local pr_title="$(curl https://api.github.com/repos/$user_repo/issues/$pr_num 2> /dev/null | sed -n -e 's/.*"title":\s\+"\([^"]\+\)".*/\1/g' -e 's/^\[\(\w\+\)]\s*\(.\+\)/\2/p')"
+	git merge --no-ff -m "Merge pull request #$pr_num '$pr_title'" $branch
+	git branch -D $branch
+	git log --graph --decorate --pretty=oneline --abbrev-commit --all --max-count=20
+	echo "Continue with the merge?[y/N]"
+	local confirm
+	read confirm
+	if [[ $confirm != "y" ]]; then
+		echo "Merge cancelled" >&2
+		git reset --hard HEAD~1
+		exit 1
+	fi
 	git push
 	curl \
 		-X POST \
-		-H "Authorization: token $(< .git/ghtok)"  \
+		-H "Authorization: token $ghtok"  \
 		-d '{"body": ":+1: merged, thanks"}' \
-		"https://api.github.com/repos/$(< .git/user-repo)/issues/$pr_num/comments" > /dev/null
+		"https://api.github.com/repos/$user_repo/issues/$pr_num/comments" > /dev/null
 	curl \
 		-X PATCH \
-		-H "Authorization: token $(< .git/ghtok)"  \
+		-H "Authorization: token $ghtok"  \
 		-d '{"state": "closed"}' \
-		"https://api.github.com/repos/$(< .git/user-repo)/issues/$pr_num" > /dev/null
+		"https://api.github.com/repos/$user_repo/issues/$pr_num" > /dev/null
 	echo "Done"
 	)
 }
