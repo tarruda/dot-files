@@ -63,3 +63,5 @@
 [alias]
   lol = log --graph --decorate --pretty=oneline --abbrev-commit --all --max-count=20
   lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
+  s = stash --keep-index
+  sp = stash pop

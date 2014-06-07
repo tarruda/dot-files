@@ -485,7 +485,7 @@ install-ruby() {
 # }}}
 # Python {{{
 install-pyenv() {
-	install-github-tree -d "$HOME/.pyenv" -t 'v0.4.0-20140311' 'yyuu/pyenv'
+	install-github-tree -d "$HOME/.pyenv" -t 'v0.4.0-20140602' 'yyuu/pyenv'
 	mkdir -p "$ZDOTDIR/site-zshrc.d"
 	cat > "$ZDOTDIR/site-zshrc.d/pyenv.zsh" <<-EOF
 	export PYENV_ROOT="\$HOME/.pyenv"
@@ -496,7 +496,7 @@ install-pyenv() {
 
 install-python() {
 	local version='2.7.6'
-	PYTHON_CONFIGURE_OPTS='--enable-shared' LDFLAGS="-Wl,-rpath=$PYENV_ROOT/versions/$version/lib" pyenv install $version
+	PYTHON_CONFIGURE_OPTS='--enable-shared --with-pydebug' LDFLAGS="-Wl,-rpath=$PYENV_ROOT/versions/$version/lib" pyenv install $version
 	echo $version > "$HOME/.python-version"
 }
 # }}}

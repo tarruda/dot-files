@@ -632,16 +632,30 @@ function! LoadAddons()
   call add(s:vim_addons, 'github:jamessan/vim-gnupg.git')
   " }}}
   " Omnisharp {{{
-  let g:Omnisharp_stop_server = 0
-  call add(s:vim_addons, 'github:nosami/Omnisharp.git')
+  if g:has_python
+    let g:Omnisharp_stop_server = 0
+    call add(s:vim_addons, 'github:nosami/Omnisharp.git')
+  endif
+  " }}}
+  " Fugitive {{{
+  nnoremap <leader>gs :Gstatus<cr>
+  nnoremap <leader>gd :Gdiff<cr>
+  nnoremap <leader>gb :Gblame<cr>
+  nnoremap <leader>gw :Gwrite
+  nnoremap <leader>gr :Gread
+  nnoremap <leader>dp :diffput<cr>:diffupdate<cr>
+  vnoremap <leader>dp :diffput<cr>:diffupdate<cr>
+  nnoremap <leader>dg :diffget<cr>:diffupdate<cr>
+  vnoremap <leader>dg :diffget<cr>:diffupdate<cr>
+  call add(s:vim_addons, 'github:tpope/vim-fugitive')
   " }}}
   " Other {{{
   call add(s:vim_addons, 'github:Raimondi/delimitMate') " autoclose brackets,quotes...
   call add(s:vim_addons, 'github:tpope/vim-tbone')
+  call add(s:vim_addons, 'github:tpope/vim-unimpaired')
   call add(s:vim_addons, 'github:plasticboy/vim-markdown')
   call add(s:vim_addons, 'github:tpope/vim-repeat')
   call add(s:vim_addons, 'github:tpope/vim-surround')
-  call add(s:vim_addons, 'github:tpope/vim-fugitive')
   call add(s:vim_addons, 'github:tpope/vim-commentary')
   call add(s:vim_addons, 'github:juvenn/mustache.vim')
   call add(s:vim_addons, 'github:pangloss/vim-javascript')
