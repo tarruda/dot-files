@@ -268,6 +268,9 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias d='dirs -v | head -10'
+alias vim=nvim
+alias vi=vim
+alias e=vi
 
 # }}}
 # Debian/Ubuntu {{{
@@ -396,11 +399,8 @@ fi
 # }}}
 # Tmux {{{
 
-if [[ -z $TMUX || $TERM != tmux ]]; then
-	alias vi=vim
-else
-	vim () { command vim -X "$@" }
-	vi() { zsh $DOTDIR/tmux/scripts/vim-tmux-open.zsh "$@" }
+if ! [[ -z $TMUX || $TERM != tmux ]]; then
+	# vim () { command vim -X "$@" }
 
 	mutt() {
 		TERM=screen-256color command mutt -e "set editor='TERM=tmux vim -X'" "$@"
@@ -410,12 +410,18 @@ else
 		TERM=screen-256color command weechat-curses "$@"
 	}
 
+	gdb() {
+		GDB=screen-256color command gdb "$@"
+	}
+
 	tgdb() {
 		TERM=screen-256color command gdb -tui "$@"
 	}
-fi
 
-alias e=vi
+	cgdb() {
+		TERM=screen-256color command cgdb "$@"
+	}
+fi
 
 # }}}
 # Git/Github {{{
@@ -485,7 +491,7 @@ install-ruby() {
 # }}}
 # Python {{{
 install-pyenv() {
-	install-github-tree -d "$HOME/.pyenv" -t 'v0.4.0-20140602' 'yyuu/pyenv'
+	install-github-tree -d "$HOME/.pyenv" -t 'v20140615' 'yyuu/pyenv'
 	mkdir -p "$ZDOTDIR/site-zshrc.d"
 	cat > "$ZDOTDIR/site-zshrc.d/pyenv.zsh" <<-EOF
 	export PYENV_ROOT="\$HOME/.pyenv"
@@ -496,7 +502,7 @@ install-pyenv() {
 
 install-python() {
 	local version='2.7.6'
-	PYTHON_CONFIGURE_OPTS='--enable-shared --with-pydebug' LDFLAGS="-Wl,-rpath=$PYENV_ROOT/versions/$version/lib" pyenv install $version
+	PYTHON_CONFIGURE_OPTS='--enable-shared' LDFLAGS="-Wl,-rpath=$PYENV_ROOT/versions/$version/lib" pyenv install $version
 	echo $version > "$HOME/.python-version"
 }
 # }}}
@@ -521,9 +527,9 @@ install-perl() {
 # }}}
 # Node.js {{{
 install-nodenv() {
-	install-github-tree -d "$HOME/.nodenv" -t '6231c7843cb6bdd1266a6396ee9ab290346a3de6' 'oinutter/nodenv'
+	install-github-tree -d "$HOME/.nodenv" -t 'v0.2.0' 'oinutter/nodenv'
 	mkdir -p "$HOME/.nodenv/plugins"
-	install-github-tree -d "$HOME/.nodenv/plugins/node-build" -t '0be9dec4f65a2463d5f90c15bd620400bae8cd5f' 'oinutter/node-build'
+	install-github-tree -d "$HOME/.nodenv/plugins/node-build" -t 'b3ca83581b459049e770f3ff5b4c4734a2f5fc78' 'oinutter/node-build'
 	mkdir -p "$ZDOTDIR/site-zshrc.d"
 	cat > "$ZDOTDIR/site-zshrc.d/nodenv.zsh" <<-EOF
 	export NODENV_ROOT="\$HOME/.nodenv"
@@ -533,7 +539,7 @@ install-nodenv() {
 }
 
 install-node() {
-	local version='0.10.20'
+	local version='0.10.28'
 	nodenv install $version
 	echo $version > ~/.node-version
 }

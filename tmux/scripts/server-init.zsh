@@ -10,13 +10,13 @@ fi
 if which xclip &> /dev/null && [[ -n $DISPLAY ]]; then
 	tmux bind -t vi-copy M-y copy-pipe 'xclip -i -selection clipboard'
 	tmux bind -n M-p if\
-	 	'cmd=$(tmux display -p "#{pane_current_command}"); [ $cmd = vim ] || [ $cmd = mutt ] || [ $cmd = psql ]'\
+	 	'cmd=$(tmux display -p "#{pane_current_command}"); [ $cmd = nvim ] || [ $cmd = vim ] || [ $cmd = mutt ] || [ $cmd = psql ]'\
 		"send-keys M-t 'mux' paste-tmux"\
 		'run "xclip -o -selection clipboard | tmux load-buffer -; tmux paste-buffer"'
 else
 	tmux bind -t vi-copy M-y copy-selection
 	tmux bind -n M-p if\
-	 	'cmd=$(tmux display -p "#{pane_current_command}"); [ $cmd = vim ] || [ $cmd = mutt ] || [ $cmd = psql ]'\
+	 	'cmd=$(tmux display -p "#{pane_current_command}"); [ $cmd = nvim ] || [ $cmd = vim ] || [ $cmd = mutt ] || [ $cmd = psql ]'\
 		"send-keys M-t 'mux' paste-tmux"\
 		"paste-buffer"
 fi
@@ -39,7 +39,7 @@ for key in ${(k)vim_tmux_command_map}; do
 	kv=${vim_tmux_command_map[$key]}
 	vim_tmux_cmd=("${=kv}")
 	tmux bind -n $key if\
-		'[ $(tmux display -p "#{pane_current_command}") = vim ]'\
+		'cmd=$(tmux display -p "#{pane_current_command}"); [ $cmd = nvim ] || [ $cmd = vim ]'\
 		"send-keys M-t 'mux' '$vim_tmux_cmd[1]'"\
 		"$vim_tmux_cmd[2,-1]"
 done
