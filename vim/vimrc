@@ -5,6 +5,8 @@
 "   7.3 compiled with most features.  A lot here was taken from this vimrc:
 "   https://bitbucket.org/sjl/dotfiles/src/tip/vim/vimrc
 
+let g:ycmd_path = $DOTDIR . '/vim/addons'
+      \. '/github-Valloric-YouCompleteMe/third_party/ycmd/ycmd'
 " Basic initialization {{{
 "
 if !exists('g:vimrc_done_basic_init')

@@ -19,18 +19,15 @@ let g:ycm_key_completion_prev =
       \ get(g:, 'ycm_key_completion_prev', ['<s-tab>', '<up>'])
 
 let g:ycm_error_symbol =
-      \ get( g:, 'ycm_error_symbol',
-      \ get( g:, 'syntastic_error_symbol', '>>' ) )
+      \ get(g:, 'ycm_error_symbol',
+      \ get(g:, 'syntastic_error_symbol', '>>'))
 
 let g:ycm_warning_symbol =
-      \ get( g:, 'ycm_warning_symbol',
-      \ get( g:, 'syntastic_warning_symbol', '>>' ) )
+      \ get(g:, 'ycm_warning_symbol',
+      \ get(g:, 'syntastic_warning_symbol', '>>'))
 
-function! s:Setup()
-  let g:syntastic_cpp_checkers = []
-  let g:syntastic_c_checkers = []
-  let g:syntastic_objc_checkers = []
-  let g:syntastic_objcpp_checkers = []
+
+function! g:YcmSetup()
   call s:SetupKeys()
   call s:SetupEvents()
   call s:SetupSigns()
@@ -50,8 +47,6 @@ function! s:SetupKeys()
       let invoke_key = '<nul>'
     endif
 
-    " <c-x><c-o> trigger omni completion, <c-p> deselects the first completion
-    " candidate that vim selects by default
     silent! exe 'inoremap ' . invoke_key . ' <c-r>=ycm#BeginCompletion()<cr>'
   endif
 
@@ -65,36 +60,44 @@ function! s:SetupKeys()
 endfunction
 
 function! s:SetupEvents()
-  " augroup ycm
-  "   autocmd BufRead,BufEnter,FileType * call ycm#BeginCompilation()
-  " augroup END
+  augroup ycm
+    autocmd!
+    " autocmd BufRead,BufEnter,FileType * call s:OnBufferVisit()
+    " autocmd BufUnload * call s:OnBufferUnload(expand('<afile>:p'))
+    " autocmd CursorMovedI * call s:OnCursorMoved()
+  augroup END
+  " call s:OnBufferVisit()
 endfunction
 
 function! s:SetupSigns()
+  let g:syntastic_cpp_checkers = []
+  let g:syntastic_c_checkers = []
+  let g:syntastic_objc_checkers = []
+  let g:syntastic_objcpp_checkers = []
   " We try to ensure backwards compatibility with Syntastic if the user has
   " already defined styling for Syntastic highlight groups.
 
-  if !hlexists( 'YcmErrorSign' )
-    if hlexists( 'SyntasticErrorSign')
+  if !hlexists('YcmErrorSign')
+    if hlexists('SyntasticErrorSign')
       highlight link YcmErrorSign SyntasticErrorSign
     else
       highlight link YcmErrorSign error
     endif
   endif
 
-  if !hlexists( 'YcmWarningSign' )
-    if hlexists( 'SyntasticWarningSign')
+  if !hlexists('YcmWarningSign')
+    if hlexists('SyntasticWarningSign')
       highlight link YcmWarningSign SyntasticWarningSign
     else
       highlight link YcmWarningSign todo
     endif
   endif
 
-  if !hlexists( 'YcmErrorLine' )
+  if !hlexists('YcmErrorLine')
     highlight link YcmErrorLine SyntasticErrorLine
   endif
 
-  if !hlexists( 'YcmWarningLine' )
+  if !hlexists('YcmWarningLine')
     highlight link YcmWarningLine SyntasticWarningLine
   endif
 
@@ -104,7 +107,31 @@ function! s:SetupSigns()
         \ ' texthl=YcmWarningSign linehl=YcmWarningLine'
 endfunction
 
+
+function! s:OnBufferVisit()
+  call ycm#BeginCompilation()
+endfunction
+
+
+function! s:OnBufferUnload(file)
+  call send_event(0, 'buffer_unload', a:file)
+endfunction
+
+
+function! s:OnCursorMoved()
+endfunction
+
+
+function! s:StartYcmd()
+  if &diff || !has('neovim')
+    return
+  endif
+  call send_event(0, 'waiting_for_ycmd', 0)
+endfunction
+
+
 augroup ycmStart
   autocmd!
-  autocmd VimEnter * call s:Setup()
+  autocmd VimEnter * call s:StartYcmd()
 augroup END
+
