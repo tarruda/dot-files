@@ -1,0 +1,20 @@
+#compdef gdb
+
+local curcontext="$curcontext" line state
+
+
+case $words[$(( CURRENT - 1 ))] in
+	attach)
+		_alternative 'processes:: _pids'
+		return
+		;;
+esac
+
+_arguments \
+	'(--tui)--tui[Use a terminal user interface]' \
+	'(--tty)--tty[Use TTY for input/output by the program being debugged]' \
+	'(-c --core)'{-c,--core}'[Analyze the core dump COREFILE]' && return 0
+
+_alternative '*::(attach)' && return 0
+
+_files

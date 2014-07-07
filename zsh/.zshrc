@@ -104,7 +104,9 @@ zstyle ':completion:*' squeeze-slashes true
 # ignore extensions when completing edit commands
 zstyle ":completion:*:*:(vim|vi|e):*:*files" ignored-patterns '(*~|*.(o|swp|swo|tgz|tbz|tar.(gz|bz2|xz)))'
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
-zstyle ':completion:*:(kill|strace|gdb):*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
+zstyle ':completion:*:*:gdb:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
+zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
+zstyle ':completion:*:gdb:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
 # initialize the completion system
 autoload -Uz compinit
@@ -191,7 +193,7 @@ mpr() {
 	echo "Will push commits and comment/close on PR $pr_num"
 	git checkout master
 	echo "Retrieving the PR title..."
-	local pr_title="$(curl https://api.github.com/repos/$user_repo/issues/$pr_num 2> /dev/null | sed -n -e 's/.*"title":\s\+"\([^"]\+\)".*/\1/g' -e 's/^\[\(\w\+\)]\s*\(.\+\)/\2/p')"
+	local pr_title="$(curl https://api.github.com/repos/$user_repo/issues/$pr_num 2> /dev/null | sed -n -e 's/.*"title":\s\+"\([^"]\+\)".*/\1/gp')"
 	git merge --no-ff -m "Merge pull request #$pr_num '$pr_title'" $branch
 	git branch -D $branch
 	git log --graph --decorate --pretty=oneline --abbrev-commit --all --max-count=20
@@ -221,7 +223,7 @@ mpr() {
 # Print the stack trace of a core file.
 # From http://www.commandlinefu.com/commands/view/4039/print-stack-trace-of-a-core-file-without-needing-to-enter-gdb-interactively
 # Usage: corebt program corefile
-alias corebt="gdb -q -n -ex bt -batch"
+# alias corebt="gdb -q -n -ex bt -batch"
 
 # wrapper for reading man pages
 
@@ -410,17 +412,17 @@ if ! [[ -z $TMUX || $TERM != tmux ]]; then
 		TERM=screen-256color command weechat-curses "$@"
 	}
 
-	gdb() {
-		GDB=screen-256color command gdb "$@"
-	}
+	# gdb() {
+	# 	GDB=screen-256color command gdb "$@"
+	# }
 
-	tgdb() {
-		TERM=screen-256color command gdb -tui "$@"
-	}
+	# tgdb() {
+	# 	TERM=screen-256color command gdb -tui "$@"
+	# }
 
-	cgdb() {
-		TERM=screen-256color command cgdb "$@"
-	}
+	# cgdb() {
+	# 	TERM=screen-256color command cgdb "$@"
+	# }
 fi
 
 # }}}

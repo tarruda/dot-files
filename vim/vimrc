@@ -551,7 +551,7 @@ function! LoadAddons()
   endif
   " }}}
   " YouCompleteMe {{{
-  if g:has_python && !has('neovim')
+  if g:has_python
     let g:ycm_auto_trigger = 1
     call add(s:vim_addons, 'github:Valloric/YouCompleteMe')
     au FileType c,cpp nnoremap <buffer> <c-]> :YcmCompleter GoToDefinitionElseDeclaration<CR>
