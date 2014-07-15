@@ -1250,9 +1250,13 @@ class Frame(object):
         if self.is_evalframeex():
             pyop = self.get_pyop()
             if pyop:
+                sys.stdout.write('\n')
                 sys.stdout.write('#%i %s\n' % (self.get_index(), pyop.get_truncated_repr(MAX_OUTPUT_LEN)))
                 if not pyop.is_optimized_out():
-                    line = pyop.current_line()
+                    try:
+                        line = pyop.current_line()
+                    except IOError:
+                        line = ''
                     sys.stdout.write('    %s\n' % line.strip())
             else:
                 sys.stdout.write('#%i (unable to read python frame information)\n' % self.get_index())

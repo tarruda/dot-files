@@ -7,7 +7,6 @@
 
 [core]
   excludesfile = ~/.global.gitignore
-  pager = vim -X -R --cmd 'let g:disable_addons = 1' -c 'set nomod nolist nomodifiable' -c 'set nonumber norelativenumber' -c 'map q :q<cr>' -c 'map <space> <c-d>' -c 'map b <c-u>' -
 
 [color]
   ui = true
@@ -52,10 +51,10 @@
   sslverify = true 
 
 [diff]
-  tool = vimdiff
+  tool = vim -d
 
 [merge]
-  tool = vimdiff
+  tool = vim -d
 
 [difftool]
   prompt = true
