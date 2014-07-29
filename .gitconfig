@@ -51,10 +51,10 @@
   sslverify = true 
 
 [diff]
-  tool = vim -d
+  tool = vimdiff
 
 [merge]
-  tool = vim -d
+  tool = vimdiff
 
 [difftool]
   prompt = true

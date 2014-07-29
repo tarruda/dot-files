@@ -7,7 +7,18 @@
 
 " Basic initialization {{{
 "
+set nocompatible
+
+if has('neovim')
+  let s:python_host_init = 'python -c "import neovim; neovim.start_host()"'
+  " Neovim-specific stuff
+  let &initpython = s:python_host_init
+  let &initclipboard = s:python_host_init
+  set unnamedclip
+endif
+
 if !exists('g:vimrc_done_basic_init')
+
   let g:is_windows = has('win32') || has('win64')
   " Little hack to set the $MYVIMRC from the $VIMINIT in the case it was used to 
   " initialize vim.
@@ -31,7 +42,6 @@ endif
 " }}}
 " Global settings {{{
 "
-set nocompatible
 let mapleader = ","
 set backspace=indent,eol,start " backspace over everything in insert mode
 set nobackup " no need for backup files(use undo files instead)
@@ -86,9 +96,6 @@ set timeout " enable timeout of key codes and mappings(the default)
 set timeoutlen=3000 " big timeout for key sequences
 set ttimeoutlen=10 " small timeout for key sequences since these will be normally scripted
 set clipboard=
-if has('neovim')
-  set unnamedclip
-endif
 syntax on " enable syntax highlighting
 filetype plugin indent on " enable file-specific plugins/settings
 set backupskip=/tmp/*,/private/tmp/* " make it possible to use vim to edit crontab
@@ -151,12 +158,6 @@ command! -nargs=? -complete=customlist,ScratchPadComplete ScratchPad call OpenSc
 
 " }}}
 " Utility functions {{{
-
-function! StartClipboard()
-  if has('neovim') && has('python')
-    py import vim
-  endif
-endfunction
 
 " Restore cursor position, window position, and last search after running a
 " command.
@@ -397,6 +398,16 @@ augroup filetype_settings
   au BufNewFile,BufRead $ZDOTDIR/completion-functions/* setl filetype=zsh
   au BufNewFile,BufRead $ZDOTDIR/plugins/**/functions/* setl filetype=zsh
   " }}}
+  " Coffeescript {{{
+  au FileType coffee
+        \   setl foldmethod=marker
+        \ | setl foldenable
+  " }}}
+  " Html {{{
+  au FileType html
+        \   setl foldmethod=marker
+        \ | setl foldenable
+  " }}}
   " Vim {{{
   au FileType vim
         \   setl foldmethod=marker
@@ -614,6 +625,7 @@ function! LoadAddons()
   call add(s:vim_addons, 'github:tpope/vim-fugitive')
   " }}}
   " Other {{{
+  call add(s:vim_addons, 'github:fatih/vim-go')
   call add(s:vim_addons, 'github:Raimondi/delimitMate') " autoclose brackets,quotes...
   call add(s:vim_addons, 'github:tpope/vim-tbone')
   call add(s:vim_addons, 'github:tpope/vim-unimpaired')

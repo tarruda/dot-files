@@ -82,7 +82,6 @@ if which vim &> /dev/null; then
 	read PAGER <<- EOF
 	zsh -c \"col -b -x | vim -R \
 		--cmd 'let g:disable_addons = 1' \
-		-c 'call StartClipboard()' \
 		-c 'set nomod nolist nomodifiable' \
 		-c 'set nonumber norelativenumber' \
 		-c 'map q :q<cr>' \
