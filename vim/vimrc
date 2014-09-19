@@ -553,7 +553,7 @@ function! LoadAddons()
     let g:UltiSnipsJumpBackwardTrigger="<c-k>"
     let g:UltiSnipsListSnippets="<c-tab>"
     call add(s:vim_addons, 'github:SirVer/ultisnips')
-    call add(s:vim_addons, 'github:Shougo/vinarise.vim')
+    call add(s:vim_addons, 'github:honza/vim-snippets')
   endif
   " }}}
   " YouCompleteMe {{{
@@ -622,6 +622,7 @@ function! LoadAddons()
   call add(s:vim_addons, 'github:tpope/vim-fugitive')
   " }}}
   " Other {{{
+  call add(s:vim_addons, 'github:Shougo/vinarise.vim')
   call add(s:vim_addons, 'github:google/vim-ft.vroom')
   call add(s:vim_addons, 'github:fatih/vim-go')
   call add(s:vim_addons, 'github:Raimondi/delimitMate') " autoclose brackets,quotes...
@@ -642,7 +643,7 @@ function! LoadAddons()
   call add(s:vim_addons, 'github:mattn/gist-vim')
   call add(s:vim_addons, 'github:godlygeek/csapprox')
   call add(s:vim_addons, 'github:godlygeek/tabular.git')
-  call add(s:vim_addons, 'github:mileszs/ack.vim')
+  call add(s:vim_addons, 'github:rking/ag.vim')
   call add(s:vim_addons, 'github:PProvost/vim-ps1.git')
   call add(s:vim_addons, 'github:alunny/pegjs-vim.git')
   call add(s:vim_addons, 'github:vim-scripts/Decho.git')
