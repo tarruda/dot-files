@@ -205,6 +205,25 @@ mpr() {
 		git reset --hard HEAD~1
 		exit 1
 	fi
+	)
+}
+
+cpr() {
+	if [[ ! -r .git/user-repo ]]; then
+		echo "Need to setup user/repo" >&2
+		return 1
+	fi
+	local user_repo=$(< .git/user-repo)
+	if [[ ! -r .git/ghtok ]]; then
+		echo "Need to setup oauth token" >&2
+		return 1
+	fi
+	local ghtok=$(< .git/ghtok)
+	local pr_num=$1
+	if [[ -z $pr_num ]]; then
+		echo "Need the pull request number" >&2
+		return 1
+	fi
 	git push
 	curl \
 		-X POST \
@@ -217,13 +236,12 @@ mpr() {
 		-d '{"state": "closed"}' \
 		"https://api.github.com/repos/$user_repo/issues/$pr_num" > /dev/null
 	echo "Done"
-	)
 }
 
 # Print the stack trace of a core file.
 # From http://www.commandlinefu.com/commands/view/4039/print-stack-trace-of-a-core-file-without-needing-to-enter-gdb-interactively
 # Usage: corebt program corefile
-# alias corebt="gdb -q -n -ex bt -batch"
+alias corebt="gdb -q -n -ex bt -batch"
 
 # wrapper for reading man pages
 
@@ -531,7 +549,7 @@ install-perl() {
 install-nodenv() {
 	install-github-tree -d "$HOME/.nodenv" -t 'v0.2.0' 'oinutter/nodenv'
 	mkdir -p "$HOME/.nodenv/plugins"
-	install-github-tree -d "$HOME/.nodenv/plugins/node-build" -t 'b3ca83581b459049e770f3ff5b4c4734a2f5fc78' 'oinutter/node-build'
+	install-github-tree -d "$HOME/.nodenv/plugins/node-build" -t '448092505a8d6994ecc03de1a9d7ca1cdc22d30b' 'oinutter/node-build'
 	mkdir -p "$ZDOTDIR/site-zshrc.d"
 	cat > "$ZDOTDIR/site-zshrc.d/nodenv.zsh" <<-EOF
 	export NODENV_ROOT="\$HOME/.nodenv"
@@ -541,7 +559,7 @@ install-nodenv() {
 }
 
 install-node() {
-	local version='0.10.28'
+	local version='0.10.31'
 	nodenv install $version
 	echo $version > ~/.node-version
 }

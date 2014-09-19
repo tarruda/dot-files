@@ -29,4 +29,3 @@ define py-log-bt
   set logging redirect off
   set pagination on
 end
-

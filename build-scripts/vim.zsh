@@ -8,7 +8,7 @@
 # weechat vim 7.4 
 
 python_prefix=$(pyenv prefix)
-python_lib=$(ls $python_prefix/**/libpython*.so([1]))
+python_lib=$(ls $python_prefix/**/libpython*.(so|a)([1]))
 python_lib_dir=${python_lib:h}
 python_config_dir=${$(ls $python_lib_dir/**/config.c):h}
 pushd $python_config_dir
@@ -18,11 +18,11 @@ done
 popd
 
 ruby_prefix=$(rbenv prefix)
-ruby_lib=$(ls $ruby_prefix/**/libruby*.so([1]))
+ruby_lib=$(ls $ruby_prefix/**/libruby*.(so|a)([1]))
 ruby_lib_dir=${ruby_lib:h}
 
 perl_prefix=$(plenv prefix)
-perl_lib=$(ls $perl_prefix/**/libperl*.so([1]))
+perl_lib=$(ls $perl_prefix/**/libperl*.(so|a)([1]))
 perl_lib_dir=${perl_lib:h}
 
 rpath=$python_lib_dir:$ruby_lib_dir:$perl_lib_dir

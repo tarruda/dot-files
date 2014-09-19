@@ -5,16 +5,15 @@ fi
 
 # Vim/tmux integration {{{
 
-# use alt+y/alt+p to seamless copy and paste between tmux, vim and the
-# x11 clipboard if available
+# use y to copy and alt+p to paste(from the clipboard x11 clipboard if available)
 if which xclip &> /dev/null && [[ -n $DISPLAY ]]; then
-	tmux bind -t vi-copy M-y copy-pipe 'xclip -i -selection clipboard'
+	tmux bind -t vi-copy y copy-pipe 'xclip -i -selection clipboard'
 	tmux bind -n M-p if\
 	 	'cmd=$(tmux display -p "#{pane_current_command}"); [ $cmd = nvim ] || [ $cmd = vim ] || [ $cmd = mutt ] || [ $cmd = psql ]'\
 		"send-keys M-t 'mux' paste-tmux"\
 		'run "xclip -o -selection clipboard | tmux load-buffer -; tmux paste-buffer"'
 else
-	tmux bind -t vi-copy M-y copy-selection
+	tmux bind -t vi-copy y copy-selection
 	tmux bind -n M-p if\
 	 	'cmd=$(tmux display -p "#{pane_current_command}"); [ $cmd = nvim ] || [ $cmd = vim ] || [ $cmd = mutt ] || [ $cmd = psql ]'\
 		"send-keys M-t 'mux' paste-tmux"\

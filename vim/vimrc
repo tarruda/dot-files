@@ -9,14 +9,6 @@
 "
 set nocompatible
 
-if has('neovim')
-  let s:python_host_init = 'python -c "import neovim; neovim.start_host()"'
-  " Neovim-specific stuff
-  let &initpython = s:python_host_init
-  let &initclipboard = s:python_host_init
-  set unnamedclip
-endif
-
 if !exists('g:vimrc_done_basic_init')
 
   let g:is_windows = has('win32') || has('win64')
@@ -36,6 +28,12 @@ if !exists('g:vimrc_done_basic_init')
   let $RCDIR = g:rc_dir
   let g:vam_plugins_dir = g:rc_dir.'/addons'
   let &runtimepath = g:rc_dir.','.g:vam_plugins_dir.'/vim-addon-manager,'.$VIMRUNTIME
+  if has('nvim')
+    " The python_setup script must be sourced before plugins that need python
+    runtime! plugin/python_setup.vim
+    " Use unnamed registers for clipboard
+    set unnamedclip
+  endif
   let g:has_python = has('python') || has('python3')
 endif
 
@@ -78,7 +76,6 @@ set expandtab " expand tabs into spaces
 set softtabstop=2 " number of spaces used with tab/bs
 set tabstop=2 " display tabs with the width of two spaces
 set shiftwidth=2 " indent with two spaces 
-set modelines=0 " running code in comments is not cool
 set ignorecase " ignore case when searching
 set smartcase " disable 'ignorecase' if search pattern has uppercase characters
 set incsearch " highlight matches while typing search pattern
@@ -625,6 +622,7 @@ function! LoadAddons()
   call add(s:vim_addons, 'github:tpope/vim-fugitive')
   " }}}
   " Other {{{
+  call add(s:vim_addons, 'github:google/vim-ft.vroom')
   call add(s:vim_addons, 'github:fatih/vim-go')
   call add(s:vim_addons, 'github:Raimondi/delimitMate') " autoclose brackets,quotes...
   call add(s:vim_addons, 'github:tpope/vim-tbone')

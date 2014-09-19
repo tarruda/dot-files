@@ -17,4 +17,4 @@ sed -i '/#include <winsock2.h>/a#include ".\/missing.h"' src/win/util.c
 
 sh autogen.sh
 ./configure --disable-shared --enable-static --host=x86_64-w64-mingw32
-make && make install
+make && make test/run-tests.exe
