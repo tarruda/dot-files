@@ -9,11 +9,11 @@ if ! which xbuild > /dev/null 2>&1; then
 fi
 
 python_prefix=$(pyenv prefix)
-libpython=$(ls $python_prefix/lib/*.so([1]))
+libpython=$(ls $python_prefix/lib/*.(so|a)([1]))
 python_include=$(ls $python_prefix/include/**/Python.h([1]))
 python_include=${python_include:h}
 
-cd $DOTDIR/vim/addons/github-Valloric-YouCompleteMe
+cd $DOTDIR/vim/plugged/YouCompleteMe
 
 git submodule update --init --recursive
 echo $python_include

@@ -93,9 +93,9 @@ class Game(Thread):
                 # Increases the speed of Snake as its length increases
                 timeout = 0.001 * (150 - (l / 5 + l /10) % 120)
                 self.prevKey = self.key # Previous key pressed
-                self.vim.post('update_screen', [self])
+                self.vim.session.post('update_screen', self)
  
-        self.vim.post('game_end', [self])
+        self.vim.session.post('game_end', self)
  
  
     def addstr(self, lnum, cnum, string):
@@ -161,6 +161,7 @@ class NvimSnake(object):
  
  
     def on_update_screen(self, game):
+        print 'UPDATING...'
         self.current_game.update()
  
  

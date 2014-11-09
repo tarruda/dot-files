@@ -241,7 +241,16 @@ cpr() {
 # Print the stack trace of a core file.
 # From http://www.commandlinefu.com/commands/view/4039/print-stack-trace-of-a-core-file-without-needing-to-enter-gdb-interactively
 # Usage: corebt program corefile
-alias corebt="gdb -q -n -ex bt -batch"
+corebt() {
+	command gdb -q -n -batch -ex bt -c "$2" "$1"
+}
+
+# Open disassembly of function with original source code in comments
+dis() {
+	command gdb -q -n -batch -ex "set disassembly-flavor intel" \
+	 	-ex "disassemble /m $1" $2 | sed -e 's/^[0-9a-zA-Z]/;\0/g' \
+	 	-e 's/#/;/g' | vim -c 'setf asm' -c 'set syntax=nasm' -
+}
 
 # wrapper for reading man pages
 
@@ -521,8 +530,8 @@ install-pyenv() {
 }
 
 install-python() {
-	local version='2.7.6'
-	PYTHON_CONFIGURE_OPTS='--enable-shared' LDFLAGS="-Wl,-rpath=$PYENV_ROOT/versions/$version/lib" pyenv install $version
+	local version='2.7.7'
+	PYTHON_CONFIGURE_OPTS='--enable-shared' CFLAGS='-fPIC' LDFLAGS="-Wl,-rpath=$PYENV_ROOT/versions/$version/lib" pyenv install $version
 	echo $version > "$HOME/.python-version"
 }
 # }}}
@@ -549,7 +558,7 @@ install-perl() {
 install-nodenv() {
 	install-github-tree -d "$HOME/.nodenv" -t 'v0.2.0' 'oinutter/nodenv'
 	mkdir -p "$HOME/.nodenv/plugins"
-	install-github-tree -d "$HOME/.nodenv/plugins/node-build" -t '448092505a8d6994ecc03de1a9d7ca1cdc22d30b' 'oinutter/node-build'
+	install-github-tree -d "$HOME/.nodenv/plugins/node-build" -t 'c3642328f264429982f5d7623f8a894cc741962c' 'oinutter/node-build'
 	mkdir -p "$ZDOTDIR/site-zshrc.d"
 	cat > "$ZDOTDIR/site-zshrc.d/nodenv.zsh" <<-EOF
 	export NODENV_ROOT="\$HOME/.nodenv"
@@ -559,7 +568,7 @@ install-nodenv() {
 }
 
 install-node() {
-	local version='0.10.31'
+	local version='0.10.32'
 	nodenv install $version
 	echo $version > ~/.node-version
 }
