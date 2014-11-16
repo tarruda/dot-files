@@ -30,27 +30,9 @@ if !exists('g:vimrc_done_basic_init')
   let g:vim_plug_dir = g:plugins_dir.'/vim-plug'
   let &runtimepath = g:rc_dir.','.g:vim_plug_dir.','.$VIMRUNTIME
   if has('nvim')
-    " if executable('pyenv')
-    "   let s:pypy_version = substitute(system('pyenv versions | grep pypy'),
-    "         \ "[\ \n]*", "", "g")
-    "   if s:pypy_version != ''
-    "     " Pin the current cpython path
-    "     let s:cpython_path = join([
-    "           \ substitute(system('pyenv prefix'), "[\ \n]*", "", "g"),
-    "           \ 'bin', 'python'], '/')
-    "     " Use pypy as the interpreter for python plugins
-    "     let $PYENV_VERSION=s:pypy_version
-    "   endif
-    " endif
-    " the python_setup script must be sourced before plugins that need python
-    " runtime! python_setup.vim
-    " let did_python_setup = 1
-    " runtime! provider/python/init.vim
-    " runtime! provider/clipboard/init.vim
-    " Use unnamed registers for clipboard
     set unnamedclip
   endif
-  let g:has_python = has('python') || has('python3')
+  let g:has_python = has('python')
 endif
 
 " }}}
@@ -320,6 +302,16 @@ if &term == 'tmux'
 endif
 " }}}
 " Mappings {{{
+function! Manpage()
+  let word = expand('<cword>')
+  enew!
+  setl nomod nolist nonumber norelativenumber
+  nnoremap q :bd!<cr>
+  setf man
+  exe 'r !man '.word
+  normal gg
+endfunction
+nnoremap K :call Manpage()<cr>
 " Quickly open/close quickfix and location list, based on
 " github:Valloric/ListToogle
 augroup quick_loc_list
@@ -653,6 +645,7 @@ function! LoadAddons()
   Plug 'Shougo/vinarise.vim'
   Plug 'google/vim-ft.vroom'
   Plug 'fatih/vim-go'
+  Plug 'wting/rust.vim'
   Plug 'Raimondi/delimitMate' " autoclose brackets,quotes...
   Plug 'tpope/vim-tbone'
   Plug 'tpope/vim-unimpaired'

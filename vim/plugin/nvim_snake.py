@@ -7,7 +7,7 @@
 from threading import Thread, Lock
 from time import sleep
 from random import randint
- 
+import neovim
  
 class Game(Thread):
     def __init__(self, vim):
@@ -93,9 +93,9 @@ class Game(Thread):
                 # Increases the speed of Snake as its length increases
                 timeout = 0.001 * (150 - (l / 5 + l /10) % 120)
                 self.prevKey = self.key # Previous key pressed
-                self.vim.session.post('update_screen', self)
+                self.vim.session.threadsafe_call(self.update)
  
-        self.vim.session.post('game_end', self)
+        self.vim.session.threadsafe_call(self.end)
  
  
     def addstr(self, lnum, cnum, string):
@@ -141,30 +141,21 @@ class Game(Thread):
         self.key = k
  
  
-class NvimSnake(object):
+@neovim.plugin
+class Snake(object):
     def __init__(self, vim):
         self.vim = vim
         self.current_game = None
-        vim.command('command! SnakeStart call rpcrequest(%d, "snake_start")' %
-                    self.vim.channel_id)
  
  
-    def on_keypress(self, key):
+    @neovim.rpc_export('keypress')
+    def keypress(self, key):
         self.current_game.keypress(key)
  
  
+    @neovim.command('SnakeStart', sync=True)
     def snake_start(self):
         if self.current_game:
             raise Exception('Snake already running!')
         self.current_game = Game(self.vim)
         self.current_game.start()
- 
- 
-    def on_update_screen(self, game):
-        print 'UPDATING...'
-        self.current_game.update()
- 
- 
-    def on_game_end(self, game):
-        self.current_game.end()
-        self.current_game = None
