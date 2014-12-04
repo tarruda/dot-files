@@ -2,4 +2,4 @@
 #	It imports the screen settings then it is overriden by 
 tmux|tmux with rxvt-unicode-256color client,
   use=rxvt-unicode-256color,
-	use=screen,
+  use=screen,

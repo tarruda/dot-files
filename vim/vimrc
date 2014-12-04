@@ -47,7 +47,7 @@ set undodir=. " undo files storage, only allow the same directory
 set history=500 " 500 lines of command-line history
 set ruler " display cursor position at bottom
 set mouse=a " enable terminal mouse extensions
-if &term =~ 'tmux' " requires my custom terminfo file
+if $TERM =~ 'tmux' " requires my custom terminfo file
   set ttymouse=xterm2 " integrate mouse extensions with tmux
   set ttyfast " normally this is only set for certain known terminals
 endi
@@ -116,7 +116,7 @@ if ! has('gui_running')
   " this is used to represent ctrl+tab in terminal vim
   :set <f20>=[34~
 endif
-if &term == 'tmux'
+if $TERM == 'tmux'
   :set <up>=[A
   :set <down>=[B
   :set <right>=[C
@@ -125,7 +125,7 @@ if &term == 'tmux'
   " no possibility of tmux accidentally hitting my own mappings. Think of it as
   " a namespace used for tmux-related commands
   :set <f37>=tmux
-elseif &term =~ 'rxvt-unicode' || &term =~ 'xterm'
+elseif $TERM =~ 'rxvt-unicode' || $TERM =~ 'xterm'
   " with urxvt configured to use xterm control/alt sequences
   " this should normalize vim/gvim mappings
   :set <a-k>=k
@@ -276,7 +276,7 @@ function! GetVisualSelection()
   return join(lines, "\n")
 endfunction
 
-if &term == 'tmux'
+if $TERM == 'tmux'
   " tranparent window/pane movement
   function! TmuxMove(direction)
     " Check if we are currently focusing on a edge window.
@@ -346,7 +346,7 @@ vnoremap <silent> <leader>f :s/\v(\w)(\_[^.?!:;]*)/\u\1\2/g<cr>:noh<cr>gvgq
 nnoremap <leader>e :e $MYVIMRC<cr>
 " quickly reload vimrc
 nnoremap <leader>r :source $MYVIMRC<cr>:e<cr>
-if &term == 'tmux'
+if $TERM == 'tmux'
   " tmux will handle the actual mappings so we just 
   nnoremap <silent> <f37>move-down :silent call TmuxMove('j')<cr>
   nnoremap <silent> <f37>move-up :silent call TmuxMove('k')<cr>
@@ -475,34 +475,6 @@ augroup filetype_settings
   " }}}
 augroup END
 
-" }}}
-" Appearance {{{
-"
-if has('gui_running') " gvim
-  colorscheme molokai
-  if g:is_windows
-    set guifont=Ubuntu\ Mono:h16
-  elseif has('win32unix') " cygwin
-    set guifont=Consolas\ 16
-  else
-    set guifont=Ubuntu\ Mono\ 16,Inconsolata\ 16,Monospace\ 14
-  endif
-  set guioptions=
-else
-
-  if &term =~ 'tmux' || &term =~ 'rxvt-unicode-256color'
-        \ || &term =~ 'xterm-256color'
-    colorscheme twilight-term256
-  endif
-
-  if &term =~ 'tmux' || &term =~ 'rxvt-unicode-256color'
-        \ || &term =~ 'xterm-256color-italic'
-    " for tmux, this will only work if the client terminal supports italic
-    " escape sequences
-    highlight Comment cterm=italic
-  endif
-
-endif
 " }}}
 " Addons {{{
 function! LoadAddons() 
@@ -642,11 +614,13 @@ function! LoadAddons()
   Plug 'tpope/vim-fugitive'
   " }}}
   " Other {{{
+  Plug 'jceb/vim-orgmode'
   Plug 'Shougo/vinarise.vim'
   Plug 'google/vim-ft.vroom'
   Plug 'fatih/vim-go'
   Plug 'wting/rust.vim'
   Plug 'Raimondi/delimitMate' " autoclose brackets,quotes...
+  Plug 'tpope/vim-speeddating'
   Plug 'tpope/vim-tbone'
   Plug 'tpope/vim-unimpaired'
   Plug 'plasticboy/vim-markdown'
@@ -675,10 +649,33 @@ function! LoadAddons()
 
   " load 'after' directory
   let &runtimepath = &runtimepath.','.g:rc_dir.'/after'
-  " }}} 
   let g:vimrc_done_basic_init = 1
 endfunction
 if !exists('g:vimrc_done_basic_init') && !exists('g:disable_addons')
   call LoadAddons()
+endif
+" }}}
+" Appearance {{{
+"
+if has('gui_running') " gvim
+  colorscheme molokai
+  if g:is_windows
+    set guifont=Ubuntu\ Mono:h16
+  elseif has('win32unix') " cygwin
+    set guifont=Consolas\ 16
+  else
+    set guifont=Ubuntu\ Mono\ 16,Inconsolata\ 16,Monospace\ 14
+  endif
+  set guioptions=
+else
+  if $TERM =~ 'tmux' || $TERM =~ 'rxvt-unicode-256color' || $TERM =~ 'xterm-256color'
+    colorscheme twilight-term256
+  endif
+
+  if $TERM =~ 'tmux' || $TERM =~ 'rxvt-unicode-256color' || $TERM =~ 'xterm-256color-italic'
+    " for tmux, this will only work if the client terminal supports italic
+    " escape sequences
+    highlight Comment cterm=italic
+  endif
 endif
 " }}}

@@ -1,9 +1,12 @@
 # Snake for Neovim! Adapted from https://gist.github.com/sanchitgangwar/2158084
-# To install, create a ~/.vim/pythonx/nvim_snake.py file with this code.
+# To install, create a ~/.vim/plugin/external/python/snake.py file with this
+# code, then run `nvim -c 'UpdateExternalPlugins' -c 'q'` from a shell.
+#
 # Make sure you have read the internal help explaining how to setup python
-# intergration(:help nvim-python)
+# host for external plugins(:help nvim-python)
 # 
-# To start a new game, use the `:SnakeStart` command on an empty buffer(uses 80 columns and 20 rows)
+# To start a new game, use the `:SnakeStart` command on an empty buffer(uses 80
+# columns and 20 rows)
 from threading import Thread, Lock
 from time import sleep
 from random import randint
