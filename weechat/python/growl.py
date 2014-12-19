@@ -445,10 +445,14 @@ def main():
             weechat.config_set_plugin(option, value)
     # Initialize Growl.
     name = "WeeChat"
-    hostname = weechat.config_get_plugin('hostname')
-    password = weechat.config_get_plugin('password')
+    hostname = weechat.string_eval_expression(
+        weechat.config_get_plugin('hostname'), {}, {}, {})
+    password = weechat.string_eval_expression(
+        weechat.config_get_plugin('password'), {}, {}, {})
     icon_path = os.path.join(weechat.info_get("weechat_dir", ""),
             weechat.config_get_plugin('icon'))
+    weechat.prnt('', 'Hostname: "{0}", Password: "{1}"'.format(hostname,
+                                                               password))
     try:
         icon = open(icon_path, "rb").read()
     except IOError:
