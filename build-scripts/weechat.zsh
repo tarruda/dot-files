@@ -23,6 +23,7 @@ perl_lib_dir=${perl_lib:h}
 
 # patch CMakeLists.txt to enable rpath
 sed -i 's/^\s*set(cmake_skip_rpath/#\0/I' CMakeLists.txt
+sed -i 's/LIBPL/LIBDIR/' cmake/FindPython.cmake
 
 src_dir=$(pwd)
 build_dir=$(mktemp -d)
