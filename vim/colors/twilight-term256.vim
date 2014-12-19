@@ -26,7 +26,7 @@ function! s:old_kde()
 endfunction
 
 if 0
-elseif has("gui_running") || (&t_Co == 256 && (&term ==# "xterm" || &term =~# "^screen") && exists("g:CSApprox_konsole") && g:CSApprox_konsole) || (&term =~? "^konsole" && s:old_kde())
+elseif &term == 'abstract_ui' || has("gui_running") || (&t_Co == 256 && (&term ==# "xterm" || &term =~# "^screen") && exists("g:CSApprox_konsole") && g:CSApprox_konsole) || (&term =~? "^konsole" && s:old_kde())
     CSAHi Normal term=NONE cterm=NONE ctermbg=234 ctermfg=230 gui=NONE guibg=#1a1a1a guifg=#fffedc
     CSAHi PreProc term=underline cterm=NONE ctermbg=234 ctermfg=145 gui=NONE guibg=#1a1a1a guifg=#8a9597
     CSAHi Type term=underline cterm=NONE ctermbg=234 ctermfg=144 gui=NONE guibg=#1a1a1a guifg=#a2a96f

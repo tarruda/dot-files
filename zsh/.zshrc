@@ -509,30 +509,75 @@ install-rbenv() {
 	export PATH="\$RBENV_ROOT/bin:\$PATH"
 	eval "\$(rbenv init -)"
 	EOF
+	mkdir "$HOME/.rbenv/cache"
 }
 
 install-ruby() {
 	local version='1.9.3-p448'
 	RUBY_CONFIGURE_OPTS='--enable-shared' rbenv install $version
-	echo $version > "$HOME/.ruby-version"
+	rbenv global $version
 }
 
 # }}}
 # Python {{{
 install-pyenv() {
-	install-github-tree -d "$HOME/.pyenv" -t 'v20140615' 'yyuu/pyenv'
+	install-github-tree -d "$HOME/.pyenv" -t 'v20141211' 'yyuu/pyenv'
 	mkdir -p "$ZDOTDIR/site-zshrc.d"
 	cat > "$ZDOTDIR/site-zshrc.d/pyenv.zsh" <<-EOF
 	export PYENV_ROOT="\$HOME/.pyenv"
 	export PATH="\$PYENV_ROOT/bin:\$PATH"
 	eval "\$(pyenv init -)"
 	EOF
+	mkdir "$HOME/.pyenv/cache"
 }
 
 install-python() {
-	local version='2.7.7'
-	PYTHON_CONFIGURE_OPTS='--enable-shared' CFLAGS='-fPIC' LDFLAGS="-Wl,-rpath=$PYENV_ROOT/versions/$version/lib" pyenv install $version
-	echo $version > "$HOME/.python-version"
+	local o_version o_name o_flags version flags recipe_dir vname
+	o_version=(-V)
+	o_name=(-N)
+	o_flags=(-E)
+	zparseopts -D -K -- V:=o_version N:=o_name E:=o_flags
+	if [[ -z $o_version[2] ]]; then
+		print 'Version must be specified' >&2
+		return 1
+	fi
+	flags=(${(z)o_flags[2]})
+	recipe_dir="$PYENV_ROOT/plugins/python-build/share/python-build/"
+	if [[ -n $o_name[2] && $o_name[2] != $o_version[2] ]]; then
+		if [[ -e "$recipe_dir/$o_name[2]" ]]; then
+			print 'Version name already exists' >&2
+			return 1
+		fi
+		cp "$recipe_dir"/{$o_version[2],$o_name[2]}
+		version=$o_name[2]
+	else
+		version=$o_version[2]
+	fi
+	vname=$version
+  if [[ ${flags[(r)-g]} == '-g' ]]; then
+		vname=${version}-debug
+	fi
+	# local patchdir="$PYENV_ROOT/plugins/python-build/share/python-build/patches/$version/Python-$version"
+	# mkdir -p "$patchdir"
+	PYTHON_CONFIGURE_OPTS='--enable-shared' CFLAGS='-DOPENSSL_NO_SSL2 -fPIC' LDFLAGS="-Wl,-rpath=$PYENV_ROOT/versions/$vname/lib" \
+		pyenv install $flags -p $version <<-EOF
+	diff --git a/Modules/_ssl.c b/Modules/_ssl.c
+	index ee8c0e2..752b033 100644
+	--- a/Modules/_ssl.c
+	+++ b/Modules/_ssl.c
+	@@ -374,7 +374,7 @@ newPySSLObject(PySocketSockObject *Sock, char *key_file, char *cert_file,
+	
+	     /* ssl compatibility */
+	     options = SSL_OP_ALL & ~SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS;
+	-    if (proto_version != PY_SSL_VERSION_SSL2)
+	+//    if (proto_version != PY_SSL_VERSION_SSL2)
+	         options |= SSL_OP_NO_SSLv2;
+	     SSL_CTX_set_options(self->ctx, options);
+	EOF
+	if [[ $version != $o_version[2] ]]; then
+		rm "$recipe_dir/$version"
+	fi
+	pyenv global $vname
 }
 # }}}
 # Perl {{{
@@ -546,12 +591,13 @@ install-plenv() {
 	export PATH="\$PLENV_ROOT/bin:\$PATH"
 	eval "\$(plenv init -)"
 	EOF
+	mkdir "$HOME/.plenv/cache"
 }
 
 install-perl() {
 	version='5.18.1'
 	plenv install $version -Duseshrplib
-	echo $version > ~/.perl-version
+	plenv global $version
 }
 # }}}
 # Node.js {{{
@@ -565,12 +611,13 @@ install-nodenv() {
 	export PATH="\$NODENV_ROOT/bin:\$PATH"
 	eval "\$(nodenv init -)"
 	EOF
+	mkdir "$HOME/.nodenv/cache"
 }
 
 install-node() {
 	local version='0.10.32'
 	nodenv install $version
-	echo $version > ~/.node-version
+	nodenv global $version
 }
 # }}}
 # Misc {{{

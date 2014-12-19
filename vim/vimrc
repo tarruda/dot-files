@@ -29,9 +29,6 @@ if !exists('g:vimrc_done_basic_init')
   let g:plugins_dir = g:rc_dir.'/plugged'
   let g:vim_plug_dir = g:plugins_dir.'/vim-plug'
   let &runtimepath = g:rc_dir.','.g:vim_plug_dir.','.$VIMRUNTIME
-  if has('nvim')
-    set unnamedclip
-  endif
   let g:has_python = has('python')
 endif
 
@@ -90,7 +87,7 @@ set synmaxcol=500 " maximum length to apply syntax highlighting
 set timeout " enable timeout of key codes and mappings(the default)
 set timeoutlen=3000 " big timeout for key sequences
 set ttimeoutlen=10 " small timeout for key sequences since these will be normally scripted
-set clipboard=
+set clipboard+=unnamedplus
 syntax on " enable syntax highlighting
 filetype plugin indent on " enable file-specific plugins/settings
 set backupskip=/tmp/*,/private/tmp/* " make it possible to use vim to edit crontab
