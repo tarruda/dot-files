@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Pangoterm
+Exec=pangoterm
+StartupNotify=true
+Categories=Terminal;
