@@ -94,8 +94,8 @@ namespace FileShortcutGeneratorServer
           int nameLength = reader.ReadInt32();
           byte[] nameData = reader.ReadBytes(nameLength);
           string name = Encoding.UTF8.GetString(nameData, 0, nameLength);
-          name = name.Replace(@"\", @" ");
-          name = name.Replace(@"/", @" ");
+          // remove invalid substrings in paths
+          name = name.Replace(@"\", @" ").Replace(@"/", @" ").Replace(":", "");
           name += " (Ubuntu)";
 
           // read command
