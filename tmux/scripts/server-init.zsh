@@ -39,7 +39,7 @@ for key in ${(k)vim_tmux_command_map}; do
 	vim_tmux_cmd=("${=kv}")
 	tmux bind -n $key if\
 		'cmd=$(tmux display -p "#{pane_current_command}"); [ $cmd = nvim ] || [ $cmd = vim ]'\
-		"send-keys M-t 'mux' '$vim_tmux_cmd[1]'"\
+		"send-keys $key"\
 		"$vim_tmux_cmd[2,-1]"
 done
 # }}}

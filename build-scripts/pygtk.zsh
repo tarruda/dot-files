@@ -1,4 +1,12 @@
 #!/bin/bash
+# script for pyenv installation of pygtk3 in ubuntu 12.04
+# Adapted from https://gist.github.com/mehcode/6172694
+
+system_package_installed() {
+	if ! dpkg -l | grep -q $1; then
+		sudo apt-get install $1
+	fi
+}
 
 python_module_installed() {
 	local mod=$1
@@ -14,17 +22,21 @@ python_module_installed() {
 	fi
 }
 
-# Adapted to pyenv from https://gist.github.com/mehcode/6172694
 set -e
 PYGTK_PREFIX="$(pyenv prefix)"
 export PATH="$PYGTK_PREFIX/bin:$PATH"
+export PKG_CONFIG_PATH="$PYGTK_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
+
+system_package_installed libcairo2-dev
+system_package_installed libglib2.0-dev
+system_package_installed libgirepository1.0-dev
  
 # Setup variables.
 CACHE="/tmp/install-pygtk-$$"
  
 # Make temp directory.
 mkdir -p $CACHE
- 
+
 # Test for py2cairo.
 echo -e "\E[1m * Checking for cairo...\E[0m"
 if ! python_module_installed cairo; then
@@ -36,7 +48,7 @@ if ! python_module_installed cairo; then
         (   cd py2cairo*
             touch ChangeLog
             autoreconf -ivf
-            ./configure --prefix=$PYGTK_PREFIX --disable-dependency-tracking
+            ./configure --prefix=$PYGTK_PREFIX
             make
             make install
         )
@@ -45,30 +57,14 @@ fi
  
 # Test for gobject.
 echo -e "\E[1m * Checking for gobject...\E[0m"
-if ! python_module_installed gobject; then
+if ! python_module_installed gi; then
     echo -e "\E[1m * Installing gobject...\E[0m"
     # Fetch, build, and install gobject.
     (   cd $CACHE
-        curl 'http://ftp.gnome.org/pub/GNOME/sources/pygobject/2.28/pygobject-2.28.6.tar.bz2' > 'pygobject.tar.bz2'
-        tar -xvf pygobject.tar.bz2
+        curl 'http://ftp.gnome.org/pub/GNOME/sources/pygobject/3.2/pygobject-3.2.2.tar.xz' > 'pygobject.tar.xz'
+        tar -xf pygobject.tar.xz
         (   cd pygobject*
-            ./configure --prefix=$PYGTK_PREFIX --disable-introspection
-            make
-            make install
-        )
-    )
-fi
- 
-# Test for gtk.
-echo -e "\E[1m * Checking for gtk...\E[0m"
-if ! python_module_installed gtk; then
-    echo -e "\E[1m * Installing gtk...\E[0m"
-    # Fetch, build, and install gtk.
-    (   cd $CACHE
-        curl 'https://pypi.python.org/packages/source/P/PyGTK/pygtk-2.24.0.tar.bz2' > 'pygtk.tar.bz2'
-        tar -xvf pygtk.tar.bz2
-        (   cd pygtk*
-            ./configure --prefix=$PYGTK_PREFIX PKG_CONFIG_PATH="$PYGTK_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
+            ./configure --prefix=$PYGTK_PREFIX
             make
             make install
         )

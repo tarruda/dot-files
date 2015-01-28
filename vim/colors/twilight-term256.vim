@@ -26,7 +26,7 @@ function! s:old_kde()
 endfunction
 
 if 0
-elseif &term == 'abstract_ui' || has("gui_running") || (&t_Co == 256 && (&term ==# "xterm" || &term =~# "^screen") && exists("g:CSApprox_konsole") && g:CSApprox_konsole) || (&term =~? "^konsole" && s:old_kde())
+elseif has("gui_running") || (&t_Co == 256 && (&term ==# "xterm" || &term =~# "^screen") && exists("g:CSApprox_konsole") && g:CSApprox_konsole) || (&term =~? "^konsole" && s:old_kde())
     CSAHi Normal term=NONE cterm=NONE ctermbg=234 ctermfg=230 gui=NONE guibg=#1a1a1a guifg=#fffedc
     CSAHi PreProc term=underline cterm=NONE ctermbg=234 ctermfg=145 gui=NONE guibg=#1a1a1a guifg=#8a9597
     CSAHi Type term=underline cterm=NONE ctermbg=234 ctermfg=144 gui=NONE guibg=#1a1a1a guifg=#a2a96f
@@ -154,14 +154,14 @@ elseif has("gui_running") || (&t_Co == 256 && (&term ==# "xterm" || &term =~# "^
     CSAHi SpellBad term=reverse cterm=undercurl ctermbg=bg ctermfg=196 gui=undercurl guibg=bg guifg=fg guisp=#ff0000
     CSAHi SpellCap term=reverse cterm=undercurl ctermbg=bg ctermfg=21 gui=undercurl guibg=bg guifg=fg guisp=#0000ff
     CSAHi SpellRare term=reverse cterm=undercurl ctermbg=bg ctermfg=201 gui=undercurl guibg=bg guifg=fg guisp=#ff00ff
-elseif has("gui_running") || &t_Co == 256
+elseif &term == 'abstract_ui' || has("gui_running") || &t_Co == 256
     CSAHi Normal term=NONE cterm=NONE ctermbg=234 ctermfg=230 gui=NONE guibg=#1a1a1a guifg=#fffedc
     CSAHi PreProc term=underline cterm=NONE ctermbg=234 ctermfg=102 gui=NONE guibg=#1a1a1a guifg=#8a9597
     CSAHi Type term=underline cterm=NONE ctermbg=234 ctermfg=143 gui=NONE guibg=#1a1a1a guifg=#a2a96f
     CSAHi Underlined term=underline cterm=underline ctermbg=234 ctermfg=230 gui=underline guibg=#1a1a1a guifg=#fffedc
     CSAHi Ignore term=NONE cterm=NONE ctermbg=bg ctermfg=234 gui=NONE guibg=bg guifg=#1a1a1a
     CSAHi Error term=reverse cterm=NONE ctermbg=52 ctermfg=231 gui=NONE guibg=#602020 guifg=#ffffff
-    CSAHi Todo term=NONE cterm=bold ctermbg=234 ctermfg=102 gui=bold,italic guibg=#1a1a1a guifg=#8a9597
+    CSAHi Todo term=NONE cterm=bold ctermbg=234 ctermfg=102 gui=bold guibg=#1a1a1a guifg=#8a9597
     CSAHi String term=NONE cterm=NONE ctermbg=234 ctermfg=74 gui=NONE guibg=#1a1a1a guifg=#4bb5c6
     CSAHi SpecialKey term=bold cterm=NONE ctermbg=234 ctermfg=236 gui=NONE guibg=#1a1a1a guifg=#303030
     CSAHi NonText term=bold cterm=bold ctermbg=234 ctermfg=59 gui=bold guibg=#1a1a1a guifg=#605958

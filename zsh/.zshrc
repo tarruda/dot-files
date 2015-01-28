@@ -297,8 +297,9 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias d='dirs -v | head -10'
-alias vim=nvim
-alias vi=vim
+# alias gvim='pynvim -g --'
+# alias vim='pynvim --'
+# alias vi='pynvim --'
 alias e=vi
 
 # }}}

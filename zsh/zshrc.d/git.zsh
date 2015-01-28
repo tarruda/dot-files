@@ -50,6 +50,7 @@ compdef _git gss=git-status
 alias ga='git add'
 compdef _git ga=git-add
 alias gwc='git whatchanged -p --abbrev-commit --pretty=medium'
+alias glm='git log --pretty=oneline --abbrev-commit'
 alias gf='git ls-files | grep'
 alias gpoat='git push origin --all && git push origin --tags'
 alias gclean='git clean -x -f -d'

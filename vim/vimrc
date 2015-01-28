@@ -44,7 +44,7 @@ set undodir=. " undo files storage, only allow the same directory
 set history=500 " 500 lines of command-line history
 set ruler " display cursor position at bottom
 set mouse=a " enable terminal mouse extensions
-if $TERM =~ 'tmux' " requires my custom terminfo file
+if &term =~ 'tmux' " requires my custom terminfo file
   set ttymouse=xterm2 " integrate mouse extensions with tmux
   set ttyfast " normally this is only set for certain known terminals
 endi
@@ -113,7 +113,7 @@ if ! has('gui_running')
   " this is used to represent ctrl+tab in terminal vim
   :set <f20>=[34~
 endif
-if $TERM == 'tmux'
+if &term == 'tmux'
   :set <up>=[A
   :set <down>=[B
   :set <right>=[C
@@ -122,7 +122,7 @@ if $TERM == 'tmux'
   " no possibility of tmux accidentally hitting my own mappings. Think of it as
   " a namespace used for tmux-related commands
   :set <f37>=tmux
-elseif $TERM =~ 'rxvt-unicode' || $TERM =~ 'xterm'
+elseif &term =~ 'rxvt-unicode' || &term =~ 'xterm'
   " with urxvt configured to use xterm control/alt sequences
   " this should normalize vim/gvim mappings
   :set <a-k>=k
@@ -273,7 +273,7 @@ function! GetVisualSelection()
   return join(lines, "\n")
 endfunction
 
-if $TERM == 'tmux'
+if &term == 'tmux' || (&term == 'abstract_ui' && $TERM == 'tmux')
   " tranparent window/pane movement
   function! TmuxMove(direction)
     " Check if we are currently focusing on a edge window.
@@ -329,6 +329,10 @@ vnoremap <silent> <c-k> :m '<-2<cr>gv=gv
 inoremap <f1> <esc>:Help 
 nnoremap <f1> <esc>:Help 
 vnoremap <f1> <esc>:Help 
+" Identify highlight group under cursor
+nnoremap <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
+      \ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
+      \ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 " search/replace the word under the cursor
 nnoremap <leader>z :let @z = expand("<cword>")<cr>q:i%s/\C\v<<esc>"zpa>//g<esc>hi
 " Quickly toggle spell on/off
@@ -341,22 +345,48 @@ nnoremap <silent> <leader>c :noh<cr>
 vnoremap <silent> <leader>f :s/\v(\w)(\_[^.?!:;]*)/\u\1\2/g<cr>:noh<cr>gvgq
 " quickly edit vimrc
 nnoremap <leader>e :e $MYVIMRC<cr>
-" quickly reload vimrc
-nnoremap <leader>r :source $MYVIMRC<cr>:e<cr>
-if $TERM == 'tmux'
+" quickly execute the current line or selection
+nnoremap <silent> <leader>t "ryy:@r<cr>
+vnoremap <silent> <leader>t "rygv:@r<cr>
+if &term == 'tmux'
   " tmux will handle the actual mappings so we just 
   nnoremap <silent> <f37>move-down :silent call TmuxMove('j')<cr>
   nnoremap <silent> <f37>move-up :silent call TmuxMove('k')<cr>
   nnoremap <silent> <f37>move-left :silent call TmuxMove('h')<cr>
   nnoremap <silent> <f37>move-right :silent call TmuxMove('l')<cr>
-  inoremap <silent> <f37>move-down <esc>:silent call TmuxMove('j')<cr>
-  inoremap <silent> <f37>move-up <esc>:silent call TmuxMove('k')<cr>
+  inoremap <silent> <f37>move-down <esc>:silent call tmuxmove('j')<cr>
+  inorema <silent> <f37>move-up <esc>:silent call TmuxMove('k')<cr>
   inoremap <silent> <f37>move-left <esc>:silent call TmuxMove('h')<cr>
   inoremap <silent> <f37>move-right <esc>:silent call TmuxMove('l')<cr>
   vnoremap <silent> <f37>move-down <esc>:silent call TmuxMove('j')<cr>
   vnoremap <silent> <f37>move-up <esc>:silent call TmuxMove('k')<cr>
   vnoremap <silent> <f37>move-left <esc>:silent call TmuxMove('h')<cr>
   vnoremap <silent> <f37>move-right <esc>:silent call TmuxMove('l')<cr>
+elseif &term == 'abstract_ui' && $TERM == 'tmux'
+  nnoremap <silent> <a-j> :silent call TmuxMove('j')<cr>
+  nnoremap <silent> <a-k> :silent call TmuxMove('k')<cr>
+  nnoremap <silent> <a-h> :silent call TmuxMove('h')<cr>
+  nnoremap <silent> <a-l> :silent call TmuxMove('l')<cr>
+  nnoremap <silent> <a-down> :silent call TmuxMove('j')<cr>
+  nnoremap <silent> <a-up> :silent call TmuxMove('k')<cr>
+  nnoremap <silent> <a-left> :silent call TmuxMove('h')<cr>
+  nnoremap <silent> <a-right> :silent call TmuxMove('l')<cr>
+  inoremap <silent> <a-j> <c-[>:silent call TmuxMove('j')<cr>
+  inoremap <silent> <a-k> <c-[>:silent call TmuxMove('k')<cr>
+  inoremap <silent> <a-h> <c-[>:silent call TmuxMove('h')<cr>
+  inoremap <silent> <a-l> <c-[>:silent call TmuxMove('l')<cr>
+  inoremap <silent> <a-down> <c-[>:silent call TmuxMove('j')<cr>
+  inoremap <silent> <a-up> <c-[>:silent call TmuxMove('k')<cr>
+  inoremap <silent> <a-left> <c-[>:silent call TmuxMove('h')<cr>
+  inoremap <silent> <a-right> <c-[>:silent call TmuxMove('l')<cr>
+  vnoremap <silent> <a-j> :silent call TmuxMove('j')<cr>
+  vnoremap <silent> <a-k> :silent call TmuxMove('k')<cr>
+  vnoremap <silent> <a-h> :silent call TmuxMove('h')<cr>
+  vnoremap <silent> <a-l> :silent call TmuxMove('l')<cr>
+  nnoremap <silent> <a-down> :silent call TmuxMove('j')<cr>
+  nnoremap <silent> <a-up> :silent call TmuxMove('k')<cr>
+  nnoremap <silent> <a-left> :silent call TmuxMove('h')<cr>
+  nnoremap <silent> <a-right> :silent call TmuxMove('l')<cr>
 else
   nnoremap <silent> <a-j> :wincmd j<cr>
   nnoremap <silent> <a-k> :wincmd k<cr>
@@ -641,6 +671,8 @@ function! LoadAddons()
   Plug 'vim-scripts/Decho'
   Plug 'Valloric/python-indent'
   Plug 'vim-scripts/DrawIt'
+  Plug 'vim-scripts/DrawIt'
+  Plug 'altercation/vim-colors-solarized'
   " }}}
   call plug#end()
 
@@ -661,15 +693,15 @@ if has('gui_running') " gvim
   elseif has('win32unix') " cygwin
     set guifont=Consolas\ 16
   else
-    set guifont=Ubuntu\ Mono\ 16,Inconsolata\ 16,Monospace\ 14
+    set guifont=Monospace\ 13
   endif
   set guioptions=
 else
-  if $TERM =~ 'tmux' || $TERM =~ 'rxvt-unicode-256color' || $TERM =~ 'xterm-256color'
+  if &term =~ 'tmux' || &term =~ 'rxvt-unicode-256color' || &term =~ 'xterm-256color' || &term == 'abstract_ui'
     colorscheme twilight-term256
   endif
 
-  if $TERM =~ 'tmux' || $TERM =~ 'rxvt-unicode-256color' || $TERM =~ 'xterm-256color-italic'
+  if &term =~ 'tmux' || &term =~ 'rxvt-unicode-256color' || &term =~ 'xterm-256color-italic' || &term == 'abstract_ui'
     " for tmux, this will only work if the client terminal supports italic
     " escape sequences
     highlight Comment cterm=italic
