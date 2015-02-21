@@ -39,7 +39,7 @@ bind l select-pane -R
 
 # setting this to 0 seems to randomly mess up alt key combinations in urxvt
 # on remote servers, set this to a higher value on site-tmuxrc
-set -g escape-time 5
+set -g escape-time 10
 
 # vi-style controls for copy mode
 setw -g mode-keys vi

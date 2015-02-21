@@ -5,6 +5,8 @@ import sys, os
 sys.path.append(os.environ['DOTDIR'])
 end
 
+add-auto-load-safe-path /home/tarruda/pub-dev/neovim/src/nvim/testdir/.gdbinit
+
 define log-bt
   set logging file gdb-backtrace.log
   set logging redirect on

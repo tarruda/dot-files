@@ -1,0 +1,7 @@
+#	Custom terminfo for better using tmux with urxvt and 256colors It imports the
+#	screen-256color settings and fixes the sitm/ritm(italics) and
+#	smso/rmso(standout) capabilities
+screen-256color-it|screen/tmux with rxvt-unicode-256color client,
+  use=screen-256color,
+  smso=\E[7m, rmso=\E[27m,
+  sitm=\E[3m, ritm=\E[23m,

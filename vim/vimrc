@@ -273,7 +273,7 @@ function! GetVisualSelection()
   return join(lines, "\n")
 endfunction
 
-if &term == 'tmux' || (&term == 'abstract_ui' && $TERM == 'tmux')
+if &term == 'tmux' || (&term == 'nvim' && $TERM =~ 'screen-256color')
   " tranparent window/pane movement
   function! TmuxMove(direction)
     " Check if we are currently focusing on a edge window.
@@ -348,7 +348,7 @@ nnoremap <leader>e :e $MYVIMRC<cr>
 " quickly execute the current line or selection
 nnoremap <silent> <leader>t "ryy:@r<cr>
 vnoremap <silent> <leader>t "rygv:@r<cr>
-if &term == 'tmux'
+if &term =~ 'screen-256color'
   " tmux will handle the actual mappings so we just 
   nnoremap <silent> <f37>move-down :silent call TmuxMove('j')<cr>
   nnoremap <silent> <f37>move-up :silent call TmuxMove('k')<cr>
@@ -362,7 +362,7 @@ if &term == 'tmux'
   vnoremap <silent> <f37>move-up <esc>:silent call TmuxMove('k')<cr>
   vnoremap <silent> <f37>move-left <esc>:silent call TmuxMove('h')<cr>
   vnoremap <silent> <f37>move-right <esc>:silent call TmuxMove('l')<cr>
-elseif &term == 'abstract_ui' && $TERM == 'tmux'
+elseif &term == 'nvim' && $TERM =~ 'screen-256color'
   nnoremap <silent> <a-j> :silent call TmuxMove('j')<cr>
   nnoremap <silent> <a-k> :silent call TmuxMove('k')<cr>
   nnoremap <silent> <a-h> :silent call TmuxMove('h')<cr>
@@ -697,11 +697,11 @@ if has('gui_running') " gvim
   endif
   set guioptions=
 else
-  if &term =~ 'tmux' || &term =~ 'rxvt-unicode-256color' || &term =~ 'xterm-256color' || &term == 'abstract_ui'
+  if $TERM =~ 'screen-256color' || $TERM =~ 'rxvt-unicode-256color' || $TERM =~ 'xterm-256color'
     colorscheme twilight-term256
   endif
 
-  if &term =~ 'tmux' || &term =~ 'rxvt-unicode-256color' || &term =~ 'xterm-256color-italic' || &term == 'abstract_ui'
+  if $TERM =~ 'screen-256color' || $TERM =~ 'rxvt-unicode-256color' || $TERM =~ 'xterm-256color-italic'
     " for tmux, this will only work if the client terminal supports italic
     " escape sequences
     highlight Comment cterm=italic

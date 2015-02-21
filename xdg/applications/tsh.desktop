@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Tsh
+Icon=terminal
+Exec=urxvt -title tmux-remote -e sh -c tsh
+StartupNotify=true
+Categories=Terminal;
