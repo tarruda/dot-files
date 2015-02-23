@@ -681,3 +681,7 @@ fi
 # }}}
 unset plugin
 # }}}
+
+if [[ -e /etc/zshenv ]]; then
+       print "/etc/zshenv exists, you probably want to move it to /etc/zprofile"
+fi

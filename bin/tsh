@@ -38,7 +38,7 @@ if [[ -z $hostname ]]; then
 	exit 1
 fi
 
-ssh -tY $hostname "zsh -l -c \"tmux attach || tmux new\""
+ssh -tY $hostname "PATH=/usr/local/bin:/usr/bin:/bin zsh -l -c \"tmux attach || tmux new\""
 
 if (( $? != 0 )); then
 	echo "[Press Enter]"
