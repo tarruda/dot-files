@@ -63,8 +63,7 @@ export PATH MANPATH LD_LIBRARY_PATH PKG_CONFIG_PATH
 # Environment {{{
 
 export LANG=en_US.UTF-8
-export VIMINIT="source $DOTDIR/vim/vimrc"
-export VIMPERATOR_INIT="source $DOTDIR/vimperator/vimperatorrc"
+export VIMINIT="source $DOTDIR/vim/nvimrc"
 export INPUTRC=$DOTDIR/.inputrc
 export PYTHONSTARTUP=$DOTDIR/.pythonrc
 export WINEARCH=win32
@@ -84,7 +83,7 @@ export EMAIL='tpadilha84@gmail.com'
 if which vim &> /dev/null; then
 	read PAGER <<- EOF
 	zsh -c \"col -b -x | vim -R \
-		--cmd 'let g:disable_addons = 1' \
+		--cmd 'let g:disable_plugins = 1' \
 		-c 'set nomod nolist nomodifiable' \
 		-c 'set nonumber norelativenumber' \
 		-c 'map q :q<cr>' \

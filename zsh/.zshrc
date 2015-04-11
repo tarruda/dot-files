@@ -499,6 +499,44 @@ install-github-tree() {
 	)
 }
 # }}}
+# Lua {{{
+
+install-luaenv() {
+	install-github-tree -d "$HOME/.luaenv" -t 'a5af8cda564e3d51a6e3db4b9e29ea825ba4235f' 'cehoffman/luaenv'
+	mkdir -p "$HOME/.luaenv/plugins"
+	install-github-tree -d "$HOME/.luaenv/plugins/lua-build" -t 'b3d8d8eb44f18c77964853d9fb4fe200af8dae1c' 'cehoffman/lua-build'
+	mkdir -p "$ZDOTDIR/site-zshrc.d"
+	cat > "$ZDOTDIR/site-zshrc.d/luaenv.zsh" <<-EOF
+	export LUAENV_ROOT="\$HOME/.luaenv"
+	export PATH="\$LUAENV_ROOT/bin:\$PATH"
+	eval "\$(luaenv init -)"
+	EOF
+	mkdir "$HOME/.luaenv/cache"
+}
+
+install-lua() {
+	local version='5.1.5'
+	luaenv install $version
+	luaenv global $version
+	luaenv rehash
+	local luarocks_version='2.2.0'
+	local prefix="$LUAENV_ROOT/versions/$version"
+	curl -R -L -O http://luarocks.org/releases/luarocks-${luarocks_version}.tar.gz
+	tar xf luarocks-${luarocks_version}.tar.gz
+	rm luarocks-${luarocks_version}.tar.gz
+	cd luarocks-${luarocks_version}
+	./configure --prefix="${prefix}" --with-lua="${prefix}"
+	make
+	make install
+	# cat >> ${prefix}/etc/luarocks/config-*.lua <<- "EOF"
+	cat >> ${HOME}/config.lua <<- "EOF"
+	rocks_servers = {
+	   "http://rocks.moonscript.org/"
+	}
+	EOF
+}
+
+# }}}
 # Ruby {{{
 install-rbenv() {
 	install-github-tree -d "$HOME/.rbenv" -t '14bc162ca606e0c61da8d82e1b99b0946d7be13f' 'sstephenson/rbenv'
