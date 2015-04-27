@@ -33,7 +33,7 @@ autoload -U colors && colors
 autoload -U promptinit
 setopt prompt_subst
 
-PROMPT='%m %{$fg[blue]%}::%{$reset_color%} %2~ %{$fg[green]%}»%{$reset_color%} '
+PROMPT='%n%{$fg[yellow]%}@%{$reset_color%}%m %{$fg[blue]%}::%{$reset_color%} %2~ %{$fg[green]%}»%{$reset_color%} '
 if [[ -n $MINGW64_ENV ]]; then
 	PROMPT="(mingw-x64)$PROMPT"
 elif [[ -n $MINGW32_END ]]; then
