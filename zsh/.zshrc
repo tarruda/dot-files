@@ -160,7 +160,7 @@ pr() {
 	set -e
 	local user_repo=$(< .git/user-repo)
 	git checkout -b $branch
-	curl "https://github.com/$(< .git/user-repo)/pull/$pr_num.patch" 2> /dev/null | git am --3way
+	curl "https://patch-diff.githubusercontent.com/raw/$(< .git/user-repo)/pull/$pr_num.diff" 2> /dev/null | git am --3way
 	)
 }
 
