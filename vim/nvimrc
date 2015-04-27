@@ -224,7 +224,9 @@ function! VimrcLoadSettings()
   set timeout " enable timeout of key codes and mappings(the default)
   set timeoutlen=3000 " big timeout for key sequences
   set ttimeoutlen=10 " small timeout for key sequences since these will be normally scripted
-  set clipboard+=unnamedplus
+  if $DISABLE_UNNAMED_CLIP != '1'
+    set clipboard+=unnamedplus
+  endif
   set backupskip=/tmp/*,/private/tmp/* " make it possible to use vim to edit crontab
 endfunction
 
