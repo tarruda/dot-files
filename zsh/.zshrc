@@ -643,7 +643,7 @@ install-perl() {
 install-nodenv() {
 	install-github-tree -d "$HOME/.nodenv" -t 'v0.2.0' 'oinutter/nodenv'
 	mkdir -p "$HOME/.nodenv/plugins"
-	install-github-tree -d "$HOME/.nodenv/plugins/node-build" -t 'eee408c415c80aa9381b6d43129c7759877d970f' 'oinutter/node-build'
+	install-github-tree -d "$HOME/.nodenv/plugins/node-build" -t 'f18b3d67756d1cb25ba6e35044f816fd67211b33' 'oinutter/node-build'
 	mkdir -p "$ZDOTDIR/site-zshrc.d"
 	cat > "$ZDOTDIR/site-zshrc.d/nodenv.zsh" <<-EOF
 	export NODENV_ROOT="\$HOME/.nodenv"
@@ -654,7 +654,7 @@ install-nodenv() {
 }
 
 install-node() {
-	local version='0.10.34'
+	local version='iojs-1.6.1'
 	nodenv install $version
 	nodenv global $version
 }
