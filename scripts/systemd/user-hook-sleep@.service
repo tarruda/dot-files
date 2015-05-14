@@ -1,0 +1,12 @@
+[Unit]
+Description=User's sleep hook
+ConditionPathExists=/home/%I/.hooks/sleep.sh
+Before=sleep.target
+
+[Service]
+User=%I
+Type=oneshot
+ExecStart=/bin/sh -e /home/%I/.hooks/sleep.sh
+
+[Install]
+WantedBy=sleep.target

@@ -1,0 +1,14 @@
+[Unit]
+Description=User's startup hook
+ConditionPathExists=/home/%I/.hooks/startup.sh
+After=multi-user.target
+
+[Service]
+User=%I
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -e /home/%I/.hooks/startup.sh
+ExecStop=/bin/true
+
+[Install]
+WantedBy=multi-user.target

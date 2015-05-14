@@ -1,0 +1,12 @@
+[Unit]
+Description=User's wake hook
+ConditionPathExists=/home/%I/.hooks/wake.sh
+After=sleep.target
+
+[Service]
+User=%I
+Type=oneshot
+ExecStart=/bin/sh -e /home/%I/.hooks/wake.sh
+
+[Install]
+WantedBy=sleep.target
