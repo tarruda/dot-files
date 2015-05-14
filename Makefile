@@ -1,3 +1,5 @@
+all: link fonts hooks
+
 link:
 	@./install/symlinks install
 
@@ -10,4 +12,7 @@ fonts:
 terminfo:
 	@./install/terminfo
 
-.PHONY: link unlink fonts terminfo
+hooks:
+	ln -s $$DOTDIR/hooks ~/.hooks
+
+.PHONY: all link unlink fonts terminfo hooks
