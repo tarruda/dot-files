@@ -1,0 +1,29 @@
+#!/bin/bash -e
+
+if ! which ffmpeg > /dev/null 2>&1 || ! which vlc > /dev/null 2>&1; then
+  echo "Install ffmpeg and vlc" 2>&1
+  exit 1
+fi
+
+if [ ! -r ~/.dcs-932l ]; then
+  echo "Create a ~/.dcs-932l file with one line containing ADDRESS:USERNAME:PASSWORD" 2>&1
+  exit 1
+fi
+
+IFS=: read address username password < ~/.dcs-932l
+
+if [ -z $address ] || [ -z $username ] || [ -z $password ]; then
+  echo "~/.dcs-932l is missing one or more fields" 2>&1
+  exit 1
+fi
+
+video_stream() {
+	curl http://${username}:${password}@${address}/video.cgi 2> /dev/null
+}
+
+audio_stream() {
+	curl http://${username}:${password}@${address}/audio.cgi 2> /dev/null
+}
+
+ffmpeg -y -f mjpeg -i <(video_stream) -i <(audio_stream) \
+	-c:v copy -map 0:v:0 -map 1:a:0 -vcodec mpeg4 -f mpegts - | vlc -
