@@ -87,7 +87,40 @@ function! VimrcLoadPlugins()
   endif
   " }}}
   " gnupg {{{
-  let g:GPGPreferSymmetric = 1
+  
+  " Small help since the plugin doesn't bundle documentation
+  "
+  " Commands: 
+
+  " :GPGEditRecipients 
+  "   Opens a scratch buffer to change the list of recipients. Recipients that 
+  "   are unknown (not in your public key) are highlighted and have 
+  "   a prepended "!". Closing the buffer makes the changes permanent. 
+
+  " :GPGViewRecipients 
+  "   Prints the list of recipients. 
+
+  " :GPGEditOptions 
+  "   Opens a scratch buffer to change the options for encryption (symmetric, 
+  "   asymmetric, signing). Closing the buffer makes the changes permanent. 
+  "   WARNING: There is no check of the entered options, so you need to know 
+  "   what you are doing. 
+
+  " :GPGViewOptions 
+  "   Prints the list of options. 
+  "
+  " Configuration:
+  " "(Defaults are commented)
+  "
+  " let g:GPGExecutable = 'gpg'
+  " let g:GPGUseAgent = 1
+  " let g:GPGPreferSymmetric = 1
+  let g:GPGPreferArmor = 1
+  " let g:GPGPreferSign = 0
+  let g:GPGDefaultRecipients = ["Thiago de Arruda <tpadilha84@gmail.com>"]
+  let g:GPGUsePipes = 1
+  " let g:GPGHomeDir = '~/.gnupg'
+ 
   Plug 'jamessan/vim-gnupg'
   " }}}
   " zoomwintab {{{
