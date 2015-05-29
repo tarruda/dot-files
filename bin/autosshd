@@ -1,0 +1,45 @@
+#!/bin/sh
+
+prog="$0"
+action="$1"
+ssh_host="$2"
+pid_file="${HOME}/.autosshd/${ssh_host}.pid"
+
+case "$action" in
+	start)
+		if ! ${prog} status ${ssh_host} > /dev/null 2>&1; then
+			mkdir -p "$(dirname ${pid_file})"
+			export AUTOSSH_PIDFILE="${pid_file}"
+			autossh -f -nNT ${ssh_host}
+			status=$?
+		else
+			echo "${ssh_host} already running" >&2
+			status=1
+		fi
+		;;
+	stop)
+		[ -e "${pid_file}" ] && kill $(cat ${pid_file})
+		status=$?
+		;;
+	restart)
+		$prog stop
+		sleep 3
+		$prog start
+		status=$?
+		;;
+	status)
+		if [ -e "${pid_file}" ] && kill -0 $(cat ${pid_file}); then
+			echo "$(tput setaf 2)*$(tput sgr0) ${ssh_host} running, process $(cat ${pid_file})"
+			status=0
+		else
+			echo "$(tput setaf 1)*$(tput sgr0) ${ssh_host} not running"
+			status=1
+		fi
+		;;
+	*)
+		echo "Usage: $prog {start|stop|restart|status} {SSH_HOST}" >&2
+		status=1
+		;;
+esac
+
+exit $status

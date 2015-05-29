@@ -1,0 +1,92 @@
+ServerAliveInterval 60
+ServerAliveCountMax 3
+
+# Some useful host definitions.
+
+# Local user that owns unprivileged linux containers
+Host lxcd
+  HostName 127.0.0.1
+  User lxcd
+  IdentityFile ~/.ssh/id_local
+
+# Headless local virtual machine or linux container with full x11/pulseaudio
+# forwarding:
+Host dev
+  HostName 192.168.56.25
+  User tarruda
+  IdentityFile ~/.ssh/id_local
+  ForwardX11 yes
+  ForwardX11Trusted yes
+  # Tell ssh to forward remote connections on 4713 to the local 4713 port, which
+  # is probably where pulseaudio is listening on.
+  RemoteForward 4713 localhost:4713
+
+# Socks proxy, weechat relay, etc. Possibly running on VPS/linux container. A
+# good way to run this one is as a user daemon with the autossh program(See
+# example script below)
+Host uproxy-daemon
+  HostName 255.255.255.255
+  User tarruda
+  IdentityFile ~/.ssh/id_rsa
+  Port 2222
+  # Forward local connections to 9001 to the remote server, which probably where
+  # a weechat relay is listening on(Can be specified multiple times if required)
+  LocalForward localhost:9001 localhost:9001
+  # Also start a SOCKS v5 server on local port 9450.
+  DynamicForward localhost:1080
+
+# Also create a non-forwarding version for manual administrative tasks
+Host uproxy
+  HostName 255.255.255.255
+  User tarruda
+  IdentityFile ~/.ssh/id_rsa
+  Port 2222
+
+# What follows is a script that can be used to start/stop autossh daemons that
+# provide persistent tunneling
+#
+# #!/bin/sh
+# 
+# prog="$0"
+# action="$1"
+# ssh_host="$2"
+# pid_file="${HOME}/.autosshd/${ssh_host}.pid"
+# 
+# case "$action" in
+# 	start)
+# 		if ! ${prog} status ${ssh_host} > /dev/null 2>&1; then
+# 			mkdir -p "$(dirname ${pid_file})"
+# 			export AUTOSSH_PIDFILE="${pid_file}"
+# 			autossh -f -nNT ${ssh_host}
+# 			status=$?
+# 		else
+# 			echo "${ssh_host} already running" >&2
+# 			status=1
+# 		fi
+# 		;;
+# 	stop)
+# 		[ -e "${pid_file}" ] && kill $(cat ${pid_file})
+# 		status=$?
+# 		;;
+# 	restart)
+# 		$prog stop
+# 		sleep 3
+# 		$prog start
+# 		status=$?
+# 		;;
+# 	status)
+# 		if [ -e "${pid_file}" ] && kill -0 $(cat ${pid_file}); then
+# 			echo "$(tput setaf 2)*$(tput sgr0) ${ssh_host} running, process $(cat ${pid_file})"
+# 			status=0
+# 		else
+# 			echo "$(tput setaf 1)*$(tput sgr0) ${ssh_host} not running"
+# 			status=1
+# 		fi
+# 		;;
+# 	*)
+# 		echo "Usage: $prog {start|stop|restart|status} {SSH_HOST}" >&2
+# 		status=1
+# 		;;
+# esac
+# 
+# exit $status
