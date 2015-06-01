@@ -539,9 +539,9 @@ install-lua() {
 # }}}
 # Ruby {{{
 install-rbenv() {
-	install-github-tree -d "$HOME/.rbenv" -t '14bc162ca606e0c61da8d82e1b99b0946d7be13f' 'sstephenson/rbenv'
+	install-github-tree -d "$HOME/.rbenv" -t '5b9e4f05846f6bd03b09b8572142f53fd7a46e62' 'sstephenson/rbenv'
 	mkdir -p "$HOME/.rbenv/plugins"
-	install-github-tree -d "$HOME/.rbenv/plugins/ruby-build" -t 'v20140225' 'sstephenson/ruby-build'
+	install-github-tree -d "$HOME/.rbenv/plugins/ruby-build" -t 'v20150506' 'sstephenson/ruby-build'
 	mkdir -p "$ZDOTDIR/site-zshrc.d"
 	cat > "$ZDOTDIR/site-zshrc.d/rbenv.zsh" <<-EOF
 	export RBENV_ROOT="\$HOME/.rbenv"
@@ -643,7 +643,7 @@ install-perl() {
 install-nodenv() {
 	install-github-tree -d "$HOME/.nodenv" -t 'v0.2.0' 'oinutter/nodenv'
 	mkdir -p "$HOME/.nodenv/plugins"
-	install-github-tree -d "$HOME/.nodenv/plugins/node-build" -t 'f18b3d67756d1cb25ba6e35044f816fd67211b33' 'oinutter/node-build'
+	install-github-tree -d "$HOME/.nodenv/plugins/node-build" -t '9672346518d54b007e7fa1018569326baa04af73' 'oinutter/node-build'
 	mkdir -p "$ZDOTDIR/site-zshrc.d"
 	cat > "$ZDOTDIR/site-zshrc.d/nodenv.zsh" <<-EOF
 	export NODENV_ROOT="\$HOME/.nodenv"

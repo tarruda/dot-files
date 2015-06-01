@@ -3,7 +3,10 @@ set history save
 python
 import sys, os
 sys.path.append(os.environ['DOTDIR'])
+sys.path.append(os.path.join(os.environ['HOME'], '.nginx-gdb-utils'))
 end
+
+source ~/.nginx-gdb-utils/luajit21.py
 
 add-auto-load-safe-path /home/tarruda/pub-dev/neovim/src/nvim/testdir/.gdbinit
 
