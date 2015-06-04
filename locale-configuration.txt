@@ -1,0 +1,30 @@
+# for ubuntu
+sudo update-locale LANG=en_US.UTF-8
+
+# X keyboard
+setxkbmap -layout us -variant intl
+
+# enable cedilla in x applications:
+# Locate the line
+<dead_acute> <c> : "ć" U0107 # LATIN SMALL LETTER C WITH ACUTE 
+# and replace with (or simply add this line if the file is empty)
+<dead_acute> <c> : "ç" ccedilla # LATIN SMALL LETTER C WITH CEDILLA 
+
+# enable cedilla in gtk/qt, add the following to /etc/environment
+GTK_IM_MODULE=cedilla
+QT_IM_MODULE=cedilla
+
+# console font setup
+sudo dpkg-reconfigure console-setup
+# choose:
+# - UTF-8
+# - Latin1 and Latin5
+# - VGA
+
+# ensure keymaps are installed:
+sudo apt-get install console-data
+
+# configure
+sudo dpkg-reconfigure keyboard-configuratioin
+
+# most configuration lives in /etc/default, so it can easily be scripted
