@@ -41,17 +41,13 @@ function! VimrcLoadPlugins()
   nnoremap <silent> <c-p> :FZF<cr>
   Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': 'yes \| ./install' }
   " }}}
-  " Syntastic {{{
-  let g:syntastic_error_symbol = '✗'
-  let g:syntastic_warning_symbol = '⚠'
-  let g:syntastic_always_populate_loc_list = 1
-  let g:syntastic_javascript_checkers = ['jsxhint']
-  let g:syntastic_coffee_checkers=['coffeelint']
-  let g:syntastic_haskell_checkers=['ghc_mod', 'hlint']
-  let g:syntastic_python_checkers = ['flake8']
-  let g:syntastic_scala_checkers = []
-  let g:syntastic_ignore_files=['\.scratchpads/scratchpad\.\.*']
-  Plug 'scrooloose/syntastic'
+  " Neomake {{{
+  Plug 'benekastah/neomake'
+  let g:neomake_verbose = 0
+  augroup Neomake
+    au!
+    au! BufWritePost * Neomake
+  augroup END
   " }}}
   " UltiSnips {{{
   if g:has_python
