@@ -29,13 +29,15 @@ function! VimrcLoadPlugins()
   Plug 'jimmyhchan/dustjs.vim'
   Plug 'mxw/vim-jsx'
   Plug 'leafgarland/typescript-vim'
+  Plug 'digitaltoad/vim-jade'
   " }}}
   " FZF {{{
-  let fzf_command = '((git ls-files && git ls-files --exclude-standard --cached --others 2> /dev/null)'  " git
-  let fzf_command .= ' || (hg manifest --all 2> /dev/null)'  " mercurial
-  let fzf_command .= ' || (bzr ls --versioned --recursive 2> /dev/null)'  " bzr
-  let fzf_command .= ' || (find -type d -name ".svn" -prune -o \( -type f -o -type l \) -print | cut -c3-)) | sort | uniq'  " svn and normal directories
-  let $FZF_DEFAULT_COMMAND=fzf_command
+  " let fzf_command = '((git ls-files && git ls-files --exclude-standard --cached --others 2> /dev/null)'  " git
+  " let fzf_command .= ' || (hg manifest --all 2> /dev/null)'  " mercurial
+  " let fzf_command .= ' || (bzr ls --versioned --recursive 2> /dev/null)'  " bzr
+  " let fzf_command .= ' || (find -type d -name ".svn" -prune -o \( -type f -o -type l \) -print | cut -c3-)) | sort | uniq'  " svn and normal directories
+  " let $FZF_DEFAULT_COMMAND=fzf_command
+  let $FZF_DEFAULT_COMMAND='ag -l -g ""'
   nnoremap <silent> <c-p> :FZF<cr>
   Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': 'yes \| ./install' }
   " }}}
