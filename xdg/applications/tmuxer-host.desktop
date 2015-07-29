@@ -3,7 +3,7 @@
 Type=Application
 Name=Tmuxer
 Icon=utilities-terminal
-Exec=urxvt -e ssh tmuxer-host zsh -l -c tmuxer
+Exec=urxvt -e ssh -t tmuxer-host zsh -l -c tmuxer
 StartupNotify=true
 Categories=Terminal
 StartupWMClass=tmuxer

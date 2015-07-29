@@ -24,7 +24,7 @@ function! VimrcLoadPlugins()
   Plug 'altercation/vim-colors-solarized'
   Plug 'rking/ag.vim'
   Plug 'danro/rename.vim'
-  Plug 'kchmck/vim-coffee-script'
+  " Plug 'kchmck/vim-coffee-script'
   Plug 'pangloss/vim-javascript'
   Plug 'jimmyhchan/dustjs.vim'
   Plug 'mxw/vim-jsx'
