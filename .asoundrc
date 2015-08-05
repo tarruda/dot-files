@@ -1,13 +1,13 @@
-pcm.pulse {
-  type pulse
-}
-ctl.pulse {
-  type pulse
-}
-pcm.!default {
-  type pulse
-    hint.description "Default Audio Device"
-}
-ctl.!default {
-  type pulse
-}
+# pcm.pulse {
+#   type pulse
+# }
+# ctl.pulse {
+#   type pulse
+# }
+# pcm.!default {
+#   type pulse
+#     hint.description "Default Audio Device"
+# }
+# ctl.!default {
+#   type pulse
+# }
