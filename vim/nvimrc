@@ -18,6 +18,7 @@ function! VimrcLoadPlugins()
   Plug 'tpope/vim-surround'
   Plug 'tpope/vim-commentary'
   Plug 'tpope/vim-vinegar'
+  Plug 'tpope/vim-eunuch'
   Plug 'Shougo/vinarise.vim'
   Plug 'Valloric/python-indent'
   Plug 'vim-scripts/DrawIt'
@@ -30,6 +31,7 @@ function! VimrcLoadPlugins()
   Plug 'mxw/vim-jsx'
   Plug 'leafgarland/typescript-vim'
   Plug 'digitaltoad/vim-jade'
+  Plug 'nicklasos/vim-jsx-riot'
   " }}}
   " FZF {{{
   " let fzf_command = '((git ls-files && git ls-files --exclude-standard --cached --others 2> /dev/null)'  " git
@@ -173,31 +175,17 @@ function! VimrcLoadMappings()
   " }}}
   " Window/buffer navigation and manipulation {{{
   nnoremap <leader>e :e $MYVIMRC<cr>
-  nnoremap <a-j> <c-w>j
-  nnoremap <a-k> <c-w>k
-  nnoremap <a-h> <c-w>h
-  nnoremap <a-l> <c-w>l
-  vnoremap <a-j> <c-\><c-n><c-w>j
-  vnoremap <a-k> <c-\><c-n><c-w>k
-  vnoremap <a-h> <c-\><c-n><c-w>h
-  vnoremap <a-l> <c-\><c-n><c-w>l
-  inoremap <a-j> <c-\><c-n><c-w>j
-  inoremap <a-k> <c-\><c-n><c-w>k
-  inoremap <a-h> <c-\><c-n><c-w>h
-  inoremap <a-l> <c-\><c-n><c-w>l
-  cnoremap <a-j> <c-\><c-n><c-w>j
-  cnoremap <a-k> <c-\><c-n><c-w>k
-  cnoremap <a-h> <c-\><c-n><c-w>h
-  cnoremap <a-l> <c-\><c-n><c-w>l
   " zoom with <c-w>z in any mode
   nnoremap <silent> <c-w>z :ZoomWinTabToggle<cr>
   inoremap <silent> <c-w>z <c-\><c-n>:ZoomWinTabToggle<cr>a
   vnoremap <silent> <c-w>z <c-\><c-n>:ZoomWinTabToggle<cr>gv
   if has('nvim') && exists(':tnoremap')
-    tnoremap <a-j> <c-\><c-n><c-w>j
-    tnoremap <a-k> <c-\><c-n><c-w>k
-    tnoremap <a-h> <c-\><c-n><c-w>h
-    tnoremap <a-l> <c-\><c-n><c-w>l
+    tnoremap <c-w>j <c-\><c-n><c-w>j
+    tnoremap <c-w>k <c-\><c-n><c-w>k
+    tnoremap <c-w>h <c-\><c-n><c-w>h
+    tnoremap <c-w>l <c-\><c-n><c-w>l
+    tnoremap <pageup> <c-\><c-n><pageup>
+    tnoremap <pagedown> <c-\><c-n><pagedown>
     tnoremap <silent> <c-w>z <c-\><c-n>:ZoomWinTabToggle<cr>
   endif
   " }}}
@@ -220,6 +208,7 @@ function! VimrcLoadSettings()
   set mouse=a " enable mouse
   set noerrorbells visualbell t_vb= " disable annoying terminal sounds
   set encoding=utf-8 " universal text encoding, compatible with ascii
+  set noequalalways
   set list
   set listchars=tab:▸\ ,extends:❯,precedes:❮ " ,eol:¬
   set showbreak=↪
@@ -270,6 +259,8 @@ function! VimrcLoadFiletypeSettings()
     au BufNewFile,BufRead $ZDOTDIR/functions/**/* setl filetype=zsh
     au BufNewFile,BufRead $ZDOTDIR/completion-functions/* setl filetype=zsh
     au BufNewFile,BufRead $ZDOTDIR/plugins/**/functions/* setl filetype=zsh
+    " riot/jsx
+    au BufNewFile,BufRead *.riot.tag setlocal ft=javascript
     " Coffeescript {{{
     au FileType coffee
           \   setl foldmethod=marker

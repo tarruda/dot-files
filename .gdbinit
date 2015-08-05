@@ -55,3 +55,11 @@ define lua-bt
     set $p = $p - 1
   end
 end
+
+define redirect-stderr
+  shell rm -f /tmp/gdb-inferior-stderr
+  shell touch /tmp/gdb-inferior-stderr
+  call close(2)
+  call dup2(open("/tmp/gdb-inferior-stderr", 1), 2)
+  printf "stderr redirected, run tail -f /tmp/gdb-inferior-stderr from another terminal\n"
+end
