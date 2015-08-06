@@ -3,15 +3,6 @@ adapted from: hex.ro/wp/projects/personal-cloud-computing/rsh-between-windows-7-
 
 #rsh between Windows 7 and Ubuntu 10 using different user names.
 
-##Purpose
-
-A hurdle I’ve encountered is how to get rsh to work between Windows 7 Ultimate and Ubuntu 10.04 LTS.
-
-We’re starting with two limiting factors, which I learned the hard way:
-
-    rsh-server coming with Ubuntu 10.04 uses a configuration file pointing to a PAM security module that was missing from the system. The /etc/pam.d/rsh points to the old pam_rhosts_auth.so (which supported the promiscuous option which all tutorials talk about), but my system only has pam_rhosts.so.
-    rsh.exe is not found in Windows 7 anymore, so we have to manage using some other tools to connect.
-
 ##Network configuration:
 
 The following diagram shows the network layout:
@@ -37,14 +28,48 @@ This is the most complex part  and a lot of things have to be in order. I had tr
 These are the steps:
 
 1. Install the three packages: `sudo apt-get install rsh-redone-server rsh-redone-client xinetd`. xinetd is required, as it is running the rsh server. Also, from now on, the rsh-server service name is ‘shell’ as you will see below.
-2. Make sure to check /etc/services to contain a line like this: `shell 514/tcp cmd             # no passwords used`. We need the shell service present there, since that’s what xinetd looks for when a connection arrives on port 514.
-3. Make sure to check /etc/inetd.conf if it has this line: `shell stream  tcp nowait  root    /usr/sbin/in.rshd`. This file tells to xinetd what to execute when a connection arrives on port 514. The link to the /etc/services above is the service name ‘shell’.
-4. The last part of configuration is setting up the hosts files so that it will allow the Windows user name. For this two files have to be modified to allow pam_rhost module to match the remote user name with the remote ip and also with the local account:
-  - /etc/hosts.equiv to add a line in format `remote_host remote_username`, for example: `192.168.56.1 Ubuntu`
-  - /home/ubuntu/.rhosts needs the same line added: `192.168.56.1 Ubuntu`
-  Also, logged in as ubuntu you need to `chmod +600 .rhosts`
 
-A lot of tutorials say that /etc/securetty has to be updated to include rsh (and rlogin). But this is not needed, since the /etc/pam.d/rsh does not mention pam_securetty.so.
+2. Make sure to check /etc/services to contain a line like this: `shell 514/tcp cmd             # no passwords used`. We need the shell service present there, since that’s what xinetd looks for when a connection arrives on port 514.
+
+3. Add a /etc/xinetd.d/rsh file with these contents:
+
+```
+service shell
+{
+	disable		= no
+	socket_type	= stream
+	wait		= no
+	user		= root
+	log_on_success	+= USERID
+	log_on_failure	+= USERID
+	server		= /usr/sbin/in.rshd
+	protocol	= tcp
+}
+```
+
+This file tells to xinetd what to execute when a connection arrives on port 514. The link to the /etc/services above is the service name ‘shell’.
+
+4. Add the following to /etc/security/pam_env.conf
+
+```
+REMOTEHOST	DEFAULT=localhost OVERRIDE=@{PAM_RHOST}
+DISPLAY		DEFAULT=${REMOTEHOST}:0.0 OVERRIDE=${DISPLAY}
+PULSE_SERVER	DEFAULT=${REMOTEHOST} OVERRIDE=${PULSE_SERVER}
+LIBGL_ALWAYS_INDIRECT DEFAULT=1
+```
+
+This will point the DISPLAY/PULSE_SERVER variables to the client IP(Which are
+probably running X/pulse servers)
+
+5. Now configure rshd authorization to allow connections from the Windows
+user/host to the local linux user. Create a ~/.rhosts file with these contents:
+
+```
+192.168.56.1 Ubuntu
+```
+
+The ip is the address of the client machine and Ubuntu is the windows user name.
+This file needs 600 permissions(`chmod 600 ~/.rhosts`)
 
 ##Windows 7
 

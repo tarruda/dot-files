@@ -138,7 +138,7 @@ namespace FileShortcutGeneratorServer
           IWshRuntimeLibrary.IWshShortcut shortcut = wsh.CreateShortcut(scpath)
             as IWshRuntimeLibrary.IWshShortcut;
           shortcut.TargetPath = rshCommand;
-          shortcut.Arguments = String.Format("{0} -l {1} {2}", ip, user, command);
+          shortcut.Arguments = String.Format("{0} -l {1} $SHELL -l -c '{2}'", ip, user, command);
           // not sure about what this is for
           shortcut.WindowStyle = 1;
           shortcut.Description = name;

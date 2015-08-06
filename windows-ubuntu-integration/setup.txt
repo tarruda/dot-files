@@ -30,15 +30,3 @@ on ~/.asoundrc:
   ctl.!default {
       type pulse
   }
-
-In the guest, create a shell startup file with this content
-
-  # use cygwin x-server to display graphical applications
-  export DISPLAY='192.168.56.1:0.0'
-  # tell the init scripts we are in cygwin, so no need to
-  # do normal x action such as keyboard setup
-  export CYGWIN_X=1
-  # use cygwin x-server to render opengl apps
-  export LIBGL_ALWAYS_INDIRECT=1
-  # use cygwin pulseaudio server as the default sink for audio
-  export PULSE_SERVER='192.168.56.1' 

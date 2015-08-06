@@ -72,8 +72,8 @@ export EDITOR=vim
 export VISUAL=vim
 # Thanks this article for the following two environment variables
 # http://my.opera.com/CrazyTerabyte/blog/2010/11/04/how-x11-xcompose-works
-export GTK_IM_MODULE=xim
-export QT_IM_MODULE=xim
+export GTK_IM_MODULE=cedilla
+export QT_IM_MODULE=cedilla
 export GPGKEY=F5EC672E
 export EMAIL='tpadilha84@gmail.com'
 if which vim &> /dev/null; then
