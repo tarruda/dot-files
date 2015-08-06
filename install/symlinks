@@ -11,7 +11,6 @@ function() {
 	.gitconfig .gitconfig
 	.gdbinit .gdbinit
 	.global.gitignore .global.gitignore
-	.asoundrc .asoundrc
 	.irbrc .irbrc
 	.haskeline .haskeline
 	.ghci .ghci

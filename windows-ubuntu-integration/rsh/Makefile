@@ -4,7 +4,7 @@ EXE=rsh.exe
 
 CC=gcc 
 CFLAGS=-Wall -DMINGW32
-LDFLAGS=
+LDFLAGS=-mwindows
 RM=rm
 
 %.o: %.c         # combined w/ next line will compile recently changed .c files

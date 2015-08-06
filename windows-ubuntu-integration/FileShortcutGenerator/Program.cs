@@ -4,11 +4,14 @@ using System.Text;
 using System.Net.Sockets;
 using System.Net;
 
-// Assuming you install FileShortcutGenerator.exe and TcpCommand.exe to
-// [INSTALL_DIR] and your username is [USER], create a shortcut on the Startup
-// folder in start menu with the following target:
+// Assuming you install FileShortcutGenerator.exe and rsh.exe to [INSTALL_DIR],
+// your windows username is [USER] and linux username is [user], create a
+// shortcut on the Startup folder in start menu with the following target:
 //
-// [INSTALL_DIR]\FileShortcutGenerator.exe "C:\Users\[USER]\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Ubuntu" "C:\Users\[USER]\ubuntu-generated-icons" "[INSTALL_DIR]\TcpCommand.exe"
+// [INSTALL_DIR]\FileShortcutGenerator.exe "C:\Users\[USER]\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Ubuntu" "C:\Users\[USER]\ubuntu-generated-icons" "[INSTALL_DIR]\rsh.exe" 192.168.56.1 [user]
+//
+// 192.168.56.1 is the default address of virtualbox host-only interface(where
+// it will listen on)
 namespace FileShortcutGeneratorServer
 {
   class Program
@@ -28,32 +31,48 @@ namespace FileShortcutGeneratorServer
 
       if (!Directory.Exists(shortcutDirectory)) {
         System.Windows.Forms.MessageBox.Show(String.Format(
-            "Directory {0} doesn't exist", shortcutDirectory));
+              "Directory {0} doesn't exist", shortcutDirectory));
         System.Environment.Exit(1);
       }
 
       if (!Directory.Exists(iconDirectory)) {
         System.Windows.Forms.MessageBox.Show(String.Format(
-            "Directory {0} doesn't exist", iconDirectory));
+              "Directory {0} doesn't exist", iconDirectory));
         System.Environment.Exit(1);
       }
 
       if (args.Length < 3) {
         System.Windows.Forms.MessageBox.Show(
-            "Need the path for the TcpCommand.exe utility");
+            "Need the path for the rsh.exe utility");
         System.Environment.Exit(1);
       }
 
-      string tcpCommand = args[2];
+      string rshCommand = args[2];
 
-      if (!File.Exists(tcpCommand)) {
+      if (!File.Exists(rshCommand)) {
         System.Windows.Forms.MessageBox.Show(String.Format(
-            "File {0} doesn't exist", iconDirectory));
+              "File {0} doesn't exist", iconDirectory));
         System.Environment.Exit(1);
       }
 
-      string listenIp = "192.168.56.1";
+      if (args.Length < 4)
+      {
+        System.Windows.Forms.MessageBox.Show(
+            "Need listen address");
+        System.Environment.Exit(1);
+      }
+
+      string listenIp = args[3];
       int listenPort = 55556;
+
+      if (args.Length < 5)
+      {
+        System.Windows.Forms.MessageBox.Show(
+            "Need virtualbox guest user");
+        System.Environment.Exit(1);
+      }
+
+      string user = args[4];
 
       server = new TcpListener(IPAddress.Parse(listenIp), listenPort);
       server.Start();
@@ -61,6 +80,7 @@ namespace FileShortcutGeneratorServer
       while (true)
       {
         TcpClient client = server.AcceptTcpClient();
+        string ip = client.Client.RemoteEndPoint.ToString().Split(':')[0];
 
         // Keep eveything in sync by deleting all shortcuts and icons when
         // a new connection is accepted
@@ -117,12 +137,12 @@ namespace FileShortcutGeneratorServer
           // Create shortcut and wrap command into a tcp-command call
           IWshRuntimeLibrary.IWshShortcut shortcut = wsh.CreateShortcut(scpath)
             as IWshRuntimeLibrary.IWshShortcut;
-          shortcut.TargetPath = tcpCommand;
-          shortcut.Arguments = command;
+          shortcut.TargetPath = rshCommand;
+          shortcut.Arguments = String.Format("{0} -l {1} {2}", ip, user, command);
           // not sure about what this is for
           shortcut.WindowStyle = 1;
           shortcut.Description = name;
-          shortcut.WorkingDirectory = Path.GetDirectoryName(tcpCommand);
+          shortcut.WorkingDirectory = Path.GetDirectoryName(rshCommand);
           if (iconData != null)
             shortcut.IconLocation = iconPath;
           shortcut.Save();
