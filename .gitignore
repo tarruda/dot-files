@@ -1,9 +1,7 @@
 /znc/
-/vim/sessions/
-/vim/plugged/
-/vim/site-vimrc
-/vimperator/info
-/vimperator/plugin/local.vimp
+/config/nvim/sessions/
+/config/nvim/plugged/
+/config/nvim/site-vimrc
 /zsh/.site-zprofile
 /zsh/site-zprofile.d/
 /zsh/.site-zshrc

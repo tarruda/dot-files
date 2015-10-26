@@ -32,6 +32,7 @@ function! VimrcLoadPlugins()
   Plug 'leafgarland/typescript-vim'
   Plug 'digitaltoad/vim-jade'
   Plug 'nicklasos/vim-jsx-riot'
+  Plug 'takac/vim-hardtime'
   " }}}
   " FZF {{{
   " let fzf_command = '((git ls-files && git ls-files --exclude-standard --cached --others 2> /dev/null)'  " git
@@ -244,6 +245,10 @@ function! VimrcLoadSettings()
     set clipboard+=unnamedplus
   endif
   set backupskip=/tmp/*,/private/tmp/* " make it possible to use vim to edit crontab
+  augroup global_settings
+    au!
+    au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+  augroup END
 endfunction
 
 " }}}
