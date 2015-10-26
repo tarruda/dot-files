@@ -70,6 +70,7 @@ export WINEPREFIX=$HOME/.wine
 export EDITOR=vim
 export VISUAL=vim
 export XDG_CONFIG_HOME=$DOTDIR/config
+export VIMINIT="source $XDG_CONFIG_HOME/nvim/init.vim"
 # Thanks this article for the following two environment variables
 # http://my.opera.com/CrazyTerabyte/blog/2010/11/04/how-x11-xcompose-works
 export GTK_IM_MODULE=cedilla
