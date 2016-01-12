@@ -127,7 +127,7 @@ psql() {
 	o_user=(-U postgres)
 	o_host=(-h localhost)
 	zparseopts -D -K U:=o_user -username:=o_user h=:o_host -hostname:=o_host
-	PSQL_EDITOR='vim -X +"setf sql"' command psql -U $o_user[2] -h $o_host[2]\
+	PSQL_EDITOR='vim +"setf sql"' command psql -U $o_user[2] -h $o_host[2]\
 		"$@"
 }
 
@@ -258,7 +258,7 @@ man() {
 	local pager=$PAGER
 	if which vim &> /dev/null; then
 		read pager <<- EOF
-		zsh -c \"col -b -x | vim -X -R \
+		zsh -c \"col -b -x | vim -R \
 			--cmd 'let g:disable_addons = 1' \
 			-c 'set ft=man nomod nolist nomodifiable' \
 			-c 'set nonumber norelativenumber' \
@@ -430,10 +430,10 @@ fi
 # Tmux {{{
 
 if ! [[ -z $TMUX || $TERM != tmux ]]; then
-	# vim () { command vim -X "$@" }
+	# vim () { command vim "$@" }
 
 	mutt() {
-		TERM=screen-256color command mutt -e "set editor='TERM=tmux vim -X'" "$@"
+		TERM=screen-256color command mutt -e "set editor='TERM=tmux vim'" "$@"
 	}
 
 	weechat() {

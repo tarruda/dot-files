@@ -1,5 +1,4 @@
 " Plugins {{{
-
 function! VimrcLoadPlugins()
   " Install vim-plug if not available {{{
   if !isdirectory(g:vim_plug_dir)
@@ -41,8 +40,10 @@ function! VimrcLoadPlugins()
   " let fzf_command .= ' || (find -type d -name ".svn" -prune -o \( -type f -o -type l \) -print | cut -c3-)) | sort | uniq'  " svn and normal directories
   " let $FZF_DEFAULT_COMMAND=fzf_command
   let $FZF_DEFAULT_COMMAND='ag -l -g ""'
+  let g:fzf_layout = { 'down': '~40%' }
   nnoremap <silent> <c-p> :FZF<cr>
   Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': 'yes \| ./install' }
+  Plug 'junegunn/fzf.vim'
   " }}}
   " Neomake {{{
   Plug 'benekastah/neomake'
@@ -111,7 +112,7 @@ function! VimrcLoadPlugins()
   "
   " let g:GPGExecutable = 'gpg'
   " let g:GPGUseAgent = 1
-  " let g:GPGPreferSymmetric = 1
+  let g:GPGPreferSymmetric = 1
   let g:GPGPreferArmor = 1
   " let g:GPGPreferSign = 0
   let g:GPGDefaultRecipients = ["Thiago de Arruda <tpadilha84@gmail.com>"]
