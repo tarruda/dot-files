@@ -419,11 +419,6 @@ if ! which gpg-agent &> /dev/null; then
 
 	command git "$@"
 }
-ssh() {
-	if ssh-add -l &> /dev/null || ssh-add; then
-		command ssh "$@"
-	fi
-}
 fi
 
 # }}}
