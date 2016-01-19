@@ -327,6 +327,50 @@ if [[ -x /usr/lib/command-not-found ]]; then
 fi
 
 # }}}
+# openssl {{{
+
+raw-hexdump() {
+	xxd -p | tr -d '\n'
+}
+
+random-key-256() {
+	head -c 32 < /dev/urandom
+}
+
+# encrypt/decrypt utility using key taken from the first argument or stdin's 
+# first 32 bytes. example:
+# KEY=$(random-key-256)
+# (echo -n $KEY; echo hello) | (echo -n $KEY; raw-aes256-enc) | raw-aes256-dec
+raw-aes256-enc() {
+	local key
+	local o_key
+	o_key=(-k)
+	zparseopts -D -K -- k:=o_key
+	key=$o_key[2]
+	if [[ -z $o_key[2] ]]; then
+		# no key passed as argument, decrypt using the first 32 bytes from stdin
+		key=$(head -c 32 | raw-hexdump)
+	fi
+	local iv=$(head -c 16 </dev/urandom | raw-hexdump)
+	echo -E -n $iv | xxd -p -r
+	command openssl aes-256-cbc -e -iv $iv -K $key
+}
+
+raw-aes256-dec() {
+	local key
+	local o_key
+	o_key=(-k)
+	zparseopts -D -K -- k:=o_key
+	key=$o_key[2]
+	if [[ -z $o_key[2] ]]; then
+		# no key passed as argument, decrypt using the first 32 bytes from stdin
+		key=$(head -c 32 | raw-hexdump)
+	fi
+	local iv=$(head -c 16 | raw-hexdump)
+	command openssl aes-256-cbc -d -iv $iv -K $key
+}
+
+# }}}
 # Encfs {{{
 
 # mount many encfs volumes using a single key

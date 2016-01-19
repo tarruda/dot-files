@@ -338,6 +338,8 @@ function! VimrcLoadColors()
     " escape sequences
     highlight Comment cterm=italic
   endif
+  highlight ColorColumn ctermbg=235 guibg=#2c2d27
+  let &colorcolumn=join(range(81,999),",")
 endfunction
 " }}}
 " Terminal {{{
