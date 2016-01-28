@@ -37,7 +37,7 @@ for dir in $paths; do
 		PATH="$dir:$PATH"
 	fi
 done
-prefixes_dir="$HOME/.user-prefixes"
+prefixes_dir="$HOME/.opt"
 # paths/manpaths for programs installed in home dir
 if [[ -d $prefixes_dir ]]; then
 	for dir in "$prefixes_dir"/*; do
