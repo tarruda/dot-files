@@ -3,6 +3,12 @@
 prog="$0"
 action="$1"
 ssh_host="$2"
+
+if [ "x$action" = "x" ] || [ "x$ssh_host" = "x" ]; then
+	echo "wrong number of arguments" >&2
+	exit 1
+fi
+
 pid_file="${HOME}/.autosshd/${ssh_host}.pid"
 
 case "$action" in

@@ -79,15 +79,24 @@ export GPGKEY=F5EC672E
 export EMAIL='tpadilha84@gmail.com'
 if which vim &> /dev/null; then
 	read PAGER <<- EOF
-	zsh -c \"col -b -x | vim -R \
-		--cmd 'let g:disable_plugins = 1' \
+	sh -c \"col -b -x | vim -R \
+		--cmd 'let g:vimpager = 1' \
 		-c 'set nomod nolist nomodifiable' \
 		-c 'set nonumber norelativenumber' \
-		-c 'map q :q<cr>' \
+		-c 'nnoremap <silent><buffer> q :q<cr>' \
 		-c 'map <space> <c-d>' \
 		-c 'map b <c-u>' -\"
 	EOF
-	export PAGER
+	read MANPAGER <<- EOF
+	sh -c \"col -b -x | vim -R \
+		--cmd 'let g:vimpager = 1' \
+		-c 'set ft=man nomod nolist nomodifiable' \
+		-c 'set nonumber norelativenumber' \
+		-c 'nnoremap <silent><buffer> q :q<cr>' \
+		-c 'map <space> <c-d>' \
+		-c 'map b <c-u>' -\"
+	EOF
+	export PAGER MANPAGER
 fi
 
 # }}}
@@ -104,31 +113,21 @@ if [ ! -e "$HOME/.ssh/config" ]; then
 	EOF
 fi
 
-if which gpg-agent &> /dev/null; then
-	# Use ssh-add once to add an ssh key to the list of keys managed by
-	# gnupg-agent
-	if ! ps -C gpg-agent &> /dev/null; then
-		ttl=2592000 # 1 month
-		gpg-agent --daemon --enable-ssh-support \
-			--write-env-file $HOME/.gpg-agent-env \
-			--default-cache-ttl $ttl \
-			--default-cache-ttl-ssh $ttl \
-			--max-cache-ttl $ttl \
-			--max-cache-ttl-ssh $ttl
-	fi
-	if [[ -r $HOME/.gpg-agent-env ]]; then
-		. $HOME/.gpg-agent-env > /dev/null
-		export GPG_AGENT_INFO SSH_AUTH_SOCK SSH_AGENT_PID
-	fi
-elif which ssh-agent &> /dev/null; then
-	# ensure ssh agent is running
-	if ! ps -C ssh-agent &> /dev/null; then
-		ssh-agent > $HOME/.ssh-env
-	fi
-	if [[ -r $HOME/.ssh-env ]]; then
-		. $HOME/.ssh-env > /dev/null
-	fi
-fi
+# if which gpg-agent &> /dev/null; then
+# 	if ! ps -C gpg-agent &> /dev/null; then
+# 		ttl=2592000 # 1 month
+# 		gpg-agent --daemon --enable-ssh-support \
+# 			--write-env-file $HOME/.gpg-agent-env \
+# 			--default-cache-ttl $ttl \
+# 			--default-cache-ttl-ssh $ttl \
+# 			--max-cache-ttl $ttl \
+# 			--max-cache-ttl-ssh $ttl
+# 	fi
+# 	if [[ -r $HOME/.gpg-agent-env ]]; then
+# 		. $HOME/.gpg-agent-env > /dev/null
+# 		export GPG_AGENT_INFO SSH_AUTH_SOCK SSH_AGENT_PID
+# 	fi
+# fi
 
 # }}}
 # Site initialization {{{

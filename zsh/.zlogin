@@ -6,18 +6,18 @@
 
 # X Keyboard {{{
 
-if [[ -z $X11_WINDOWS ]]; then
-	if which setxkbmap &> /dev/null; then
-		setxkbmap us_intl
-		# setxkbmap -model abnt2 -layout br -variant abnt2
-	fi
-	if which xmodmap &> /dev/null; then
-		xmodmap - <<- EOF
-		clear Lock
-		keycode 0x42 = Control_L
-		EOF
-	fi
-fi
+# if [[ -z $X11_WINDOWS ]]; then
+# 	if which setxkbmap &> /dev/null; then
+# 		setxkbmap us_intl
+# 		# setxkbmap -model abnt2 -layout br -variant abnt2
+# 	fi
+# 	if which xmodmap &> /dev/null; then
+# 		xmodmap - <<- EOF
+# 		clear Lock
+# 		keycode 0x42 = Control_L
+# 		EOF
+# 	fi
+# fi
 
 # }}}
 # Site initialization {{{

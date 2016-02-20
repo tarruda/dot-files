@@ -1,5 +1,5 @@
 ! urxvt
-urxvt*loginShell: True
+*loginShell: True
 urxvt*iso14755_52: False
 urxvt*iconFile: /usr/share/icons/Faenza/apps/48/utilities-terminal.png
 urxvt*perl-lib: .config/urxvt

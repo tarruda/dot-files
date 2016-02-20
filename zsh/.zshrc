@@ -252,23 +252,23 @@ dis() {
 	 	-e 's/#/;/g' | vim -c 'setf asm' -c 'set syntax=nasm' -
 }
 
-# wrapper for reading man pages
+# # wrapper for reading man pages
 
-man() {
-	local pager=$PAGER
-	if which vim &> /dev/null; then
-		read pager <<- EOF
-		zsh -c \"col -b -x | vim -R \
-			--cmd 'let g:disable_addons = 1' \
-			-c 'set ft=man nomod nolist nomodifiable' \
-			-c 'set nonumber norelativenumber' \
-			-c 'map q :q<cr>' \
-			-c 'map <space> <c-d>' \
-			-c 'map b <c-u>' -\"
-		EOF
-	fi
-	PAGER=$pager command man "$@"
-}
+# man() {
+# 	local pager=$PAGER
+# 	if which vim &> /dev/null; then
+# 		read pager <<- EOF
+# 		zsh -c \"col -b -x | vim -R \
+# 			--cmd 'let g:disable_addons = 1' \
+# 			-c 'set ft=man nomod nolist nomodifiable' \
+# 			-c 'set nonumber norelativenumber' \
+# 			-c 'map q :q<cr>' \
+# 			-c 'map <space> <c-d>' \
+# 			-c 'map b <c-u>' -\"
+# 		EOF
+# 	fi
+# 	PAGER=$pager command man "$@"
+# }
 
 # }}}
 # Aliases {{{
@@ -371,6 +371,21 @@ raw-aes256-dec() {
 }
 
 # }}}
+# Lxc {{{
+if which lxc-create &> /dev/null; then
+	lxc-create() { HOME=/data/lxc command lxc-create "$@" }
+	lxc-destroy() { HOME=/data/lxc command lxc-destroy "$@" }
+	lxc-start() { HOME=/data/lxc command lxc-start "$@" }
+	lxc-stop() { HOME=/data/lxc command lxc-stop "$@" }
+	lxc-autostart() { HOME=/data/lxc command lxc-autostart "$@" }
+	lxc-attach() { HOME=/data/lxc command lxc-attach "$@" }
+	lxc-ls() { HOME=/data/lxc command lxc-ls "$@" }
+	lxc-info() { HOME=/data/lxc command lxc-info "$@" }
+	lxc-snapshot() { HOME=/data/lxc command lxc-snapshot "$@" }
+	lxc-clone() { HOME=/data/lxc command lxc-clone "$@" }
+fi
+
+# }}}
 # Encfs {{{
 
 # mount many encfs volumes using a single key
@@ -423,47 +438,6 @@ alias DELETE='burl DELETE'
 alias OPTIONS='burl OPTIONS'
 
 # }}}
-
-# }}}
-# SSH/GnuPG {{{
-
-if ! which gpg-agent &> /dev/null; then
-	# Invoke ssh-add on demand, not needed if using gnupg-agent(but ssh-add has to
-	# be invoked one time to add it to the list of gnupg-agent managed keys)
-	git() {
-		case $1 in
-			pull|push|fetch)
-				local remote=$2
-				if [[ -z $remote ]]; then
-					# remote wasn't specified so we have to find it by looking at
-					# which remote branch the current branch is tracking
-					local current_branch="`command git branch | grep '^*'`"
-					current_branch=${current_branch#\*\ }
-					local line=
-					command git for-each-ref --format='%(refname:short)<-%(upstream:short)' refs/heads | while read line; do
-					if [[ ${line%%\<\-*} == $current_branch ]]; then
-						remote=${line#*<-}
-						remote=${remote%%/*}
-						break
-					fi
-				done
-			fi
-			# now find out the url
-			local grepLine='Fetch'
-			[[ $1 == push ]] && grepLine='Push'
-			local url="`git remote show "$remote" -n | grep "$grepLine"`"
-			url="${url#*$grepLine*\:\ }"
-			case $url in
-				*@*|ssh://*)
-					# needs SSH key, so invoke ssh-add if needed
-					ssh-add -l &> /dev/null || ssh-add
-			esac
-			;;
-	esac
-
-	command git "$@"
-}
-fi
 
 # }}}
 # Tmux {{{
@@ -759,6 +733,6 @@ fi
 unset plugin
 # }}}
 
-if [[ -e /etc/zshenv ]]; then
-       print "/etc/zshenv exists, you probably want to move it to /etc/zprofile"
-fi
+# if [[ -e /etc/zshenv || -e /etc/zsh/zshenv ]]; then
+#        print "/etc/zshenv exists, you probably want to move it to /etc/zprofile"
+# fi

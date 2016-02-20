@@ -167,6 +167,9 @@ function! VimrcLoadMappings()
   vnoremap <silent> <c-j> :m '>+1<cr>gv=gv
   vnoremap <silent> <c-k> :m '<-2<cr>gv=gv
   " }}}
+  " Editing {{{
+  nnoremap <leader>gf :e <cfile><cr>
+  " }}}
   " Quickfix/location list {{{
   augroup quick_loc_list
     au! BufWinEnter quickfix nnoremap <silent> <buffer>
@@ -232,7 +235,9 @@ function! VimrcLoadSettings()
   set hlsearch " highlight previous search matches
   set showmatch " briefly jump to the matching bracket on insert
   set matchtime=2 " time in decisecons to jump back from matching bracket 
-  set textwidth=80 " number of character allowed in a line
+  if !exists('g:vimpager')
+    set textwidth=80 " number of character allowed in a line
+  endif
   set wrap " automatically wrap text when 'textwidth' is reached
   set foldmethod=indent " by default, fold using indentation
   set nofoldenable " don't fold by default
@@ -339,7 +344,7 @@ function! VimrcLoadColors()
     highlight Comment cterm=italic
   endif
   highlight ColorColumn ctermbg=235 guibg=#2c2d27
-  let &colorcolumn=join(range(81,999),",")
+  let &colorcolumn='+'.join(range(1,200),",+")
 endfunction
 " }}}
 " Terminal {{{
@@ -407,7 +412,7 @@ if !exists('g:vimrc_initialized')
   let g:plugins_dir = g:rc_dir.'/plugged'
   let g:vim_plug_dir = g:plugins_dir.'/vim-plug'
   let &runtimepath = g:rc_dir.','.g:vim_plug_dir.','.$VIMRUNTIME
-  if !exists('g:disable_plugins')
+  if !exists('g:vimpager')
     let g:has_python = has('python')
     call VimrcLoadPlugins()
   else

@@ -1,0 +1,16 @@
+[Unit]
+Description=Automatically start/stop unprivileged containers for one user
+ConditionPathExists=/opt/lxc-scripts/lxc-autostart.tcl
+ConditionPathExists=/opt/lxc-scripts/lxc-autostop.tcl
+ConditionPathExists=/home/%I/.lxc-auto
+After=multi-user.target
+
+[Service]
+User=%I
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/opt/lxc-scripts/lxc-autostart.tcl
+ExecStop=/opt/lxc-scripts/lxc-autostop.tcl
+
+[Install]
+WantedBy=multi-user.target
