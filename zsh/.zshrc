@@ -371,6 +371,42 @@ raw-aes256-dec() {
 }
 
 # }}}
+# Music {{{
+beet-query() {
+	local cmd query
+	local -a o_limit o_shuffle o_path
+	o_limit=(-l 50)
+	zparseopts -K -D -- l:=o_limit s=o_shuffle p=o_path
+	query="$@"
+	if [[ -n $o_path[1] ]]; then
+		query="-p $@"
+	fi
+	
+	if [[ -n $o_shuffle[1] ]]; then
+		cmd="random -e"
+		if [[ -n $o_limit[2] ]]; then
+			cmd="$cmd -n $o_limit[2]"
+		fi
+		cmd="$cmd $query"
+	else
+		cmd="list $query"
+		if [[ -n $o_limit[2] ]]; then
+			cmd="$cmd | head -n $o_limit[2]"
+		fi
+	fi
+	if [[ -n $o_path[1] ]]; then
+		eval "command beet $cmd" | sed "s:$HOME/Music/::"
+	else
+		eval "command beet $cmd"
+	fi
+}
+
+mpd-play() {
+	mpc clear
+	beet-query "$@" | mpc add
+	mpc play
+}
+# }}}
 # Lxc {{{
 if which lxc-create &> /dev/null; then
 	lxc-create() { HOME=/data/lxc command lxc-create "$@" }
