@@ -1,0 +1,11 @@
+directory: ~/Music
+library: ~/Music/beets.blb
+plugins: web smartplaylist mpdupdate fetchart lyrics lastgenre random
+import:
+  resume: ask
+smartplaylist:
+  relative_to: ~/Music
+  playlist_dir: ~/Music/.playlists
+  playlists:
+    - name: all.m3u
+      query: ''
