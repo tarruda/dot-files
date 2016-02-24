@@ -403,7 +403,7 @@ beet-query() {
 
 mpd-play() {
 	mpc clear
-	beet-query "$@" | mpc add
+	beet-query -p "$@" | mpc add
 	mpc play
 }
 # }}}

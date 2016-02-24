@@ -1,6 +1,6 @@
 directory: ~/Music
 library: ~/Music/beets.blb
-plugins: web smartplaylist mpdupdate fetchart lyrics lastgenre random
+plugins: web smartplaylist mpdupdate fetchart lyrics lastgenre random convert
 import:
   resume: ask
 smartplaylist:
