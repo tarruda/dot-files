@@ -1,4 +1,7 @@
-## Host/container configuration
+## host/container configuration
+
+- Create a container using the "download" template:
+  `lxc-create -t download -n CONTAINER -- -d ubuntu -a amd64 -r xenial`
 
 - Edit /etc/{subuid,subgid}. Each file should contain a line like `USER:100000:1000000`
   where USER is your username, 100000 is the first host id that belongs to USER
@@ -43,7 +46,16 @@
     lxc.id_map = u    0   100000     65535
     lxc.id_map = g    0   100000     65535
 
-# Convert from existing privileged container
+# convert from existing privileged container
+
+Sometimes using the "download" template is not an option(such as when installing
+an old ubuntu distro like this:
+
+```sh
+sudo lxc-create -t ubuntu -n CONTAINER -B dir -- -r utopic -a amd64 --mirror http://old-releases.ubuntu.com/ubuntu --security-mirror http://old-releases.ubuntu.com/ubuntu
+```
+
+So here are instructions for converting a privileged container to unprivileged:
 
 - copy the rootfs from the privileged container:
   `sudo rsync -avP /var/lib/lxc/CONTAINER/rootfs/ ~/.local/share/lxc/CONTAINER/rootfs/
