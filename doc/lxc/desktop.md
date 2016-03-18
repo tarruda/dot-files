@@ -43,8 +43,8 @@ end script
 Spawn programs using ssh, eg:
 
 ```sh
-ssh container DISPLAY=:100 setsid urxvt &
-ssh container DISPLAY=:100 setsid chromium-browser &
+ssh CONTAINER DISPLAY=:100 setsid urxvt &
+ssh CONTAINER DISPLAY=:100 setsid chromium-browser &
 ```
 
 ## full desktop through xpra
@@ -99,7 +99,7 @@ setsid xpra attach --sharing=yes :100 &
 exec xfce4-session
 ```
 
-So any applications spawned like `ssh container DISPLAY=:100 setsid urxvt &`
+So any applications spawned like `ssh CONTAINER DISPLAY=:100 setsid urxvt &`
 would also be visible in the desktop.
 
 ## attaching from the host
@@ -109,7 +109,7 @@ on the container, this should work:
 
 ```sh
 mkdir ~/.xpra/mmap
-TMPDIR=$HOME/.xpra/mmap xpra attach --sharing=yes socket:$HOME/.xpra/container-${XPRA_DISPLAY}
+TMPDIR=$HOME/.xpra/mmap xpra attach --sharing=yes socket:$HOME/.xpra/CONTAINER-${XPRA_DISPLAY}
 ```
 
 Where `${XPRA_DISPLAY}` is the display of the xpra server you want to connect.
@@ -124,3 +124,17 @@ servers(possibly because /tmp is not used by X).
 
 The TMPDIR and socket URL can probably be skipped by also bind mounting the
 host's /tmp to the container, but I prefer to not do it for security reasons.
+
+## scripting examples
+
+Send key to the xpra desktop:
+
+```sh
+ssh CONTAINER DISPLAY=:201 xdotool key "alt+Tab"
+```
+
+Take screenshot(requires the `scrot` command to be installed):
+
+```sh
+sh -c 'ssh CONTAINER DISPLAY=:201 scrot screen.png' && scp CONTAINER:screen.png ./ && xdg-open screen.png
+```
