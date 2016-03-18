@@ -104,13 +104,18 @@ on the container, this should work:
 
 ```sh
 mkdir ~/.xpra/mmap
-TMPDIR=$HOME/.xpra/mmap xpra attach socket:$HOME/.xpra/container-${XPRA_DISPLAY}
+TMPDIR=$HOME/.xpra/mmap xpra attach --sharing=yes socket:$HOME/.xpra/container-${XPRA_DISPLAY}
 ```
 
 Where `${XPRA_DISPLAY}` is the display of the xpra server you want to connect.
+`--sharing=yes` should only be used if the server was also started with this
+option.
+
 Specifying TMPDIR is required because by default `/tmp` is used to store mmapped
-files. It is required to use the `socket:` URL because xpra fails to find local
-live servers(possibly because /tmp is not used by X).
+files.
+
+The `socket:` URL is required because xpra fails to find local live
+servers(possibly because /tmp is not used by X).
 
 The TMPDIR and socket URL can probably be skipped by also bind mounting the
 host's /tmp to the container, but I prefer to not do it for security reasons.
