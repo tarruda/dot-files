@@ -2,12 +2,17 @@
 
 For best results:
 
-- Install xpra from latest source tarball(uncomment '-Wno-strict-prototypes'
+- Install xpra from latest source tarball(uncomment '-Wno-error=strict-prototypes'
   flag from setup.py or it may fail compilation).
 - Bind mount the host's ~/.xpra directory to the container by adding something
   like this to the configuration:
-
+    
     lxc.mount.entry = /home/tarruda/.xpra home/tarruda/.xpra none bind,create=dir 0 0
+
+- Install required opengl packages on both client and server:
+
+    sudo pip install PyOpenGL PyOpenGL_accelerate
+    sudo apt-get install python-gtkglext1
 
 Create a service script to automatically run xpra on boot. For upstart, put the
 following into /etc/init/xpra.conf:
